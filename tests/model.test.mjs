@@ -4,9 +4,14 @@ import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
 const {
+  demoBooks,
   demoLessons,
+  getBookProgress,
+  getBookStartIndex,
+  getPositionIndex,
   getProgress,
   nextLessonIndex,
+  savePosition,
   toggleFavorite,
   toTraditional,
   updateNote
@@ -22,6 +27,23 @@ test("阅读进度限制在当前样例路线范围内", () => {
   assert.equal(getProgress(3, 7), 50);
   assert.equal(getProgress(99, 7), 100);
   assert.equal(getProgress(0, 0), 0);
+});
+
+test("九部书都进入默认演示路线，书目次序与阅读次序一致", () => {
+  assert.deepEqual([...new Set(demoLessons.map((lesson) => lesson.bookId))], demoBooks.map((book) => book.id));
+  assert.equal(getBookStartIndex("daxue"), 0);
+  assert.equal(demoLessons[getBookStartIndex("chunqiu")].bookId, "chunqiu");
+});
+
+test("阅读位置按书独立保存，切换书目时可从原位置继续", () => {
+  const positions = savePosition({}, "lunyu", "lunyu-xueer-01-02");
+  assert.equal(getPositionIndex("lunyu", positions), 3);
+  assert.equal(getPositionIndex("mengzi", positions), getBookStartIndex("mengzi"));
+});
+
+test("每部书的完成进度只计算该书已经读过的样句", () => {
+  assert.equal(getBookProgress(["daxue-jing-01"], "daxue"), 100);
+  assert.equal(getBookProgress(["daxue-jing-01"], "zhongyong"), 0);
 });
 
 test("收藏可以添加和移除", () => {

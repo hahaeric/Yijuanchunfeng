@@ -16,8 +16,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const {
   demoBooks,
   demoLessons,
+  getBookProgress,
+  getPositionIndex,
   getProgress,
   nextLessonIndex,
+  savePosition,
   toggleFavorite,
   toTraditional,
   updateNote
@@ -96,6 +99,8 @@ export default function App() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [favorites, setFavorites] = useState([]);
   const [notes, setNotes] = useState({});
+  const [positions, setPositions] = useState({});
+  const [readLessonIds, setReadLessonIds] = useState([]);
   const [todayReadIds, setTodayReadIds] = useState([]);
   const [settings, setSettings] = useState(defaultSettings);
   const [storageReady, setStorageReady] = useState(false);
@@ -126,6 +131,8 @@ export default function App() {
         setScreen(saved.screen || "today");
         setFavorites(Array.isArray(saved.favorites) ? saved.favorites : []);
         setNotes(saved.notes && typeof saved.notes === "object" ? saved.notes : {});
+        setPositions(saved.positions && typeof saved.positions === "object" ? saved.positions : {});
+        setReadLessonIds(Array.isArray(saved.readLessonIds) ? saved.readLessonIds : []);
         setSettings({ ...defaultSettings, ...(saved.settings || {}) });
         setSavedTab(saved.savedTab || "favorites");
         if (saved.dateKey === localDateKey() && Array.isArray(saved.todayReadIds)) {
@@ -152,13 +159,15 @@ export default function App() {
       screen,
       favorites,
       notes,
+      positions,
+      readLessonIds,
       settings,
       savedTab,
       todayReadIds,
       dateKey: todayKey.current
     };
     AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(payload)).catch(() => {});
-  }, [storageReady, currentIndex, screen, favorites, notes, settings, savedTab, todayReadIds]);
+  }, [storageReady, currentIndex, screen, favorites, notes, positions, readLessonIds, settings, savedTab, todayReadIds]);
 
   function notify(message) {
     setToast(message);
@@ -168,6 +177,7 @@ export default function App() {
 
   function markCurrentRead() {
     setTodayReadIds((previous) => previous.includes(currentLesson.id) ? previous : [...previous, currentLesson.id]);
+    setReadLessonIds((previous) => previous.includes(currentLesson.id) ? previous : [...previous, currentLesson.id]);
   }
 
   function continueReading() {
@@ -176,19 +186,40 @@ export default function App() {
       notify("已经读到本地演示样例的末尾。");
       return;
     }
-    setCurrentIndex(nextLessonIndex(currentIndex));
+    const nextIndex = nextLessonIndex(currentIndex);
+    const followingLesson = demoLessons[nextIndex];
+    setPositions((previous) =>
+      savePosition(savePosition(previous, currentLesson.bookId, currentLesson.id), followingLesson.bookId, followingLesson.id)
+    );
+    setCurrentIndex(nextIndex);
     setGlossOpen(false);
     setTranslationOpen(false);
     setAnnotationOpen(false);
     setNoteOpen(false);
     setNoteDraft("");
     scrollRef.current?.scrollTo({ y: 0, animated: false });
-    notify("进度已保存，继续读下一句。");
+    notify(followingLesson.bookId === currentLesson.bookId
+      ? "进度已保存，继续读下一句。"
+      : "已进入《" + followingLesson.book + "》的顺序样例。");
   }
 
   function stopReading() {
     markCurrentRead();
+    setPositions((previous) => savePosition(previous, currentLesson.bookId, currentLesson.id));
     notify("阅读位置已保存，下次从这里继续。");
+  }
+
+  function selectBook(bookId) {
+    const index = getPositionIndex(bookId, positions);
+    if (index < 0) return;
+    setCurrentIndex(index);
+    setPositions((previous) => savePosition(previous, bookId, demoLessons[index].id));
+    setScreen("today");
+    setGlossOpen(false);
+    setTranslationOpen(false);
+    setAnnotationOpen(false);
+    setNoteOpen(false);
+    scrollRef.current?.scrollTo({ y: 0, animated: false });
   }
 
   function toggleCurrentFavorite() {
@@ -206,6 +237,7 @@ export default function App() {
     const index = demoLessons.findIndex((lesson) => lesson.id === lessonId);
     if (index < 0) return;
     setCurrentIndex(index);
+    setPositions((previous) => savePosition(previous, demoLessons[index].bookId, demoLessons[index].id));
     setScreen("today");
     setNoteOpen(false);
     setGlossOpen(false);
@@ -248,7 +280,12 @@ export default function App() {
   }
 
   function renderToday() {
-    const progress = getProgress(currentIndex, demoLessons.length);
+    const routeProgress = getProgress(currentIndex, demoLessons.length);
+    const bookProgress = getBookProgress(readLessonIds, currentLesson.bookId);
+    const bookLessons = demoLessons.filter((lesson) => lesson.bookId === currentLesson.bookId);
+    const bookLessonPosition = bookLessons.findIndex((lesson) => lesson.id === currentLesson.id) + 1;
+    const previousContext = previousLesson && previousLesson.bookId === currentLesson.bookId && previousLesson.chapter === currentLesson.chapter ? previousLesson : null;
+    const nextContext = nextLesson && nextLesson.bookId === currentLesson.bookId && nextLesson.chapter === currentLesson.chapter ? nextLesson : null;
     const favorite = favorites.includes(currentLesson.id);
     const note = notes[currentLesson.id] || "";
     return (
@@ -286,11 +323,11 @@ export default function App() {
           </View>
 
           <View style={styles.contextBlock}>
-            {previousLesson ? <Text style={styles.contextLine}><Text style={styles.contextTag}>上句　</Text>{safeTraditional(previousLesson.text, settings.script === "traditional")}</Text> : <View style={styles.contextSpacer} />}
+            {previousContext ? <Text style={styles.contextLine}><Text style={styles.contextTag}>上句　</Text>{safeTraditional(previousContext.text, settings.script === "traditional")}</Text> : <View style={styles.contextSpacer} />}
             <View style={[styles.quotePanel, settings.layout === "vertical" && styles.quotePanelVertical]}>
               {renderCurrentSentence()}
             </View>
-            {nextLesson ? <Text style={[styles.contextLine, styles.contextNext]}><Text style={styles.contextTag}>下句　</Text>{safeTraditional(nextLesson.text, settings.script === "traditional")}</Text> : <View style={styles.contextSpacer} />}
+            {nextContext ? <Text style={[styles.contextLine, styles.contextNext]}><Text style={styles.contextTag}>下句　</Text>{safeTraditional(nextContext.text, settings.script === "traditional")}</Text> : <View style={styles.contextSpacer} />}
           </View>
           <Text style={styles.citation}>{currentLesson.citation}</Text>
           <Text style={styles.tapHint}>{settings.layout === "vertical" ? "点选“" + safeTraditional(currentLesson.term, settings.script === "traditional") + "”查看释义" : "点选原文中的词语查看释义"}</Text>
@@ -352,17 +389,18 @@ export default function App() {
               <Text style={styles.nextButtonArrow}>→</Text>
             </Pressable>
           </View>
-          <Text style={styles.demoDisclaimer}>本页是手机 App 交互原型：仅有《论语·学而》部分顺序样例，译文和注释均为模拟内容。</Text>
+          <Text style={styles.demoDisclaimer}>本页为手机 App 原型：九部书各有开篇样句，尚非校订全文；译文与注释均为演示内容。</Text>
         </View>
 
         <View style={styles.pathCard}>
           <View style={styles.pathHeader}><Text style={styles.pathTitle}>阅读位置</Text><Pressable onPress={() => setScreen("library")}><Text style={styles.pathLink}>查看目录　→</Text></Pressable></View>
           <View style={styles.pathRow}>
-            <View style={styles.pathSeal}><Text style={styles.pathSealText}>论</Text></View>
-            <View style={styles.pathCopy}><Text style={styles.pathBookTitle}>《论语》· {currentLesson.chapter}篇</Text><Text style={styles.pathBookSubtitle}>本地样例 {currentIndex + 1} / {demoLessons.length} 句</Text></View>
-            <Text style={styles.pathPercent}>{progress}%</Text>
+            <View style={styles.pathSeal}><Text style={styles.pathSealText}>{currentLesson.book.slice(0, 1)}</Text></View>
+            <View style={styles.pathCopy}><Text style={styles.pathBookTitle}>《{currentLesson.book}》· {currentLesson.chapter}</Text><Text style={styles.pathBookSubtitle}>本书样例 {bookLessonPosition} / {bookLessons.length} 句 · 路线 {currentIndex + 1}/{demoLessons.length}</Text></View>
+            <Text style={styles.pathPercent}>{bookProgress}%</Text>
           </View>
-          <View style={styles.progressTrack}><View style={[styles.progressFill, { width: progress + "%" }]} /></View>
+          <View style={styles.progressTrack}><View style={[styles.progressFill, { width: bookProgress + "%" }]} /></View>
+          <Text style={styles.pathBookSubtitle}>演示路线进度 {routeProgress}%</Text>
         </View>
       </ScrollView>
     );
@@ -378,8 +416,8 @@ export default function App() {
           <Text style={styles.screenSubtitle}>按书与篇章顺序推进，读到哪里就从哪里继续。</Text>
         </View>
         <View style={styles.routeNotice}>
-          <Text style={styles.routeNoticeTitle}>从《论语·学而》开始体验</Text>
-          <Text style={styles.routeNoticeText}>九部经典的完整路线、底本与篇章目录，将在内容方案确定后补齐。</Text>
+          <Text style={styles.routeNoticeTitle}>九部经典已接入顺序样例</Text>
+          <Text style={styles.routeNoticeText}>大学 → 中庸 → 论语 → 孟子 → 诗经 → 尚书 → 礼记 → 周易 → 春秋。每部目前只含开篇样句，用于体验跨书阅读和进度保存。</Text>
         </View>
         {groups.map((group) => {
           const books = demoBooks.filter((book) => book.group === group);
@@ -387,26 +425,32 @@ export default function App() {
             <View key={group} style={styles.catalogGroup}>
               <View style={styles.catalogHeading}><Text style={styles.catalogTitle}>{group}</Text><Text style={styles.catalogCount}>{books.length} 部</Text></View>
               <View style={styles.bookGrid}>
-                {books.map((book) => (
-                  <Pressable
-                    key={book.title}
-                    disabled={!book.active}
-                    onPress={() => setScreen("today")}
-                    style={({ pressed }) => [styles.bookCard, book.active && styles.bookCardActive, pressed && book.active && styles.pressed]}
-                  >
-                    <View style={styles.bookCardTop}>
-                      <View style={[styles.bookSeal, book.active && styles.bookSealActive]}><Text style={[styles.bookSealText, book.active && styles.bookSealTextActive]}>{book.title.slice(0, 1)}</Text></View>
-                      <Text style={[styles.bookStatus, book.active && styles.bookStatusActive]}>{book.status}</Text>
-                    </View>
-                    <Text style={styles.bookName}>{book.title}</Text>
-                    <Text style={styles.bookHint}>{book.active ? "点击继续当前样例" : "待加入演示路线"}</Text>
-                  </Pressable>
-                ))}
+                {books.map((book) => {
+                  const progress = getBookProgress(readLessonIds, book.id);
+                  const selected = currentLesson.bookId === book.id;
+                  const savedId = positions[book.id];
+                  const savedLesson = demoLessons.find((lesson) => lesson.id === savedId);
+                  const status = selected ? "正在阅读" : progress === 100 ? "已读完样例" : progress > 0 ? "读过 " + progress + "%" : "尚未开始";
+                  return (
+                    <Pressable
+                      key={book.title}
+                      onPress={() => selectBook(book.id)}
+                      style={({ pressed }) => [styles.bookCard, (selected || progress > 0) && styles.bookCardActive, pressed && styles.pressed]}
+                    >
+                      <View style={styles.bookCardTop}>
+                        <View style={[styles.bookSeal, (selected || progress > 0) && styles.bookSealActive]}><Text style={[styles.bookSealText, (selected || progress > 0) && styles.bookSealTextActive]}>{book.title.slice(0, 1)}</Text></View>
+                        <Text style={[styles.bookStatus, (selected || progress > 0) && styles.bookStatusActive]}>{status}</Text>
+                      </View>
+                      <Text style={styles.bookName}>{book.title}</Text>
+                      <Text style={styles.bookHint}>{savedLesson ? "从上次位置继续" : "进入开篇样句"}</Text>
+                    </Pressable>
+                  );
+                })}
               </View>
             </View>
           );
         })}
-        <Text style={styles.catalogFootnote}>灰色卡片尚未载入演示正文。当前样例用于体验手机阅读流程，不代表最终书目顺序。</Text>
+        <Text style={styles.catalogFootnote}>当前九部书的文本均为短样例。正式上线前需确认底本、标点、完整篇章和默认阅读顺序。</Text>
       </ScrollView>
     );
   }
