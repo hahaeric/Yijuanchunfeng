@@ -1,4 +1,4 @@
-export const demoLessons = [
+const demoLessons = [
   {
     id: "lunyu-xueer-01-01",
     book: "论语",
@@ -73,7 +73,7 @@ export const demoLessons = [
   }
 ];
 
-export const demoBooks = [
+const demoBooks = [
   { group: "四书", title: "大学", status: "路线待定" },
   { group: "四书", title: "中庸", status: "路线待定" },
   { group: "四书", title: "论语", status: "演示内容", active: true },
@@ -85,29 +85,49 @@ export const demoBooks = [
   { group: "五经", title: "春秋", status: "路线待定" }
 ];
 
-export function nextLessonIndex(index, lessons = demoLessons) {
+const traditionalCharacters = {
+  学: "學", 时: "時", 习: "習", 说: "說", 远: "遠", 来: "來", 乐: "樂",
+  愠: "慍", 为: "為", 鲜: "鮮", 乱: "亂", 务: "務", 与: "與", 令: "令",
+  谋: "謀", 传: "傳", 还: "還"
+};
+
+function nextLessonIndex(index, lessons = demoLessons) {
   if (lessons.length === 0) return -1;
   const current = Math.max(0, Math.min(index, lessons.length - 1));
   return Math.min(current + 1, lessons.length - 1);
 }
 
-export function toggleFavorite(favorites, lessonId) {
+function toggleFavorite(favorites, lessonId) {
   return favorites.includes(lessonId)
     ? favorites.filter((id) => id !== lessonId)
     : [...favorites, lessonId];
 }
 
-export function getProgress(index, total) {
+function getProgress(index, total) {
   if (total <= 0) return 0;
   if (total === 1) return 100;
   const current = Math.max(0, Math.min(index, total - 1));
   return Math.round((current / (total - 1)) * 100);
 }
 
-export function updateNote(notes, lessonId, value) {
+function updateNote(notes, lessonId, value) {
   const next = { ...notes };
   const note = value.trim();
   if (note) next[lessonId] = note;
   else delete next[lessonId];
   return next;
 }
+
+function toTraditional(value) {
+  return [...value].map((character) => traditionalCharacters[character] || character).join("");
+}
+
+module.exports = {
+  demoBooks,
+  demoLessons,
+  getProgress,
+  nextLessonIndex,
+  toggleFavorite,
+  toTraditional,
+  updateNote
+};

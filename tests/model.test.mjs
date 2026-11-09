@@ -1,12 +1,16 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {
+import { createRequire } from "node:module";
+
+const require = createRequire(import.meta.url);
+const {
   demoLessons,
   getProgress,
   nextLessonIndex,
   toggleFavorite,
+  toTraditional,
   updateNote
-} from "../src/model.mjs";
+} = require("../mobile/src/model.js");
 
 test("阅读位置按顺序前进并停在演示内容末尾", () => {
   assert.equal(nextLessonIndex(0), 1);
@@ -30,4 +34,8 @@ test("笔记保存时去掉首尾空格，空内容会删除笔记", () => {
   const saved = updateNote({}, "lesson-1", "  这是一条笔记  ");
   assert.equal(saved["lesson-1"], "这是一条笔记");
   assert.deepEqual(updateNote(saved, "lesson-1", "  "), {});
+});
+
+test("繁简切换只转换演示数据中包含的字", () => {
+  assert.equal(toTraditional("学而时习之，不亦说乎？"), "學而時習之，不亦說乎？");
 });

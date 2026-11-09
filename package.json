@@ -1,9 +1,13 @@
 {
-  "name": "jingri-classics-reading-demo",
+  "name": "jingri-mobile-demo",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "scripts": {
+    "start": "npm --prefix mobile start",
+    "web": "npm --prefix mobile run web",
+    "android": "npm --prefix mobile run android",
+    "ios": "npm --prefix mobile run ios",
     "test": "node --test"
   }
 }
