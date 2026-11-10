@@ -33,6 +33,47 @@ const expectedBooks = [
   ["chunqiu", "春秋", 12, 517]
 ];
 
+function assertPhrasePinyin(lesson, phrase, expected, fromIndex = 0) {
+  const textIndex = lesson.text.indexOf(phrase, fromIndex);
+  assert.notEqual(textIndex, -1, `${lesson.id} 缺少待校订词组 ${phrase}`);
+  const start = [...lesson.text.slice(0, textIndex)].length;
+  assert.deepEqual(lesson.pinyinUnits.slice(start, start + [...phrase].length), expected, `${lesson.id}: ${phrase}`);
+}
+
+function assertEveryPhrasePinyin(phrase, expected, predicate = () => true) {
+  let occurrences = 0;
+  for (const lesson of demoLessons) {
+    if (!predicate(lesson)) continue;
+    let from = 0;
+    while (true) {
+      const index = lesson.text.indexOf(phrase, from);
+      if (index < 0) break;
+      assertPhrasePinyin(lesson, phrase, expected, index);
+      occurrences += 1;
+      from = index + [...phrase][0].length;
+    }
+  }
+  assert.ok(occurrences > 0, `语料中应包含 ${phrase}`);
+}
+
+function assertEveryCharacterInPhrasePinyin(phrase, character, expected) {
+  let occurrences = 0;
+  for (const lesson of demoLessons) {
+    let from = 0;
+    while (true) {
+      const index = lesson.text.indexOf(phrase, from);
+      if (index < 0) break;
+      const start = [...lesson.text.slice(0, index)].length;
+      const offset = [...phrase].indexOf(character);
+      assert.notEqual(offset, -1, `${phrase} 不包含 ${character}`);
+      assert.equal(lesson.pinyinUnits[start + offset], expected, `${lesson.id}: ${phrase}`);
+      occurrences += 1;
+      from = index + [...phrase][0].length;
+    }
+  }
+  assert.ok(occurrences > 0, `语料中应包含 ${phrase}`);
+}
+
 test("九部书按阅读路线收录完整篇章结构和全部导入章句", () => {
   assert.deepEqual(
     demoBooks.map((book) => [book.id, book.title, book.chapterCount, book.lessonCount]),
@@ -77,6 +118,115 @@ test("每条原文都有拼音、简繁文本和出处，不再混入演示注�
   const yueJi = demoLessons.find((lesson) => lesson.bookId === "liji" && lesson.text.includes("乐者，心之动也"));
   const yueStart = [...yueJi.text.slice(0, yueJi.text.indexOf("乐者"))].length;
   assert.deepEqual(yueJi.pinyinUnits.slice(yueStart, yueStart + 2), ["yuè", "zhě"]);
+});
+
+test("古文常见多音字按上下文校订，并覆盖全库相关用例", () => {
+  const assertCharacterReading = (character, getExpected, predicate = () => true) => {
+    let count = 0;
+    for (const lesson of demoLessons) {
+      if (!predicate(lesson)) continue;
+      const chars = [...lesson.text];
+      chars.forEach((value, index) => {
+        if (value !== character) return;
+        assert.equal(lesson.pinyinUnits[index], getExpected(lesson, chars, index), `${lesson.id}:${chars.slice(Math.max(0, index - 4), index + 5).join("")}`);
+        count += 1;
+      });
+    }
+    assert.ok(count > 0, `语料中应包含 ${character}`);
+  };
+
+  assertCharacterReading("率", (lesson, chars, index) =>
+    chars[index - 1] === "彀" ? "lǜ" : "shuài");
+  assertCharacterReading("载", (lesson, chars, index) => {
+    if (lesson.text.includes("乘四载") && chars[index - 1] === "四") return "zǎi";
+    return index > 0 && "零〇一二三四五六七八九十百千万亿两".includes(chars[index - 1]) ? "zǎi" : "zài";
+  });
+  assertCharacterReading("行", (lesson, chars, index) => {
+    if (chars[index - 1] === "太" || chars[index + 1] === "列") return "háng";
+    return "xíng";
+  });
+  assertCharacterReading("予", (_lesson, chars, index) =>
+    chars.slice(Math.max(0, index - 1), index + 2).join("") === "以予之" ? "yǔ" : "yú");
+  assertCharacterReading("有", (lesson, chars, index) => {
+    const numerals = "零〇一二三四五六七八九十百千万亿两";
+    return index > 0 && index + 1 < chars.length
+      && numerals.includes(chars[index - 1]) && numerals.includes(chars[index + 1]) ? "yòu" : "yǒu";
+  });
+  assertCharacterReading("乘", (_lesson, chars, index) => {
+    if (chars.slice(Math.max(0, index - 2), index + 1).join("") === "畜马乘") return "shèng";
+    return index > 0 && "零〇一二三四五六七八九十百千万亿两".includes(chars[index - 1]) ? "shèng" : "chéng";
+  });
+
+  assertEveryPhrasePinyin("道之以政", ["dǎo", "zhī", "yǐ", "zhèng"]);
+  assertEveryPhrasePinyin("道之以德", ["dǎo", "zhī", "yǐ", "dé"]);
+  assertEveryPhrasePinyin("求之与", ["qiú", "zhī", "yú"]);
+  assertEveryPhrasePinyin("岁不我与", ["suì", "bù", "wǒ", "yǔ"]);
+  assertEveryPhrasePinyin("不我与", ["bù", "wǒ", "yǔ"]);
+  assertEveryPhrasePinyin("参与昴", ["cān", "yǔ", "mǎo"]);
+  assertEveryPhrasePinyin("与娱", ["yǔ", "yú"]);
+  assertEveryCharacterInPhrasePinyin("谁与", "与", "yǔ");
+  assertEveryPhrasePinyin("道之将行也与", ["dào", "zhī", "jiāng", "xíng", "yě", "yú"]);
+  assertEveryPhrasePinyin("道之将废也与", ["dào", "zhī", "jiāng", "fèi", "yě", "yú"]);
+  assertEveryPhrasePinyin("南方之强与", ["nán", "fāng", "zhī", "qiáng", "yú"]);
+  assertEveryPhrasePinyin("北方之强与", ["běi", "fāng", "zhī", "qiáng", "yú"]);
+  assertEveryPhrasePinyin("于予与何诛", ["yú", "yú", "yú", "hé", "zhū"]);
+  assertEveryPhrasePinyin("夫子圣者与", ["fū", "zǐ", "shèng", "zhě", "yú"]);
+  let sentenceFinalYuCount = 0;
+  for (const lesson of demoLessons) {
+    const chars = [...lesson.text];
+    chars.forEach((character, index) => {
+      if (character !== "与" || !["？", "?", "！", "!"].includes(chars[index + 1])) return;
+      const isLexicalVerb = chars[index - 1] === "谁"
+        || chars.slice(Math.max(0, index - 2), index + 1).join("") === "不我与";
+      assert.equal(lesson.pinyinUnits[index], isLexicalVerb ? "yǔ" : "yú", `${lesson.id}: ${chars.slice(Math.max(0, index - 4), index + 3).join("")}`);
+      sentenceFinalYuCount += 1;
+    });
+  }
+  assert.ok(sentenceFinalYuCount > 0);
+  assertEveryPhrasePinyin("大夫", ["dà", "fū"]);
+  assertEveryPhrasePinyin("吾日三省吾身", ["wú", "rì", "sān", "xǐng", "wú", "shēn"]);
+  assertEveryPhrasePinyin("退而省其私", ["tuì", "ér", "xǐng", "qí", "sī"]);
+  assertEveryPhrasePinyin("默而识之", ["mò", "ér", "zhì", "zhī"]);
+  assertEveryPhrasePinyin("多见而识之", ["duō", "jiàn", "ér", "zhì", "zhī"]);
+  assertEveryPhrasePinyin("多学而识之", ["duō", "xué", "ér", "zhì", "zhī"]);
+  assertEveryPhrasePinyin("小子识之", ["xiǎo", "zi", "zhì", "zhī"]);
+  assertEveryPhrasePinyin("数罟", ["cù", "gǔ"]);
+  assertEveryPhrasePinyin("事君数", ["shì", "jūn", "shuò"]);
+  assertEveryPhrasePinyin("朋友数", ["péng", "yǒu", "shuò"]);
+  assertEveryPhrasePinyin("称物平施", ["chèn", "wù", "píng", "shī"]);
+  assertEveryPhrasePinyin("絜矩", ["xié", "jǔ"]);
+  assertEveryPhrasePinyin("将子无怒", ["qiāng", "zǐ", "wú", "nù"]);
+  assertEveryPhrasePinyin("将仲子", ["qiāng", "zhòng", "zǐ"]);
+  assertEveryPhrasePinyin("将将", ["qiāng", "qiāng"]);
+  assertEveryPhrasePinyin("何以予之", ["hé", "yǐ", "yǔ", "zhī"]);
+  assertEveryPhrasePinyin("掌与女乘", ["zhǎng", "yǔ", "rǔ", "chéng"]);
+  assertEveryPhrasePinyin("予及女偕亡", ["yú", "jí", "rǔ", "xié", "wáng"]);
+  assertEveryPhrasePinyin("舍女所学", ["shě", "rǔ", "suǒ", "xué"]);
+  assertEveryPhrasePinyin("之女家", ["zhī", "rǔ", "jiā"]);
+  assertEveryPhrasePinyin("二女女焉", ["èr", "nǚ", "nǜ", "yān"]);
+  assertEveryPhrasePinyin("衣轻裘", ["yì", "qīng", "qiú"]);
+  assertEveryPhrasePinyin("衣敝缊袍", ["yì", "bì", "yùn", "páo"]);
+  assertEveryPhrasePinyin("冠者五六人", ["guàn", "zhě", "wǔ", "liù", "rén"]);
+  assertEveryPhrasePinyin("丈夫之冠", ["zhàng", "fu", "zhī", "guàn"]);
+  assertEveryPhrasePinyin("许子冠乎", ["xǔ", "zǐ", "guàn", "hū"]);
+  assertEveryPhrasePinyin("冠者未至", ["guàn", "zhě", "wèi", "zhì"]);
+
+  const lunyuWomen = demoLessons.filter((lesson) => lesson.bookId === "lunyu");
+  let addressedWomen = 0;
+  for (const lesson of lunyuWomen) {
+    const chars = [...lesson.text];
+    chars.forEach((character, index) => {
+      if (character !== "女") return;
+      const expected = chars[index + 1] === "子" || chars[index + 1] === "乐" ? "nǚ" : "rǔ";
+      assert.equal(lesson.pinyinUnits[index], expected, `${lesson.id}: 女`);
+      addressedWomen += 1;
+    });
+  }
+  assert.ok(addressedWomen > 0);
+
+  const dialogue = demoLessons.find((lesson) => lesson.text.startsWith("子禽问于子贡曰："));
+  assert.ok(dialogue.pinyin.includes("qiú zhī yú，yì yǔ zhī yú？"));
+  assert.equal(corpus.pinyin.method, "自动普通话注音，结合古文语境校订多音字");
 });
 
 test("《论语》按说话人分段，问答仍保留为同一则阅读内容", () => {
