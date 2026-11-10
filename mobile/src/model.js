@@ -104,6 +104,13 @@ function getLessonText(lesson, script = "simplified") {
   return script === "traditional" ? lesson.traditionalText : lesson.text;
 }
 
+function getLessonBlocks(lesson, script = "simplified") {
+  const characters = [...getLessonText(lesson, script)];
+  const ranges = lesson.dialogueRanges;
+  if (!Array.isArray(ranges) || ranges.length < 2) return [characters.join("")];
+  return ranges.map(({ start, end }) => characters.slice(start, end).join(""));
+}
+
 module.exports = {
   corpus,
   demoBooks,
@@ -112,6 +119,7 @@ module.exports = {
   getBookPosition,
   getBookProgress,
   getBookStartIndex,
+  getLessonBlocks,
   getLessonText,
   getPositionIndex,
   getProgress,

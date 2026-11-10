@@ -19,7 +19,36 @@ customPinyin({
   "好学": "hào xué",
   "好學": "hào xué",
   "好之者": "hào zhī zhě",
-  "予及女偕亡": "yú jí rǔ xié wáng"
+  "予及女偕亡": "yú jí rǔ xié wáng",
+  "如恶恶臭": "rú wù è chòu",
+  "如惡惡臭": "rú wù è chòu",
+  "如好好色": "rú hào hǎo sè",
+  "乐者": "yuè zhě",
+  "樂者": "yuè zhě",
+  "乐之象也": "yuè zhī xiàng yě",
+  "樂之象也": "yuè zhī xiàng yě",
+  "乐其象": "lè qí xiàng",
+  "樂其象": "lè qí xiàng",
+  "乐也者施也": "yuè yě zhě shī yě",
+  "樂也者施也": "yuè yě zhě shī yě",
+  "乐为大焉": "yuè wéi dà yān",
+  "樂為大焉": "yuè wéi dà yān",
+  "乐之情也": "yuè zhī qíng yě",
+  "樂之情也": "yuè zhī qíng yě",
+  "乐之末节也": "yuè zhī mò jié yě",
+  "樂之末節也": "yuè zhī mò jié yě",
+  "乐统同": "yuè tǒng tóng",
+  "樂統同": "yuè tǒng tóng",
+  "乐师辨乎声诗": "yuè shī biàn hū shēng shī",
+  "樂師辨乎聲詩": "yuè shī biàn hū shēng shī",
+  "䯄": "guā",
+  "騧": "guā",
+  "㱩": "dú",
+  "殰": "dú",
+  "䲡": "qiū",
+  "鰌": "qiū",
+  "䓕": "wěi",
+  "薳": "wěi"
 });
 
 const sources = [
@@ -103,6 +132,16 @@ function stripHtml(value) {
 function makeLesson({ bookId, chapter, section = "", unitLabel = "", text, id, citation }) {
   const normalized = toClassicSimplified(text);
   if (!normalized) return null;
+  const characters = [...normalized];
+  const pinyinUnits = pinyin(normalized, { type: "array" }).map((syllable, index) => {
+    if (/\p{Script=Han}/u.test(characters[index]) && /\p{Script=Han}/u.test(syllable)) {
+      throw new Error(`缺少拼音：${characters[index]}（${id || bookId}）`);
+    }
+    return /\p{Script=Han}/u.test(characters[index]) ? syllable : "";
+  });
+  if (pinyinUnits.length !== characters.length) {
+    throw new Error(`拼音数量与原文字符不匹配：${id || bookId}`);
+  }
   let reading = pinyin(normalized, { type: "string" });
   reading = reading
     .replace(/\s+([，。；：？！、,.!?;:])/gu, "$1")
@@ -111,7 +150,7 @@ function makeLesson({ bookId, chapter, section = "", unitLabel = "", text, id, c
     .replace(/\s+([”’）》」』])/gu, "$1")
     .trim();
   const book = books.find((item) => item.id === bookId);
-  return {
+  const lesson = {
     id,
     bookId,
     book: book.title,
@@ -121,8 +160,19 @@ function makeLesson({ bookId, chapter, section = "", unitLabel = "", text, id, c
     text: normalized,
     traditionalText: toTraditional(normalized),
     pinyin: reading,
+    pinyinUnits,
     citation: citation || `《${book.title}·${chapter}${section ? `·${section}` : ""}》`
   };
+  if (bookId === "lunyu") {
+    const boundaries = [...normalized.matchAll(/(?<=[\u201D\u2019])(?=[\p{Script=Han}]{1,12}(?:对曰|问曰|答曰|曰)[：:]?[\u201C\u300C\u300E])/gu)]
+      .map((match) => [...normalized.slice(0, match.index)].length);
+    if (boundaries.length > 0) {
+      const starts = [0, ...boundaries];
+      const length = characters.length;
+      lesson.dialogueRanges = starts.map((start, index) => ({ start, end: starts[index + 1] ?? length }));
+    }
+  }
+  return lesson;
 }
 
 function appendLesson(input) {
@@ -317,7 +367,7 @@ const output = {
     engine: "pinyin-pro",
     method: "自动普通话注音，声调符号",
     note: "并非邓启铜注音版；古汉语异读和多音字仍可能需要校订。",
-    overrides: ["不亦说乎", "钟鼓乐之", "王好战", "好学", "好之者", "予及女偕亡"]
+    overrides: ["不亦说乎", "钟鼓乐之", "王好战", "好学", "好之者", "予及女偕亡", "如恶恶臭", "如好好色", "乐记中的乐音义", "䯄、㱩、䲡、䓕"]
   },
   sources,
   books,

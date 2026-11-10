@@ -7,6 +7,7 @@ const {
   corpus,
   demoBooks,
   demoLessons,
+  getLessonBlocks,
   getBookPosition,
   getBookProgress,
   getBookStartIndex,
@@ -46,9 +47,53 @@ test("每条原文都有拼音、简繁文本和出处，不再混入演示注�
   for (const lesson of demoLessons) {
     assert.ok(lesson.text.trim(), lesson.id);
     assert.ok(lesson.pinyin.trim(), lesson.id);
+    assert.equal(lesson.pinyinUnits.length, [...lesson.text].length, lesson.id);
     assert.ok(lesson.traditionalText.trim(), lesson.id);
     assert.ok(lesson.citation.trim(), lesson.id);
     assert.doesNotMatch(lesson.text, /演示释义|演示注释|此处为演示/u);
+    assert.doesNotMatch(lesson.pinyin, /\p{Script=Han}/u, lesson.id);
+    assert.equal([...lesson.text].length, [...lesson.traditionalText].length, lesson.id);
+    for (const [index, character] of [...lesson.text].entries()) {
+      const syllable = lesson.pinyinUnits[index];
+      if (/\p{Script=Han}/u.test(character)) {
+        assert.ok(syllable, `${lesson.id}:${index}:${character} 缺少拼音`);
+        assert.doesNotMatch(syllable, /\p{Script=Han}/u, `${lesson.id}:${index}:${character} 拼音未转换`);
+      } else {
+        assert.equal(syllable, "", `${lesson.id}:${index}:${character} 不应注音`);
+      }
+    }
+  }
+
+  const youZiSays = demoLessons.find((lesson) => lesson.text.startsWith("有子曰："));
+  assert.deepEqual(youZiSays.pinyinUnits.slice(0, 3), ["yǒu", "zǐ", "yuē"]);
+
+  const polyphonePhrase = "如恶恶臭，如好好色";
+  const daxue = demoLessons.find((lesson) => lesson.bookId === "daxue" && lesson.text.includes(polyphonePhrase));
+  const polyphoneStart = [...daxue.text.slice(0, daxue.text.indexOf(polyphonePhrase))].length;
+  assert.deepEqual(daxue.pinyinUnits.slice(polyphoneStart, polyphoneStart + [...polyphonePhrase].length), [
+    "rú", "wù", "è", "chòu", "", "rú", "hào", "hǎo", "sè"
+  ]);
+
+  const yueJi = demoLessons.find((lesson) => lesson.bookId === "liji" && lesson.text.includes("乐者，心之动也"));
+  const yueStart = [...yueJi.text.slice(0, yueJi.text.indexOf("乐者"))].length;
+  assert.deepEqual(yueJi.pinyinUnits.slice(yueStart, yueStart + 2), ["yuè", "zhě"]);
+});
+
+test("《论语》按说话人分段，问答仍保留为同一则阅读内容", () => {
+  const lesson = demoLessons.find((item) => item.text.startsWith("子禽问于子贡曰："));
+  const blocks = getLessonBlocks(lesson);
+  assert.deepEqual(blocks, [
+    "子禽问于子贡曰：“夫子至于是邦也，必闻其政，求之与，抑与之与？”",
+    "子贡曰：“夫子温、良、恭、俭、让以得之。夫子之求之也，其诸异乎人之求之与？”"
+  ]);
+  assert.equal(blocks.join(""), lesson.text);
+  assert.equal(getLessonBlocks(lesson, "traditional").join(""), lesson.traditionalText);
+
+  const splitDialogues = demoLessons.filter((item) => item.bookId === "lunyu" && item.dialogueRanges?.length > 1);
+  assert.ok(splitDialogues.length >= 100);
+  for (const item of splitDialogues) {
+    assert.equal(getLessonBlocks(item).join(""), item.text, item.id);
+    assert.equal(getLessonBlocks(item, "traditional").join(""), item.traditionalText, item.id);
   }
 });
 

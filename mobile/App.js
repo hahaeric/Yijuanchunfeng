@@ -19,6 +19,7 @@ const {
   getBookPosition,
   getBookProgress,
   getPositionIndex,
+  getLessonBlocks,
   getLessonText,
   getTransition,
   savePosition,
@@ -94,6 +95,80 @@ function SegmentedChoice({ options, value, onChange }) {
           <Text style={[styles.segmentOptionText, value === option.value && styles.segmentOptionTextActive]}>{option.label}</Text>
         </Pressable>
       ))}
+    </View>
+  );
+}
+
+function PinyinAnnotatedLine({ text, pinyinUnits, fontSize, textStyle }) {
+  const characters = [...text];
+  if (!Array.isArray(pinyinUnits) || pinyinUnits.length !== characters.length) {
+    return <Text style={textStyle}>{text}</Text>;
+  }
+  const pinyinSize = Math.max(8, Math.round(fontSize * 0.36));
+  const pinyinHeight = Math.max(12, Math.round(fontSize * 0.48));
+  const openingPunctuation = new Set(["“", "‘", "「", "『", "（", "【", "《", "〈", "〔", "〖", "〘", "〚"]);
+  const closingPunctuation = new Set(["，", "。", "；", "：", "？", "！", "、", ",", ".", ";", ":", "?", "!", "”", "’", "」", "』", "）", "】", "》", "〉", "〕", "〗", "〙", "〛", "…"]);
+  const groups = [];
+  let prefix = "";
+  for (let index = 0; index < characters.length; index += 1) {
+    const character = characters[index];
+    if (openingPunctuation.has(character)) {
+      prefix += character;
+      continue;
+    }
+    if (/\p{Script=Han}/u.test(character)) {
+      const pinyinIndex = index;
+      let suffix = "";
+      while (index + 1 < characters.length && closingPunctuation.has(characters[index + 1])) {
+        suffix += characters[index + 1];
+        index += 1;
+      }
+      groups.push({ prefix, character, suffix, pinyin: pinyinUnits[pinyinIndex] });
+      prefix = "";
+      continue;
+    }
+    groups.push({ text: `${prefix}${character}`, pinyin: "" });
+    prefix = "";
+  }
+  if (prefix) {
+    const lastGroup = groups[groups.length - 1];
+    if (lastGroup?.character) lastGroup.suffix += prefix;
+    else if (lastGroup) lastGroup.text = `${lastGroup.text}${prefix}`;
+    else groups.push({ text: prefix, pinyin: "" });
+  }
+  return (
+    <View style={styles.rubyWrap}>
+      {groups.map((group, index) => {
+        const hasPinyin = Boolean(group.character);
+        return (
+          <View key={`${index}-${group.character || group.text}`} style={styles.rubyCell}>
+            <View style={[styles.rubyPinyinSlot, { height: pinyinHeight }]}>
+              {hasPinyin ? <Text style={[styles.rubyPinyin, { fontSize: pinyinSize, lineHeight: pinyinHeight }]}>{group.pinyin}</Text> : null}
+            </View>
+            <Text style={textStyle}>{group.character ? `${group.prefix}${group.character}${group.suffix}` : group.text}</Text>
+          </View>
+        );
+      })}
+    </View>
+  );
+}
+
+function ReadingBlocks({ lesson, blocks, showPinyin, fontSize, textStyle }) {
+  let characterOffset = 0;
+  return (
+    <View style={styles.readingBlocks}>
+      {blocks.map((block, index) => {
+        const count = [...block].length;
+        const units = (lesson.pinyinUnits || []).slice(characterOffset, characterOffset + count);
+        characterOffset += count;
+        return (
+          <View key={`block-${index}`} style={index > 0 ? styles.dialogueBlockGap : null}>
+            {showPinyin
+              ? <PinyinAnnotatedLine text={block} pinyinUnits={units} fontSize={fontSize} textStyle={textStyle} />
+              : <Text style={textStyle}>{block}</Text>}
+          </View>
+        );
+      })}
     </View>
   );
 }
@@ -182,6 +257,8 @@ export default function App() {
   }
 
   function continueReading() {
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    setToast("");
     markCurrentRead();
     if (!nextLesson) {
       setPositions((previous) => savePosition(previous, currentLesson.bookId, currentLesson.id));
@@ -197,15 +274,6 @@ export default function App() {
     setNoteOpen(false);
     setNoteDraft("");
     scrollRef.current?.scrollTo({ y: 0, animated: false });
-    if (transition.type === "book") {
-      notify(`《${currentLesson.book}》已读完，开始《${followingLesson.book}》。`);
-    } else if (transition.type === "chapter") {
-      notify(`本篇已读完，继续《${followingLesson.book}·${followingLesson.chapter}》。`);
-    } else if (transition.type === "section") {
-      notify(`继续阅读${followingLesson.section ? `「${followingLesson.section}」` : "下一段"}。`);
-    } else {
-      notify("进度已保存，继续读下一则。");
-    }
   }
 
   function stopReading() {
@@ -247,24 +315,19 @@ export default function App() {
   }
 
   function renderCurrentPassage() {
-    const text = getLessonText(currentLesson, settings.script);
     const size = settings.fontSize === "small" ? 25 : settings.fontSize === "large" ? 34 : 29;
     const textStyle = [styles.sentenceText, { fontSize: size }];
+    const blocks = getLessonBlocks(currentLesson, settings.script);
     if (settings.layout === "vertical") {
       return (
         <View>
           {settings.showPinyin ? <Text style={styles.pinyinText}>{currentLesson.pinyin}</Text> : null}
-          <View style={styles.verticalSentence}>
-            {[...text].map((character, index) => <Text key={index} style={[textStyle, styles.verticalCharacter]}>{character}</Text>)}
-          </View>
+          {blocks.map((block, index) => <View key={`vertical-block-${index}`} style={index > 0 ? styles.dialogueBlockGap : null}><View style={styles.verticalSentence}>{[...block].map((character, characterIndex) => <Text key={characterIndex} style={[textStyle, styles.verticalCharacter]}>{character}</Text>)}</View></View>)}
         </View>
       );
     }
     return (
-      <View>
-        {settings.showPinyin ? <Text style={styles.pinyinText}>{currentLesson.pinyin}</Text> : null}
-        <Text style={textStyle}>{text}</Text>
-      </View>
+      <ReadingBlocks lesson={currentLesson} blocks={blocks} showPinyin={settings.showPinyin} fontSize={size} textStyle={textStyle} />
     );
   }
 
@@ -455,8 +518,7 @@ export default function App() {
                 ) : <Text style={styles.savedMeta}>个人笔记</Text>}
               </View>
               <Pressable onPress={() => openSavedLesson(lesson.id)}>
-                {settings.showPinyin ? <Text style={styles.savedPinyin}>{lesson.pinyin}</Text> : null}
-                <Text style={styles.savedQuote}>{getLessonText(lesson, settings.script)}</Text>
+                <ReadingBlocks lesson={lesson} blocks={getLessonBlocks(lesson, settings.script)} showPinyin={settings.showPinyin} fontSize={17} textStyle={styles.savedQuote} />
               </Pressable>
               {savedTab === "notes" ? <Text style={styles.savedNote}>{notes[lesson.id]}</Text> : null}
               <View style={styles.savedCardFooter}><Text style={styles.savedCitation}>{lesson.citation}</Text><Pressable onPress={() => openSavedLesson(lesson.id)}><Text style={styles.pathLink}>回到原文　→</Text></Pressable></View>
@@ -476,7 +538,7 @@ export default function App() {
         <View style={styles.topBar}>
           <View style={styles.brand}>
             <View style={styles.brandMark}><Text style={styles.brandMarkText}>经</Text></View>
-            <View><Text style={styles.brandName}>经日</Text><Text style={styles.brandSubtitle}>四书五经 · 日日读</Text></View>
+            <View><Text style={styles.brandName}>经典</Text><Text style={styles.brandSubtitle}>四书五经 · 日日读</Text></View>
           </View>
           <Pressable onPress={() => setSettingsOpen(true)} style={({ pressed }) => [styles.settingsButton, pressed && styles.pressed]} accessibilityLabel="阅读设置">
             <Text style={styles.settingsGlyph}>⚙</Text>
@@ -602,6 +664,12 @@ const styles = StyleSheet.create({
   contextSpacer: { height: 24 },
   quotePanel: { minHeight: 142, width: "100%", alignItems: "center", justifyContent: "center", paddingHorizontal: 5 },
   quotePanelVertical: { minHeight: 230, flexDirection: "row", alignItems: "flex-start", justifyContent: "center" },
+  readingBlocks: { width: "100%" },
+  dialogueBlockGap: { marginTop: 9 },
+  rubyWrap: { width: "100%", flexDirection: "row", flexWrap: "wrap", justifyContent: "center", alignItems: "flex-end" },
+  rubyCell: { alignItems: "center", justifyContent: "flex-end" },
+  rubyPinyinSlot: { minWidth: 8, alignItems: "center", justifyContent: "flex-end" },
+  rubyPinyin: { color: "#9B8665", fontFamily: "sans-serif", textAlign: "center" },
   pinyinText: { marginBottom: 9, color: "#9B8665", fontSize: 12, lineHeight: 21, textAlign: "center", letterSpacing: 0.2 },
   sentenceText: { color: "#2A3B31", fontFamily: "serif", fontWeight: "500", letterSpacing: 0.6, lineHeight: 43, textAlign: "center" },
   termText: { color: "#94703F", textDecorationLine: "underline", textDecorationStyle: "dashed" },
