@@ -26,6 +26,14 @@ const {
   toggleFavorite,
   updateNote
 } = require("./src/model");
+const {
+  DEFAULT_READING_FONT_SIZE,
+  MAX_READING_FONT_SIZE,
+  MIN_READING_FONT_SIZE,
+  adjustReadingFontSize,
+  makeVerticalColumns,
+  normalizeReadingFontSize
+} = require("./src/reader-layout");
 
 const STORAGE_KEY = "jingri-mobile-full-corpus-v2";
 const COLORS = {
@@ -44,7 +52,7 @@ const COLORS = {
   rose: "#A8725C"
 };
 
-const defaultSettings = { script: "simplified", layout: "horizontal", fontSize: "medium", showPinyin: true };
+const defaultSettings = { script: "simplified", layout: "horizontal", fontSize: DEFAULT_READING_FONT_SIZE, showPinyin: true };
 
 function getNextActionLabel(transition) {
   if (transition.type === "end") return "已读完九部经典";
@@ -173,6 +181,44 @@ function ReadingBlocks({ lesson, blocks, showPinyin, fontSize, textStyle }) {
   );
 }
 
+function VerticalReadingBlocks({ lesson, blocks, showPinyin, fontSize, height }) {
+  const scrollRef = useRef(null);
+  const pinyinSize = Math.max(8, Math.round(fontSize * 0.36));
+  const pinyinHeight = Math.max(12, Math.round(fontSize * 0.48));
+  const characterLineHeight = Math.round(fontSize * 1.4);
+  const columnHeight = characterLineHeight + (showPinyin ? pinyinHeight : 0);
+  const rowsPerColumn = Math.max(1, Math.floor(height / columnHeight));
+  const columnWidth = Math.max(fontSize + 12, Math.round(pinyinSize * 3.5));
+  const columnsByBlock = makeVerticalColumns(blocks, lesson.pinyinUnits, rowsPerColumn);
+  const textStyle = [styles.sentenceText, { fontSize, lineHeight: characterLineHeight }];
+
+  return (
+    <ScrollView
+      ref={scrollRef}
+      horizontal
+      style={[styles.verticalScroll, { height }]}
+      contentContainerStyle={styles.verticalPassage}
+      showsHorizontalScrollIndicator
+      onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: false })}
+    >
+      {columnsByBlock.map((columns, blockIndex) => (
+        <View key={`vertical-block-${blockIndex}`} style={[styles.verticalDialogueBlock, blockIndex > 0 && styles.verticalDialogueBlockGap]}>
+          {columns.map((column, columnIndex) => (
+            <View key={`column-${columnIndex}`} style={[styles.verticalColumn, { width: columnWidth }]}>
+              {column.map(({ character, pinyin }, characterIndex) => (
+                <View key={`character-${characterIndex}`} style={[styles.verticalCell, { minHeight: columnHeight }]}>
+                  {showPinyin ? <Text style={[styles.verticalPinyin, { height: pinyinHeight, fontSize: pinyinSize, lineHeight: pinyinHeight }]}>{pinyin}</Text> : null}
+                  <Text style={[textStyle, styles.verticalCharacter]}>{character}</Text>
+                </View>
+              ))}
+            </View>
+          ))}
+        </View>
+      ))}
+    </ScrollView>
+  );
+}
+
 export default function App() {
   const [screen, setScreen] = useState("today");
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -195,6 +241,7 @@ export default function App() {
   const transition = getTransition(currentIndex);
   const nextLesson = transition.nextLesson;
   const todayCount = todayReadIds.length;
+  const readingFontSize = normalizeReadingFontSize(settings.fontSize);
 
   useEffect(() => {
     let mounted = true;
@@ -209,7 +256,12 @@ export default function App() {
         setNotes(saved.notes && typeof saved.notes === "object" ? saved.notes : {});
         setPositions(saved.positions && typeof saved.positions === "object" ? saved.positions : {});
         setReadLessonIds(Array.isArray(saved.readLessonIds) ? saved.readLessonIds : []);
-        setSettings({ ...defaultSettings, ...(saved.settings || {}) });
+        const savedSettings = saved.settings || {};
+        setSettings({
+          ...defaultSettings,
+          ...savedSettings,
+          fontSize: normalizeReadingFontSize(savedSettings.fontSize ?? defaultSettings.fontSize)
+        });
         setSavedTab(saved.savedTab || "favorites");
         if (saved.dateKey === localDateKey() && Array.isArray(saved.todayReadIds)) {
           setTodayReadIds(saved.todayReadIds);
@@ -315,16 +367,11 @@ export default function App() {
   }
 
   function renderCurrentPassage() {
-    const size = settings.fontSize === "small" ? 25 : settings.fontSize === "large" ? 34 : 29;
+    const size = normalizeReadingFontSize(settings.fontSize);
     const textStyle = [styles.sentenceText, { fontSize: size }];
     const blocks = getLessonBlocks(currentLesson, settings.script);
     if (settings.layout === "vertical") {
-      return (
-        <View>
-          {settings.showPinyin ? <Text style={styles.pinyinText}>{currentLesson.pinyin}</Text> : null}
-          {blocks.map((block, index) => <View key={`vertical-block-${index}`} style={index > 0 ? styles.dialogueBlockGap : null}><View style={styles.verticalSentence}>{[...block].map((character, characterIndex) => <Text key={characterIndex} style={[textStyle, styles.verticalCharacter]}>{character}</Text>)}</View></View>)}
-        </View>
-      );
+      return <VerticalReadingBlocks key={`${currentLesson.id}-${settings.script}-${settings.showPinyin}-${size}`} lesson={currentLesson} blocks={blocks} showPinyin={settings.showPinyin} fontSize={size} height={380} />;
     }
     return (
       <ReadingBlocks lesson={currentLesson} blocks={blocks} showPinyin={settings.showPinyin} fontSize={size} textStyle={textStyle} />
@@ -587,8 +634,26 @@ export default function App() {
                 <SegmentedChoice options={[{ value: "horizontal", label: "横排" }, { value: "vertical", label: "竖排" }]} value={settings.layout} onChange={(value) => setSettings((previous) => ({ ...previous, layout: value }))} />
               </View>
               <View style={styles.settingRow}>
-                <View><Text style={styles.settingTitle}>原文字号</Text><Text style={styles.settingHint}>按自己的阅读习惯调整</Text></View>
-                <SegmentedChoice options={[{ value: "small", label: "小" }, { value: "medium", label: "中" }, { value: "large", label: "大" }]} value={settings.fontSize} onChange={(value) => setSettings((previous) => ({ ...previous, fontSize: value }))} />
+                <View><Text style={styles.settingTitle}>原文字号</Text><Text style={styles.settingHint}>逐级调整，拼音同步缩放</Text></View>
+                <View style={styles.fontSizeControls}>
+                  <Pressable
+                    onPress={() => setSettings((previous) => ({ ...previous, fontSize: adjustReadingFontSize(previous.fontSize, -1) }))}
+                    disabled={readingFontSize <= MIN_READING_FONT_SIZE}
+                    accessibilityRole="button"
+                    accessibilityLabel="减小原文字号"
+                    accessibilityState={{ disabled: readingFontSize <= MIN_READING_FONT_SIZE }}
+                    style={({ pressed }) => [styles.fontSizeButton, readingFontSize <= MIN_READING_FONT_SIZE && styles.fontSizeButtonDisabled, pressed && styles.pressed]}
+                  ><Text style={styles.fontSizeButtonText}>−</Text></Pressable>
+                  <Text style={styles.fontSizeValue}>{readingFontSize}</Text>
+                  <Pressable
+                    onPress={() => setSettings((previous) => ({ ...previous, fontSize: adjustReadingFontSize(previous.fontSize, 1) }))}
+                    disabled={readingFontSize >= MAX_READING_FONT_SIZE}
+                    accessibilityRole="button"
+                    accessibilityLabel="放大原文字号"
+                    accessibilityState={{ disabled: readingFontSize >= MAX_READING_FONT_SIZE }}
+                    style={({ pressed }) => [styles.fontSizeButton, readingFontSize >= MAX_READING_FONT_SIZE && styles.fontSizeButtonDisabled, pressed && styles.pressed]}
+                  ><Text style={styles.fontSizeButtonText}>+</Text></Pressable>
+                </View>
               </View>
               <Text style={styles.sheetFootnote}>设置、收藏、笔记和进度保存在当前设备。拼音为程序自动注音，仅作阅读辅助；古汉语异读与不同底本请参照来源说明。</Text>
             </View>
@@ -663,7 +728,7 @@ const styles = StyleSheet.create({
   contextTag: { color: "#B99A6D", fontSize: 9 },
   contextSpacer: { height: 24 },
   quotePanel: { minHeight: 142, width: "100%", alignItems: "center", justifyContent: "center", paddingHorizontal: 5 },
-  quotePanelVertical: { minHeight: 230, flexDirection: "row", alignItems: "flex-start", justifyContent: "center" },
+  quotePanelVertical: { minHeight: 0, alignItems: "stretch", justifyContent: "flex-start", paddingHorizontal: 0 },
   readingBlocks: { width: "100%" },
   dialogueBlockGap: { marginTop: 9 },
   rubyWrap: { width: "100%", flexDirection: "row", flexWrap: "wrap", justifyContent: "center", alignItems: "flex-end" },
@@ -673,8 +738,14 @@ const styles = StyleSheet.create({
   pinyinText: { marginBottom: 9, color: "#9B8665", fontSize: 12, lineHeight: 21, textAlign: "center", letterSpacing: 0.2 },
   sentenceText: { color: "#2A3B31", fontFamily: "serif", fontWeight: "500", letterSpacing: 0.6, lineHeight: 43, textAlign: "center" },
   termText: { color: "#94703F", textDecorationLine: "underline", textDecorationStyle: "dashed" },
-  verticalSentence: { flexDirection: "row", alignItems: "flex-start", justifyContent: "center" },
-  verticalCharacter: { marginHorizontal: 1, lineHeight: 39 },
+  verticalScroll: { width: "100%", flexGrow: 0 },
+  verticalPassage: { minWidth: "100%", flexDirection: "row-reverse", flexGrow: 1, alignItems: "flex-start", paddingHorizontal: 4 },
+  verticalDialogueBlock: { flexDirection: "row-reverse", alignItems: "flex-start", flexShrink: 0 },
+  verticalDialogueBlockGap: { marginLeft: 16 },
+  verticalColumn: { width: 41, flexDirection: "column", alignItems: "center", flexShrink: 0 },
+  verticalCell: { alignItems: "center", justifyContent: "flex-start" },
+  verticalPinyin: { minWidth: 8, color: "#9B8665", fontFamily: "sans-serif", textAlign: "center" },
+  verticalCharacter: { width: "100%", textAlign: "center", letterSpacing: 0.6 },
   citation: { marginTop: 5, color: "#90988E", fontSize: 9, textAlign: "center" },
   tapHint: { marginTop: 4, color: "#B0B3A9", fontSize: 8, textAlign: "center" },
   glossCard: { marginTop: 11, padding: 12, borderWidth: 1, borderColor: "#EBE4D7", borderRadius: 11, backgroundColor: "#F9F6EF" },
@@ -788,6 +859,11 @@ const styles = StyleSheet.create({
   settingRow: { paddingVertical: 13, borderTopWidth: 1, borderTopColor: "#EFEEE8", flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 9 },
   settingTitle: { color: "#5D6D60", fontSize: 10, fontWeight: "600" },
   settingHint: { marginTop: 4, color: "#A0A69B", fontSize: 8 },
+  fontSizeControls: { minWidth: 108, padding: 4, borderRadius: 9, flexDirection: "row", alignItems: "center", justifyContent: "space-between", backgroundColor: "#EFEEE8" },
+  fontSizeButton: { width: 30, height: 30, borderRadius: 7, alignItems: "center", justifyContent: "center", backgroundColor: COLORS.paper },
+  fontSizeButtonDisabled: { opacity: 0.42 },
+  fontSizeButtonText: { color: COLORS.green, fontSize: 17, lineHeight: 20 },
+  fontSizeValue: { minWidth: 29, color: COLORS.green, fontSize: 12, fontWeight: "600", textAlign: "center" },
   segmentedChoice: { flexDirection: "row", gap: 3, padding: 3, borderWidth: 1, borderColor: "#E9E7E0", borderRadius: 8, backgroundColor: "#F1F0EA" },
   segmentOption: { paddingHorizontal: 8, paddingVertical: 6, borderRadius: 6 },
   segmentOptionActive: { backgroundColor: COLORS.paper, shadowColor: "#26362A", shadowOpacity: 0.07, shadowRadius: 3, elevation: 1 },
