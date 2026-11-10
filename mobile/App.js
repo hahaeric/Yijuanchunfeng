@@ -16,17 +16,17 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const {
   demoBooks,
   demoLessons,
+  getBookPosition,
   getBookProgress,
   getPositionIndex,
-  getProgress,
-  nextLessonIndex,
+  getLessonText,
+  getTransition,
   savePosition,
   toggleFavorite,
-  toTraditional,
   updateNote
 } = require("./src/model");
 
-const STORAGE_KEY = "jingri-mobile-demo-v1";
+const STORAGE_KEY = "jingri-mobile-full-corpus-v2";
 const COLORS = {
   background: "#F4F2EA",
   paper: "#FEFDF9",
@@ -43,15 +43,19 @@ const COLORS = {
   rose: "#A8725C"
 };
 
-const defaultSettings = { script: "simplified", layout: "horizontal", fontSize: "medium" };
+const defaultSettings = { script: "simplified", layout: "horizontal", fontSize: "medium", showPinyin: true };
+
+function getNextActionLabel(transition) {
+  if (transition.type === "end") return "已读完九部经典";
+  if (transition.type === "book") return `本书读完 · 进入《${transition.nextLesson.book}》`;
+  if (transition.type === "chapter") return `本篇读完 · 进入${transition.nextLesson.chapter}`;
+  if (transition.type === "section") return `进入下一节 · ${transition.nextLesson.section}`;
+  return "下一句";
+}
 
 function localDateKey() {
   const date = new Date();
   return [date.getFullYear(), String(date.getMonth() + 1).padStart(2, "0"), String(date.getDate()).padStart(2, "0")].join("-");
-}
-
-function safeTraditional(text, enabled) {
-  return enabled ? toTraditional(text) : text;
 }
 
 function ActionChip({ symbol, label, active, onPress }) {
@@ -106,9 +110,6 @@ export default function App() {
   const [storageReady, setStorageReady] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [savedTab, setSavedTab] = useState("favorites");
-  const [glossOpen, setGlossOpen] = useState(false);
-  const [translationOpen, setTranslationOpen] = useState(false);
-  const [annotationOpen, setAnnotationOpen] = useState(false);
   const [noteOpen, setNoteOpen] = useState(false);
   const [noteDraft, setNoteDraft] = useState("");
   const [toast, setToast] = useState("");
@@ -116,8 +117,8 @@ export default function App() {
   const scrollRef = useRef(null);
   const todayKey = useRef(localDateKey());
   const currentLesson = demoLessons[currentIndex];
-  const previousLesson = currentIndex > 0 ? demoLessons[currentIndex - 1] : null;
-  const nextLesson = currentIndex < demoLessons.length - 1 ? demoLessons[currentIndex + 1] : null;
+  const transition = getTransition(currentIndex);
+  const nextLesson = transition.nextLesson;
   const todayCount = todayReadIds.length;
 
   useEffect(() => {
@@ -183,24 +184,28 @@ export default function App() {
   function continueReading() {
     markCurrentRead();
     if (!nextLesson) {
-      notify("已经读到本地演示样例的末尾。");
+      setPositions((previous) => savePosition(previous, currentLesson.bookId, currentLesson.id));
+      notify("已读完当前收录的全部经典。");
       return;
     }
-    const nextIndex = nextLessonIndex(currentIndex);
-    const followingLesson = demoLessons[nextIndex];
+    const nextIndex = transition.nextIndex;
+    const followingLesson = nextLesson;
     setPositions((previous) =>
       savePosition(savePosition(previous, currentLesson.bookId, currentLesson.id), followingLesson.bookId, followingLesson.id)
     );
     setCurrentIndex(nextIndex);
-    setGlossOpen(false);
-    setTranslationOpen(false);
-    setAnnotationOpen(false);
     setNoteOpen(false);
     setNoteDraft("");
     scrollRef.current?.scrollTo({ y: 0, animated: false });
-    notify(followingLesson.bookId === currentLesson.bookId
-      ? "进度已保存，继续读下一句。"
-      : "已进入《" + followingLesson.book + "》的顺序样例。");
+    if (transition.type === "book") {
+      notify(`《${currentLesson.book}》已读完，开始《${followingLesson.book}》。`);
+    } else if (transition.type === "chapter") {
+      notify(`本篇已读完，继续《${followingLesson.book}·${followingLesson.chapter}》。`);
+    } else if (transition.type === "section") {
+      notify(`继续阅读${followingLesson.section ? `「${followingLesson.section}」` : "下一段"}。`);
+    } else {
+      notify("进度已保存，继续读下一则。");
+    }
   }
 
   function stopReading() {
@@ -215,9 +220,6 @@ export default function App() {
     setCurrentIndex(index);
     setPositions((previous) => savePosition(previous, bookId, demoLessons[index].id));
     setScreen("today");
-    setGlossOpen(false);
-    setTranslationOpen(false);
-    setAnnotationOpen(false);
     setNoteOpen(false);
     scrollRef.current?.scrollTo({ y: 0, animated: false });
   }
@@ -240,52 +242,40 @@ export default function App() {
     setPositions((previous) => savePosition(previous, demoLessons[index].bookId, demoLessons[index].id));
     setScreen("today");
     setNoteOpen(false);
-    setGlossOpen(false);
     scrollRef.current?.scrollTo({ y: 0, animated: false });
-    notify("已回到这句原文。");
+    notify("已回到这则原文。");
   }
 
-  function renderCurrentSentence() {
-    const text = safeTraditional(currentLesson.text, settings.script === "traditional");
-    const term = safeTraditional(currentLesson.term, settings.script === "traditional");
-    const termIndex = text.indexOf(term);
+  function renderCurrentPassage() {
+    const text = getLessonText(currentLesson, settings.script);
     const size = settings.fontSize === "small" ? 25 : settings.fontSize === "large" ? 34 : 29;
-    const sentenceStyle = [styles.sentenceText, { fontSize: size }];
+    const textStyle = [styles.sentenceText, { fontSize: size }];
     if (settings.layout === "vertical") {
       return (
-        <View style={styles.verticalSentence}>
-          {[...text].map((character, index) => {
-            const part = text.indexOf(term) >= 0 && index >= text.indexOf(term) && index < text.indexOf(term) + term.length;
-            return (
-              <Text
-                key={index}
-                onPress={() => part && setGlossOpen((open) => !open)}
-                style={[sentenceStyle, styles.verticalCharacter, part && styles.termText]}
-              >
-                {character}
-              </Text>
-            );
-          })}
+        <View>
+          {settings.showPinyin ? <Text style={styles.pinyinText}>{currentLesson.pinyin}</Text> : null}
+          <View style={styles.verticalSentence}>
+            {[...text].map((character, index) => <Text key={index} style={[textStyle, styles.verticalCharacter]}>{character}</Text>)}
+          </View>
         </View>
       );
     }
-    if (termIndex < 0) return <Text style={sentenceStyle}>{text}</Text>;
     return (
-      <Text style={sentenceStyle}>
-        {text.slice(0, termIndex)}
-        <Text onPress={() => setGlossOpen((open) => !open)} style={styles.termText}>{term}</Text>
-        {text.slice(termIndex + term.length)}
-      </Text>
+      <View>
+        {settings.showPinyin ? <Text style={styles.pinyinText}>{currentLesson.pinyin}</Text> : null}
+        <Text style={textStyle}>{text}</Text>
+      </View>
     );
   }
 
   function renderToday() {
-    const routeProgress = getProgress(currentIndex, demoLessons.length);
     const bookProgress = getBookProgress(readLessonIds, currentLesson.bookId);
-    const bookLessons = demoLessons.filter((lesson) => lesson.bookId === currentLesson.bookId);
-    const bookLessonPosition = bookLessons.findIndex((lesson) => lesson.id === currentLesson.id) + 1;
-    const previousContext = previousLesson && previousLesson.bookId === currentLesson.bookId && previousLesson.chapter === currentLesson.chapter ? previousLesson : null;
-    const nextContext = nextLesson && nextLesson.bookId === currentLesson.bookId && nextLesson.chapter === currentLesson.chapter ? nextLesson : null;
+    const bookPosition = getBookPosition(currentLesson.id);
+    const book = demoBooks.find((item) => item.id === currentLesson.bookId);
+    const location = [currentLesson.chapter, currentLesson.section, currentLesson.unitLabel]
+      .filter(Boolean)
+      .filter((part, index, parts) => index === 0 || part !== parts[index - 1])
+      .join(" · ");
     const favorite = favorites.includes(currentLesson.id);
     const note = notes[currentLesson.id] || "";
     return (
@@ -293,75 +283,49 @@ export default function App() {
         <View style={styles.screenHeading}>
           <View style={styles.eyebrowRow}>
             <View style={styles.eyebrowLine} />
-            <Text style={styles.eyebrow}>连续阅读 · 今日建议 1 句</Text>
+            <Text style={styles.eyebrow}>连续阅读 · 每日随心</Text>
           </View>
           <Text style={styles.screenTitle}>今日阅读</Text>
-          <Text style={styles.screenSubtitle}>从一句开始，想读的话就接着往下读。</Text>
+          <Text style={styles.screenSubtitle}>从一则完整章句开始，想读多久都可以。</Text>
         </View>
 
         <View style={styles.goalCard}>
           <View style={styles.goalTop}>
             <View>
-              <Text style={styles.goalLabel}>今日进度</Text>
-              <Text style={styles.goalCount}><Text style={styles.goalCountAccent}>{todayCount}</Text> 句已读 <Text style={styles.goalDivider}>/</Text> 建议 1 句</Text>
+              <Text style={styles.goalLabel}>今日已读</Text>
+              <Text style={styles.goalCount}><Text style={styles.goalCountAccent}>{todayCount}</Text> 则 · 不限量</Text>
             </View>
             <View style={[styles.goalStamp, todayCount > 0 && styles.goalStampDone]}>
-              <Text style={styles.goalStampText}>{todayCount > 0 ? "✓" : "一"}</Text>
+              <Text style={styles.goalStampText}>∞</Text>
             </View>
           </View>
-          <View style={styles.progressTrack}><View style={[styles.progressFill, { width: todayCount > 0 ? "100%" : "8%" }]} /></View>
-          <Text style={styles.goalFoot}>{todayCount > 0 ? "今日建议已完成，继续阅读也欢迎。" : "读完一句，就完成今日的小目标。"}</Text>
+          <Text style={styles.goalFoot}>没有每日句数限制，读完当前内容后可以继续。</Text>
         </View>
 
         <View style={styles.readerCard}>
           <View style={styles.readerTop}>
             <View style={styles.bookPill}><Text style={styles.bookPillText}>《{currentLesson.book}》</Text></View>
-            <Text style={styles.readerLocation}>{currentLesson.chapter}篇 · {currentLesson.section}</Text>
-            <Pressable onPress={toggleCurrentFavorite} style={({ pressed }) => [styles.favoriteButton, favorite && styles.favoriteButtonActive, pressed && styles.pressed]} accessibilityLabel={favorite ? "取消收藏" : "收藏句子"}>
+            <Text style={styles.readerLocation}>{location}</Text>
+            <Pressable onPress={toggleCurrentFavorite} style={({ pressed }) => [styles.favoriteButton, favorite && styles.favoriteButtonActive, pressed && styles.pressed]} accessibilityLabel={favorite ? "取消收藏" : "收藏章句"}>
               <Text style={[styles.favoriteSymbol, favorite && styles.favoriteSymbolActive]}>{favorite ? "★" : "☆"}</Text>
             </Pressable>
           </View>
 
           <View style={styles.contextBlock}>
-            {previousContext ? <Text style={styles.contextLine}><Text style={styles.contextTag}>上句　</Text>{safeTraditional(previousContext.text, settings.script === "traditional")}</Text> : <View style={styles.contextSpacer} />}
             <View style={[styles.quotePanel, settings.layout === "vertical" && styles.quotePanelVertical]}>
-              {renderCurrentSentence()}
+              {renderCurrentPassage()}
             </View>
-            {nextContext ? <Text style={[styles.contextLine, styles.contextNext]}><Text style={styles.contextTag}>下句　</Text>{safeTraditional(nextContext.text, settings.script === "traditional")}</Text> : <View style={styles.contextSpacer} />}
           </View>
           <Text style={styles.citation}>{currentLesson.citation}</Text>
-          <Text style={styles.tapHint}>{settings.layout === "vertical" ? "点选“" + safeTraditional(currentLesson.term, settings.script === "traditional") + "”查看释义" : "点选原文中的词语查看释义"}</Text>
-
-          {glossOpen ? (
-            <View style={styles.glossCard}>
-              <Text style={styles.glossTitle}>“{safeTraditional(currentLesson.term, settings.script === "traditional")}” · 词语释义</Text>
-              <Text style={styles.glossText}>{safeTraditional(currentLesson.gloss, settings.script === "traditional")}</Text>
-            </View>
-          ) : null}
+          <Text style={styles.tapHint}>{book?.editionNote}</Text>
 
           <View style={styles.actionChips}>
-            <ActionChip symbol="译" label="白话释义" active={translationOpen} onPress={() => setTranslationOpen((open) => !open)} />
-            <ActionChip symbol="注" label="注释与出处" active={annotationOpen} onPress={() => setAnnotationOpen((open) => !open)} />
             <ActionChip symbol="✎" label={note ? "编辑笔记" : "写笔记"} active={noteOpen} onPress={() => {
               setNoteDraft(note);
               setNoteOpen((open) => !open);
             }} />
           </View>
 
-          {translationOpen ? (
-            <View style={styles.inlineDetail}>
-              <Text style={styles.detailTitle}>白话释义</Text>
-              <Text style={styles.detailText}>{safeTraditional(currentLesson.translation, settings.script === "traditional")}</Text>
-              <Text style={styles.detailFoot}>演示释义 · 正式内容将注明所据版本</Text>
-            </View>
-          ) : null}
-          {annotationOpen ? (
-            <View style={styles.inlineDetail}>
-              <Text style={styles.detailTitle}>注释与上下文</Text>
-              <Text style={styles.detailText}>{safeTraditional(currentLesson.note, settings.script === "traditional")}</Text>
-              <Text style={styles.detailFoot}>出处：{currentLesson.citation} · 注释文字为演示数据</Text>
-            </View>
-          ) : null}
           {noteOpen ? (
             <View style={styles.noteEditor}>
               <TextInput
@@ -381,26 +345,26 @@ export default function App() {
             </View>
           ) : null}
 
-          {todayCount > 0 ? <View style={styles.readToday}><Text style={styles.readTodayCheck}>✓</Text><Text style={styles.readTodayText}>今日已读 {todayCount} 句，想读的话可以继续。</Text></View> : null}
+          {todayCount > 0 ? <View style={styles.readToday}><Text style={styles.readTodayCheck}>✓</Text><Text style={styles.readTodayText}>今日已读 {todayCount} 则，继续阅读不设上限。</Text></View> : null}
           <View style={styles.readerActions}>
             <Pressable onPress={stopReading} style={({ pressed }) => [styles.pauseButton, pressed && styles.pressed]}><Text style={styles.pauseButtonText}>今天读到这里</Text></Pressable>
             <Pressable onPress={continueReading} disabled={!nextLesson} style={({ pressed }) => [styles.nextButton, !nextLesson && styles.nextButtonDisabled, pressed && nextLesson && styles.pressed]}>
-              <Text style={styles.nextButtonText}>{nextLesson ? "下一句" : "样例已读完"}</Text>
-              <Text style={styles.nextButtonArrow}>→</Text>
+              <Text style={styles.nextButtonText}>{getNextActionLabel(transition)}</Text>
+              <Text style={styles.nextButtonArrow}>{nextLesson ? "→" : "✓"}</Text>
             </Pressable>
           </View>
-          <Text style={styles.demoDisclaimer}>本页为手机 App 原型：九部书各有开篇样句，尚非校订全文；译文与注释均为演示内容。</Text>
+          <Text style={styles.demoDisclaimer}>拼音为程序自动注音，非邓启铜版；古汉语异读可能需要校订。</Text>
         </View>
 
         <View style={styles.pathCard}>
           <View style={styles.pathHeader}><Text style={styles.pathTitle}>阅读位置</Text><Pressable onPress={() => setScreen("library")}><Text style={styles.pathLink}>查看目录　→</Text></Pressable></View>
           <View style={styles.pathRow}>
             <View style={styles.pathSeal}><Text style={styles.pathSealText}>{currentLesson.book.slice(0, 1)}</Text></View>
-            <View style={styles.pathCopy}><Text style={styles.pathBookTitle}>《{currentLesson.book}》· {currentLesson.chapter}</Text><Text style={styles.pathBookSubtitle}>本书样例 {bookLessonPosition} / {bookLessons.length} 句 · 路线 {currentIndex + 1}/{demoLessons.length}</Text></View>
+            <View style={styles.pathCopy}><Text style={styles.pathBookTitle}>《{currentLesson.book}》· {currentLesson.chapter}</Text><Text style={styles.pathBookSubtitle}>本书章句 {bookPosition.position} / {bookPosition.total}</Text></View>
             <Text style={styles.pathPercent}>{bookProgress}%</Text>
           </View>
           <View style={styles.progressTrack}><View style={[styles.progressFill, { width: bookProgress + "%" }]} /></View>
-          <Text style={styles.pathBookSubtitle}>演示路线进度 {routeProgress}%</Text>
+          <Text style={styles.pathBookSubtitle}>已读进度 {bookProgress}% · 随时可以继续</Text>
         </View>
       </ScrollView>
     );
@@ -416,8 +380,8 @@ export default function App() {
           <Text style={styles.screenSubtitle}>按书与篇章顺序推进，读到哪里就从哪里继续。</Text>
         </View>
         <View style={styles.routeNotice}>
-          <Text style={styles.routeNoticeTitle}>九部经典已接入顺序样例</Text>
-          <Text style={styles.routeNoticeText}>大学 → 中庸 → 论语 → 孟子 → 诗经 → 尚书 → 礼记 → 周易 → 春秋。每部目前只含开篇样句，用于体验跨书阅读和进度保存。</Text>
+          <Text style={styles.routeNoticeTitle}>九部经典全文已收录</Text>
+          <Text style={styles.routeNoticeText}>按大学 → 中庸 → 论语 → 孟子 → 诗经 → 尚书 → 礼记 → 周易 → 春秋排列。下一句先留在当前篇章；篇章或书目切换时会在按钮上说明。</Text>
         </View>
         {groups.map((group) => {
           const books = demoBooks.filter((book) => book.group === group);
@@ -430,7 +394,7 @@ export default function App() {
                   const selected = currentLesson.bookId === book.id;
                   const savedId = positions[book.id];
                   const savedLesson = demoLessons.find((lesson) => lesson.id === savedId);
-                  const status = selected ? "正在阅读" : progress === 100 ? "已读完样例" : progress > 0 ? "读过 " + progress + "%" : "尚未开始";
+                  const status = selected ? "正在阅读" : progress === 100 ? "已读完" : progress > 0 ? "读过 " + progress + "%" : `${book.chapterCount}篇`;
                   return (
                     <Pressable
                       key={book.title}
@@ -442,7 +406,7 @@ export default function App() {
                         <Text style={[styles.bookStatus, (selected || progress > 0) && styles.bookStatusActive]}>{status}</Text>
                       </View>
                       <Text style={styles.bookName}>{book.title}</Text>
-                      <Text style={styles.bookHint}>{savedLesson ? "从上次位置继续" : "进入开篇样句"}</Text>
+                      <Text style={styles.bookHint}>{savedLesson ? "从上次位置继续" : `${book.chapterCount}篇 · ${book.lessonCount}则`}</Text>
                     </Pressable>
                   );
                 })}
@@ -450,7 +414,7 @@ export default function App() {
             </View>
           );
         })}
-        <Text style={styles.catalogFootnote}>当前九部书的文本均为短样例。正式上线前需确认底本、标点、完整篇章和默认阅读顺序。</Text>
+        <Text style={styles.catalogFootnote}>原文按各来源的通行文本整理；《周易》含六十四卦与《易传》，《春秋》只收经文。拼音为自动注音，并非邓启铜版；文字、标点和古汉语异读可能与纸本不同。</Text>
       </ScrollView>
     );
   }
@@ -477,20 +441,23 @@ export default function App() {
         {entries.length === 0 ? (
           <View style={styles.emptyState}>
             <Text style={styles.emptySymbol}>{savedTab === "favorites" ? "☆" : "✎"}</Text>
-            <Text style={styles.emptyTitle}>{savedTab === "favorites" ? "收藏的句子会在这里" : "你的阅读笔记会在这里"}</Text>
-            <Text style={styles.emptyText}>{savedTab === "favorites" ? "在阅读页点亮句子旁的星标，把想再读的内容收进书架。" : "读到有感触的地方，写下一句自己的理解。"}</Text>
+            <Text style={styles.emptyTitle}>{savedTab === "favorites" ? "收藏的章句会在这里" : "你的阅读笔记会在这里"}</Text>
+            <Text style={styles.emptyText}>{savedTab === "favorites" ? "在阅读页点亮原文旁的星标，把想再读的内容收进书架。" : "读到有感触的地方，写下自己的理解。"}</Text>
             <Pressable style={styles.emptyCta} onPress={() => setScreen("today")}><Text style={styles.emptyCtaText}>回到今日阅读　→</Text></Pressable>
           </View>
         ) : (
           entries.map((lesson) => (
             <View key={lesson.id} style={styles.savedCard}>
               <View style={styles.savedCardTop}>
-                <Text style={styles.savedMeta}>《{lesson.book}》· {lesson.chapter}篇 · {lesson.section}</Text>
+              <Text style={styles.savedMeta}>《{lesson.book}》· {[lesson.chapter, lesson.section, lesson.unitLabel].filter(Boolean).filter((part, index, parts) => index === 0 || part !== parts[index - 1]).join(" · ")}</Text>
                 {savedTab === "favorites" ? (
                   <Pressable onPress={() => setFavorites((previous) => toggleFavorite(previous, lesson.id))} style={styles.savedStar}><Text>★</Text></Pressable>
                 ) : <Text style={styles.savedMeta}>个人笔记</Text>}
               </View>
-              <Pressable onPress={() => openSavedLesson(lesson.id)}><Text style={styles.savedQuote}>{safeTraditional(lesson.text, settings.script === "traditional")}</Text></Pressable>
+              <Pressable onPress={() => openSavedLesson(lesson.id)}>
+                {settings.showPinyin ? <Text style={styles.savedPinyin}>{lesson.pinyin}</Text> : null}
+                <Text style={styles.savedQuote}>{getLessonText(lesson, settings.script)}</Text>
+              </Pressable>
               {savedTab === "notes" ? <Text style={styles.savedNote}>{notes[lesson.id]}</Text> : null}
               <View style={styles.savedCardFooter}><Text style={styles.savedCitation}>{lesson.citation}</Text><Pressable onPress={() => openSavedLesson(lesson.id)}><Text style={styles.pathLink}>回到原文　→</Text></Pressable></View>
             </View>
@@ -546,7 +513,11 @@ export default function App() {
                 <Pressable onPress={() => setSettingsOpen(false)} style={styles.sheetClose}><Text style={styles.sheetCloseText}>×</Text></Pressable>
               </View>
               <View style={styles.settingRow}>
-                <View><Text style={styles.settingTitle}>文字显示</Text><Text style={styles.settingHint}>本地样例支持繁简切换</Text></View>
+                <View><Text style={styles.settingTitle}>拼音显示</Text><Text style={styles.settingHint}>默认显示自动注音</Text></View>
+                <SegmentedChoice options={[{ value: true, label: "开启" }, { value: false, label: "关闭" }]} value={settings.showPinyin} onChange={(value) => setSettings((previous) => ({ ...previous, showPinyin: value }))} />
+              </View>
+              <View style={styles.settingRow}>
+                <View><Text style={styles.settingTitle}>文字显示</Text><Text style={styles.settingHint}>完整文本支持繁简切换</Text></View>
                 <SegmentedChoice options={[{ value: "simplified", label: "简体" }, { value: "traditional", label: "繁体" }]} value={settings.script} onChange={(value) => setSettings((previous) => ({ ...previous, script: value }))} />
               </View>
               <View style={styles.settingRow}>
@@ -557,7 +528,7 @@ export default function App() {
                 <View><Text style={styles.settingTitle}>原文字号</Text><Text style={styles.settingHint}>按自己的阅读习惯调整</Text></View>
                 <SegmentedChoice options={[{ value: "small", label: "小" }, { value: "medium", label: "中" }, { value: "large", label: "大" }]} value={settings.fontSize} onChange={(value) => setSettings((previous) => ({ ...previous, fontSize: value }))} />
               </View>
-              <Text style={styles.sheetFootnote}>设置只保存在当前设备。繁简转换仅覆盖本 Demo 的样例句子。</Text>
+              <Text style={styles.sheetFootnote}>设置、收藏、笔记和进度保存在当前设备。拼音为程序自动注音，仅作阅读辅助；古汉语异读与不同底本请参照来源说明。</Text>
             </View>
           </View>
         </Modal>
@@ -631,7 +602,8 @@ const styles = StyleSheet.create({
   contextSpacer: { height: 24 },
   quotePanel: { minHeight: 142, width: "100%", alignItems: "center", justifyContent: "center", paddingHorizontal: 5 },
   quotePanelVertical: { minHeight: 230, flexDirection: "row", alignItems: "flex-start", justifyContent: "center" },
-  sentenceText: { color: "#2A3B31", fontFamily: "serif", fontWeight: "500", letterSpacing: 1, lineHeight: 54, textAlign: "center" },
+  pinyinText: { marginBottom: 9, color: "#9B8665", fontSize: 12, lineHeight: 21, textAlign: "center", letterSpacing: 0.2 },
+  sentenceText: { color: "#2A3B31", fontFamily: "serif", fontWeight: "500", letterSpacing: 0.6, lineHeight: 43, textAlign: "center" },
   termText: { color: "#94703F", textDecorationLine: "underline", textDecorationStyle: "dashed" },
   verticalSentence: { flexDirection: "row", alignItems: "flex-start", justifyContent: "center" },
   verticalCharacter: { marginHorizontal: 1, lineHeight: 39 },
@@ -721,6 +693,7 @@ const styles = StyleSheet.create({
   savedCardTop: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   savedMeta: { color: "#969D92", fontSize: 8 },
   savedStar: { padding: 3 },
+  savedPinyin: { marginTop: 8, color: "#9B8665", fontSize: 10, lineHeight: 18, textAlign: "center" },
   savedQuote: { marginTop: 8, color: "#43584A", fontFamily: "serif", fontSize: 17, lineHeight: 30 },
   savedNote: { marginTop: 7, paddingTop: 8, borderTopWidth: 1, borderTopColor: "#F0EEE8", color: "#7F887E", fontSize: 10, lineHeight: 17 },
   savedCardFooter: { marginTop: 8, paddingTop: 8, borderTopWidth: 1, borderTopColor: "#F0EEE8", flexDirection: "row", alignItems: "center", justifyContent: "space-between" },

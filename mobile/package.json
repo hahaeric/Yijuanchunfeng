@@ -16,7 +16,12 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "build:data": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/download-classics-data.ps1 && node scripts/build-classics-data.mjs"
   },
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "opencc-js": "^1.4.2",
+    "pinyin-pro": "^3.29.5"
+  }
 }
