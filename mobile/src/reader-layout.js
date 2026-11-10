@@ -9,6 +9,15 @@ const LEGACY_FONT_SIZES = {
   large: 34
 };
 
+const VERTICAL_GLYPHS = {
+  "《": "︽",
+  "》": "︾"
+};
+
+function getVerticalGlyph(character) {
+  return VERTICAL_GLYPHS[character] || character;
+}
+
 function normalizeReadingFontSize(value) {
   const numericValue = typeof value === "string" ? LEGACY_FONT_SIZES[value] : value;
   if (!Number.isFinite(numericValue)) return DEFAULT_READING_FONT_SIZE;
@@ -42,6 +51,7 @@ function makeVerticalColumns(blocks, pinyinUnits, rowsPerColumn) {
 
 module.exports = {
   DEFAULT_READING_FONT_SIZE,
+  getVerticalGlyph,
   MAX_READING_FONT_SIZE,
   MIN_READING_FONT_SIZE,
   READING_FONT_SIZE_STEP,

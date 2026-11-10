@@ -5,6 +5,7 @@ import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
 const {
   DEFAULT_READING_FONT_SIZE,
+  getVerticalGlyph,
   MAX_READING_FONT_SIZE,
   MIN_READING_FONT_SIZE,
   adjustReadingFontSize,
@@ -51,4 +52,14 @@ test("竖排分栏逐字保留拼音、标点与对话顺序", () => {
   }
   assert.equal(characterOffset, [...lesson.traditionalText].length);
   assert.ok(columnsByBlock.flat(1).every((column) => column.length <= 6));
+});
+
+test("书名号只在竖排呈现为竖排专用字形", () => {
+  assert.equal(getVerticalGlyph("《"), "︽");
+  assert.equal(getVerticalGlyph("》"), "︾");
+  assert.equal(getVerticalGlyph("诗"), "诗");
+
+  const lesson = demoLessons.find((item) => item.id === "lunyu-162");
+  assert.ok(lesson.traditionalText.includes("《詩》"), "繁体原文仍保留横排底本标点");
+  assert.deepEqual(getLessonBlocks(lesson, "traditional").join(""), lesson.traditionalText);
 });

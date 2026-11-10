@@ -28,6 +28,7 @@ const {
 } = require("./src/model");
 const {
   DEFAULT_READING_FONT_SIZE,
+  getVerticalGlyph,
   MAX_READING_FONT_SIZE,
   MIN_READING_FONT_SIZE,
   adjustReadingFontSize,
@@ -208,7 +209,7 @@ function VerticalReadingBlocks({ lesson, blocks, showPinyin, fontSize, height })
               {column.map(({ character, pinyin }, characterIndex) => (
                 <View key={`character-${characterIndex}`} style={[styles.verticalCell, { minHeight: columnHeight }]}>
                   {showPinyin ? <Text style={[styles.verticalPinyin, { height: pinyinHeight, fontSize: pinyinSize, lineHeight: pinyinHeight }]}>{pinyin}</Text> : null}
-                  <Text style={[textStyle, styles.verticalCharacter]}>{character}</Text>
+                  <Text style={[textStyle, styles.verticalCharacter]}>{getVerticalGlyph(character)}</Text>
                 </View>
               ))}
             </View>
