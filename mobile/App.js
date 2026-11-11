@@ -44,7 +44,8 @@ const {
   adjustReadingFontSize,
   makeVerticalColumns,
   normalizeReadingFontSize,
-  normalizeReadingFontStyle
+  normalizeReadingFontStyle,
+  scrollToReaderCard
 } = require("./src/reader-layout");
 
 const STORAGE_KEY = "yijuan-chunfeng-mobile-full-corpus-v2";
@@ -268,6 +269,8 @@ export default function App() {
   const [searchReturnScreen, setSearchReturnScreen] = useState("library");
   const toastTimer = useRef(null);
   const scrollRef = useRef(null);
+  const readerCardOffset = useRef(0);
+  const pendingReaderScroll = useRef(false);
   const todayKey = useRef(localDateKey());
   const currentLesson = demoLessons[currentIndex];
   const transition = getTransition(currentIndex);
@@ -277,6 +280,12 @@ export default function App() {
   const readingFontStyle = normalizeReadingFontStyle(settings.fontStyle);
   const readingFontFamily = loadedFontStyles.has(readingFontStyle) ? READING_FONT_FAMILIES[readingFontStyle] : undefined;
   const searchResults = useMemo(() => searchLessons(searchQuery), [searchQuery]);
+
+  useEffect(() => {
+    if (!pendingReaderScroll.current) return;
+    pendingReaderScroll.current = false;
+    scrollToReaderCard(scrollRef, readerCardOffset.current);
+  }, [currentIndex]);
 
   useEffect(() => {
     let mounted = true;
@@ -377,21 +386,21 @@ export default function App() {
     setPositions((previous) =>
       savePosition(savePosition(previous, currentLesson.bookId, currentLesson.id), followingLesson.bookId, followingLesson.id)
     );
+    pendingReaderScroll.current = true;
     setCurrentIndex(nextIndex);
     setNoteOpen(false);
     setNoteDraft("");
-    scrollRef.current?.scrollTo({ y: 0, animated: false });
   }
 
   function goToPreviousLesson() {
     const previousIndex = previousLessonIndex(currentIndex);
     if (previousIndex < 0) return;
     const previousLesson = demoLessons[previousIndex];
+    pendingReaderScroll.current = true;
     setCurrentIndex(previousIndex);
     setPositions((previous) => savePosition(previous, previousLesson.bookId, previousLesson.id));
     setNoteOpen(false);
     setNoteDraft("");
-    scrollRef.current?.scrollTo({ y: 0, animated: false });
   }
 
   function stopReading() {
@@ -499,7 +508,11 @@ export default function App() {
           <Text style={styles.goalFoot}>没有每日句数限制，读完当前内容后可以继续。</Text>
         </View>
 
-        <View key={currentLesson.id} style={styles.readerCard}>
+        <View
+          key={currentLesson.id}
+          style={styles.readerCard}
+          onLayout={(event) => { readerCardOffset.current = event.nativeEvent.layout.y; }}
+        >
           <View style={styles.readerTop}>
             <View style={styles.bookPill}><Text style={styles.bookPillText}>《{currentLesson.book}》</Text></View>
             <Text style={styles.readerLocation}>{location}</Text>

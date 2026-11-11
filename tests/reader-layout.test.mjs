@@ -13,7 +13,8 @@ const {
   adjustReadingFontSize,
   makeVerticalColumns,
   normalizeReadingFontSize,
-  normalizeReadingFontStyle
+  normalizeReadingFontStyle,
+  scrollToReaderCard
 } = require("../mobile/src/reader-layout.js");
 const { demoLessons, getLessonBlocks } = require("../mobile/src/model.js");
 
@@ -37,6 +38,24 @@ test("阅读书体支持默认与篆隶楷行草，兼容无效的旧设置", ()
     assert.equal(normalizeReadingFontStyle(value), value);
   }
   assert.equal(normalizeReadingFontStyle("unavailable-font"), DEFAULT_READING_FONT_STYLE);
+});
+
+test("切换章句后滚动到阅读卡片顶部", () => {
+  const scrollCalls = [];
+  const scrollRef = { current: { scrollTo: (options) => scrollCalls.push(options) } };
+
+  scrollToReaderCard(scrollRef, 248);
+
+  assert.deepEqual(scrollCalls, [{ y: 248, animated: false }]);
+});
+
+test("阅读卡片滚动位置不会小于页面顶部", () => {
+  const scrollCalls = [];
+  const scrollRef = { current: { scrollTo: (options) => scrollCalls.push(options) } };
+
+  scrollToReaderCard(scrollRef, -20);
+
+  assert.deepEqual(scrollCalls, [{ y: 0, animated: false }]);
 });
 
 test("竖排分栏逐字保留拼音、标点与对话顺序", () => {

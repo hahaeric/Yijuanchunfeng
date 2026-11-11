@@ -45,6 +45,11 @@ function adjustReadingFontSize(value, direction) {
   return normalizeReadingFontSize(normalizeReadingFontSize(value) + step);
 }
 
+function scrollToReaderCard(scrollRef, cardTop) {
+  const y = Number.isFinite(cardTop) ? Math.max(0, cardTop) : 0;
+  scrollRef.current?.scrollTo({ y, animated: false });
+}
+
 function makeVerticalColumns(blocks, pinyinUnits, rowsPerColumn) {
   const columnLength = Math.max(1, Math.floor(rowsPerColumn) || 1);
   let characterOffset = 0;
@@ -76,5 +81,6 @@ module.exports = {
   adjustReadingFontSize,
   makeVerticalColumns,
   normalizeReadingFontSize,
-  normalizeReadingFontStyle
+  normalizeReadingFontStyle,
+  scrollToReaderCard
 };
