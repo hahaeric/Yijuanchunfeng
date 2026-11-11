@@ -12,4 +12,5 @@ test("EAS preview profile creates an internally distributable Android APK", () =
 
 test("Expo project is configured under the provided team account", () => {
   assert.equal(appConfig.expo.owner, "a114324s-team");
+  assert.match(appConfig.expo.extra.eas.projectId, /^[0-9a-f-]{36}$/u);
 });
