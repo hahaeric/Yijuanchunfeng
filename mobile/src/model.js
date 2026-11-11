@@ -116,6 +116,74 @@ function getLessonBlocks(lesson, script = "simplified") {
   return ranges.map(({ start, end }) => characters.slice(start, end).join(""));
 }
 
+function getChapterOutline(bookId, lessons = demoLessons) {
+  const bookLessons = getBookLessons(bookId, lessons);
+  const chapters = [];
+  const indexByChapter = new Map();
+  for (const lesson of bookLessons) {
+    const chapterName = lesson.chapter || "";
+    if (!indexByChapter.has(chapterName)) {
+      indexByChapter.set(chapterName, { chapter: chapterName, lessons: [] });
+      chapters.push(indexByChapter.get(chapterName));
+    }
+    indexByChapter.get(chapterName).lessons.push(lesson);
+  }
+  return chapters;
+}
+
+function getFirstUnreadLessonId(chapterLessons, readLessonIds) {
+  const read = new Set(readLessonIds);
+  const firstUnread = chapterLessons.find((lesson) => !read.has(lesson.id));
+  return (firstUnread || chapterLessons[0])?.id || null;
+}
+
+function getChapterProgress(chapterLessons, readLessonIds) {
+  if (!chapterLessons || chapterLessons.length === 0) return 0;
+  const read = new Set(readLessonIds);
+  const completed = chapterLessons.reduce((count, lesson) => count + (read.has(lesson.id) ? 1 : 0), 0);
+  return Math.round((completed / chapterLessons.length) * 100);
+}
+
+function makeSearchSnippet(text, matchIndex, radius = 18) {
+  const start = Math.max(0, matchIndex - radius);
+  const end = Math.min(text.length, matchIndex + radius + 1);
+  const prefix = start > 0 ? "…" : "";
+  const suffix = end < text.length ? "…" : "";
+  return `${prefix}${text.slice(start, end).replace(/\s+/g, " ").trim()}${suffix}`;
+}
+
+function searchLessons(query, lessons = demoLessons) {
+  const needle = (query || "").trim().toLowerCase();
+  if (!needle) return [];
+  const results = [];
+  for (const lesson of lessons) {
+    const locationText = [lesson.chapter, lesson.section, lesson.unitLabel].filter(Boolean).join(" ");
+    const simplifiedText = lesson.text || "";
+    const traditionalText = lesson.traditionalText || "";
+    const simplifiedIndex = simplifiedText.toLowerCase().indexOf(needle);
+    const traditionalIndex = traditionalText.toLowerCase().indexOf(needle);
+    const locationIndex = locationText.toLowerCase().indexOf(needle);
+
+    if (simplifiedIndex < 0 && traditionalIndex < 0 && locationIndex < 0) continue;
+
+    let snippet;
+    if (simplifiedIndex >= 0) snippet = makeSearchSnippet(simplifiedText, simplifiedIndex);
+    else if (traditionalIndex >= 0) snippet = makeSearchSnippet(traditionalText, traditionalIndex);
+    else snippet = makeSearchSnippet(simplifiedText, 0);
+
+    results.push({
+      lessonId: lesson.id,
+      book: lesson.book,
+      chapter: lesson.chapter,
+      section: lesson.section,
+      unitLabel: lesson.unitLabel,
+      citation: lesson.citation,
+      snippet
+    });
+  }
+  return results;
+}
+
 module.exports = {
   corpus,
   demoBooks,
@@ -124,6 +192,9 @@ module.exports = {
   getBookPosition,
   getBookProgress,
   getBookStartIndex,
+  getChapterOutline,
+  getChapterProgress,
+  getFirstUnreadLessonId,
   getLessonBlocks,
   getLessonText,
   getPositionIndex,
@@ -131,6 +202,7 @@ module.exports = {
   previousLessonIndex,
   getTransition,
   nextLessonIndex,
+  searchLessons,
   savePosition,
   toggleFavorite,
   updateNote

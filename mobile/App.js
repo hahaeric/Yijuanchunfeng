@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Modal,
   Platform,
@@ -19,12 +19,16 @@ const {
   demoLessons,
   getBookPosition,
   getBookProgress,
+  getChapterOutline,
+  getChapterProgress,
+  getFirstUnreadLessonId,
   getPositionIndex,
   getLessonBlocks,
   getLessonText,
   getTransition,
   previousLessonIndex,
   savePosition,
+  searchLessons,
   toggleFavorite,
   updateNote
 } = require("./src/model");
@@ -255,6 +259,10 @@ export default function App() {
   const [noteOpen, setNoteOpen] = useState(false);
   const [noteDraft, setNoteDraft] = useState("");
   const [toast, setToast] = useState("");
+  const [outlineBookId, setOutlineBookId] = useState(null);
+  const [openChapterKey, setOpenChapterKey] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchReturnScreen, setSearchReturnScreen] = useState("library");
   const toastTimer = useRef(null);
   const scrollRef = useRef(null);
   const todayKey = useRef(localDateKey());
@@ -265,6 +273,7 @@ export default function App() {
   const readingFontSize = normalizeReadingFontSize(settings.fontSize);
   const readingFontStyle = normalizeReadingFontStyle(settings.fontStyle);
   const readingFontFamily = loadedFontStyles.has(readingFontStyle) ? READING_FONT_FAMILIES[readingFontStyle] : undefined;
+  const searchResults = useMemo(() => searchLessons(searchQuery), [searchQuery]);
 
   useEffect(() => {
     let mounted = true;
@@ -274,7 +283,7 @@ export default function App() {
         const saved = JSON.parse(raw);
         const index = Math.max(0, Math.min(Number(saved.currentIndex) || 0, demoLessons.length - 1));
         setCurrentIndex(index);
-        setScreen(saved.screen || "today");
+        setScreen(["today", "library", "saved"].includes(saved.screen) ? saved.screen : "today");
         setFavorites(Array.isArray(saved.favorites) ? saved.favorites : []);
         setNotes(saved.notes && typeof saved.notes === "object" ? saved.notes : {});
         setPositions(saved.positions && typeof saved.positions === "object" ? saved.positions : {});
@@ -409,7 +418,7 @@ export default function App() {
     notify(noteDraft.trim() ? "笔记已保存。" : "空白笔记已清除。");
   }
 
-  function openSavedLesson(lessonId) {
+  function openLesson(lessonId) {
     const index = demoLessons.findIndex((lesson) => lesson.id === lessonId);
     if (index < 0) return;
     setCurrentIndex(index);
@@ -418,6 +427,26 @@ export default function App() {
     setNoteOpen(false);
     scrollRef.current?.scrollTo({ y: 0, animated: false });
     notify("已回到这则原文。");
+  }
+
+  function openOutline(bookId) {
+    const outline = getChapterOutline(bookId);
+    setOutlineBookId(bookId);
+    setOpenChapterKey(outline.length === 1 ? outline[0].chapter : null);
+    setScreen("chapters");
+    scrollRef.current?.scrollTo({ y: 0, animated: false });
+  }
+
+  function openSearch(fromScreen) {
+    setSearchReturnScreen(fromScreen || "library");
+    setSearchQuery("");
+    setScreen("search");
+  }
+
+  function closeSubScreen() {
+    setScreen(screen === "search" ? searchReturnScreen : "library");
+    setOutlineBookId(null);
+    setOpenChapterKey(null);
   }
 
   function renderCurrentPassage() {
@@ -583,7 +612,7 @@ export default function App() {
                   return (
                     <Pressable
                       key={book.title}
-                      onPress={() => selectBook(book.id)}
+                      onPress={() => openOutline(book.id)}
                       style={({ pressed }) => [styles.bookCard, (selected || progress > 0) && styles.bookCardActive, pressed && styles.pressed]}
                     >
                       <View style={styles.bookCardTop}>
@@ -639,11 +668,11 @@ export default function App() {
                   <Pressable onPress={() => setFavorites((previous) => toggleFavorite(previous, lesson.id))} style={styles.savedStar}><Text>★</Text></Pressable>
                 ) : <Text style={styles.savedMeta}>个人笔记</Text>}
               </View>
-              <Pressable onPress={() => openSavedLesson(lesson.id)}>
+              <Pressable onPress={() => openLesson(lesson.id)}>
                 <ReadingBlocks lesson={lesson} blocks={getLessonBlocks(lesson, settings.script)} showPinyin={settings.showPinyin} fontSize={17} textStyle={[styles.savedQuote, readingFontFamily ? { fontFamily: readingFontFamily } : null]} />
               </Pressable>
               {savedTab === "notes" ? <Text style={styles.savedNote}>{notes[lesson.id]}</Text> : null}
-              <View style={styles.savedCardFooter}><Text style={styles.savedCitation}>{lesson.citation}</Text><Pressable onPress={() => openSavedLesson(lesson.id)}><Text style={styles.pathLink}>回到原文　→</Text></Pressable></View>
+              <View style={styles.savedCardFooter}><Text style={styles.savedCitation}>{lesson.citation}</Text><Pressable onPress={() => openLesson(lesson.id)}><Text style={styles.pathLink}>回到原文　→</Text></Pressable></View>
             </View>
           ))
         )}
@@ -651,20 +680,151 @@ export default function App() {
     );
   }
 
-  const screenContent = screen === "library" ? renderLibrary() : screen === "saved" ? renderSaved() : renderToday();
+  function renderChapters() {
+    const book = demoBooks.find((item) => item.id === outlineBookId);
+    if (!book) {
+      return (
+        <ScrollView ref={scrollRef} style={styles.scroll} contentContainerStyle={styles.screenContent} showsVerticalScrollIndicator={false}>
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyTitle}>未找到该经书</Text>
+            <Pressable style={styles.emptyCta} onPress={() => setScreen("library")}><Text style={styles.emptyCtaText}>回到目录　→</Text></Pressable>
+          </View>
+        </ScrollView>
+      );
+    }
+    const outline = getChapterOutline(book.id);
+    const hasSavedPosition = Boolean(positions[book.id]);
+    return (
+      <ScrollView ref={scrollRef} style={styles.scroll} contentContainerStyle={styles.screenContent} showsVerticalScrollIndicator={false}>
+        <View style={styles.screenHeading}>
+          <View style={styles.eyebrowRow}><View style={styles.eyebrowLine} /><Text style={styles.eyebrow}>典籍 · 篇目定位</Text></View>
+          <Text style={styles.screenTitle}>《{book.title}》篇目</Text>
+          <Text style={styles.screenSubtitle}>共 {book.chapterCount} 篇 · {book.lessonCount} 则，点开篇目可定位到任意一则。</Text>
+        </View>
+        <Pressable onPress={() => selectBook(book.id)} style={({ pressed }) => [styles.continueButton, pressed && styles.pressed]}>
+          <Text style={styles.continueButtonText}>{hasSavedPosition ? "从上次位置继续阅读" : "开始阅读"}　→</Text>
+        </Pressable>
+        {outline.map((chapter) => {
+          const key = chapter.chapter;
+          const open = openChapterKey === key;
+          const progress = getChapterProgress(chapter.lessons, readLessonIds);
+          return (
+            <View key={key} style={styles.chapterCard}>
+              <Pressable onPress={() => setOpenChapterKey(open ? null : key)} style={({ pressed }) => [styles.chapterHeader, pressed && styles.pressed]}>
+                <View style={styles.chapterHeaderCopy}>
+                  <Text style={styles.chapterName}>{key}</Text>
+                  <Text style={styles.chapterMeta}>{chapter.lessons.length} 则 · 已读 {progress}%</Text>
+                </View>
+                <Text style={styles.chapterChevron}>{open ? "−" : "+"}</Text>
+              </Pressable>
+              {open ? (
+                <View style={styles.chapterBody}>
+                  <Pressable onPress={() => openLesson(getFirstUnreadLessonId(chapter.lessons, readLessonIds))} style={({ pressed }) => [styles.chapterJump, pressed && styles.pressed]}>
+                    <Text style={styles.chapterJumpText}>从未读处继续阅读　→</Text>
+                  </Pressable>
+                  {chapter.lessons.map((lesson) => {
+                    const read = readLessonIds.includes(lesson.id);
+                    const preview = getLessonText(lesson, settings.script).replace(/\s+/g, " ").trim();
+                    return (
+                      <Pressable key={lesson.id} onPress={() => openLesson(lesson.id)} style={({ pressed }) => [styles.lessonRow, pressed && styles.pressed]}>
+                        <Text style={[styles.lessonUnit, read && styles.lessonUnitRead]}>{lesson.unitLabel || "—"}</Text>
+                        <Text style={styles.lessonPreview} numberOfLines={1}>{preview}</Text>
+                        <Text style={styles.lessonArrow}>{read ? "✓" : "→"}</Text>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+              ) : null}
+            </View>
+          );
+        })}
+      </ScrollView>
+    );
+  }
+
+  function renderSearch() {
+    const query = searchQuery.trim();
+    const visibleResults = searchResults.slice(0, 80);
+    return (
+      <View style={styles.searchScreen}>
+        <View style={styles.searchBoxWrap}>
+          <View style={styles.searchBox}>
+            <Text style={styles.searchIcon}>⌕</Text>
+            <TextInput
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              placeholder="输入原文或篇目，如「学而时习之」"
+              placeholderTextColor={COLORS.mutedLight}
+              autoFocus
+              returnKeyType="search"
+              style={styles.searchInput}
+            />
+            {searchQuery ? <Pressable onPress={() => setSearchQuery("")} style={({ pressed }) => [styles.searchClear, pressed && styles.pressed]}><Text style={styles.searchClearText}>×</Text></Pressable> : null}
+          </View>
+        </View>
+        <ScrollView ref={scrollRef} style={styles.scroll} contentContainerStyle={styles.screenContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+          {!query ? (
+            <View style={styles.searchHint}>
+              <Text style={styles.searchHintTitle}>检索九部经典</Text>
+              <Text style={styles.searchHintText}>按原文、篇名或章节名查找，点击结果可直接跳到该则。</Text>
+            </View>
+          ) : visibleResults.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptySymbol}>⌕</Text>
+              <Text style={styles.emptyTitle}>没有找到相关条目</Text>
+              <Text style={styles.emptyText}>换个关键词试试，或输入篇目名定位。</Text>
+            </View>
+          ) : (
+            <View>
+              <Text style={styles.searchCount}>找到 {searchResults.length} 条，显示前 {visibleResults.length} 条</Text>
+              {visibleResults.map((result) => (
+                <Pressable key={result.lessonId} onPress={() => openLesson(result.lessonId)} style={({ pressed }) => [styles.searchResult, pressed && styles.pressed]}>
+                  <Text style={styles.searchResultMeta}>《{result.book}》· {[result.chapter, result.section, result.unitLabel].filter(Boolean).filter((part, index, parts) => index === 0 || part !== parts[index - 1]).join(" · ")}</Text>
+                  <Text style={styles.searchResultSnippet} numberOfLines={2}>{result.snippet}</Text>
+                </Pressable>
+              ))}
+            </View>
+          )}
+        </ScrollView>
+      </View>
+    );
+  }
+
+  let screenContent;
+  if (screen === "library") screenContent = renderLibrary();
+  else if (screen === "saved") screenContent = renderSaved();
+  else if (screen === "chapters") screenContent = renderChapters();
+  else if (screen === "search") screenContent = renderSearch();
+  else screenContent = renderToday();
   const webStage = Platform.OS === "web";
   return (
     <View style={[styles.stage, webStage && styles.webStage]}>
       <SafeAreaView style={[styles.appFrame, webStage && styles.webFrame]}>
         <StatusBar style="dark" />
         <View style={styles.topBar}>
-          <View style={styles.brand}>
-            <View style={styles.brandMark}><Text style={styles.brandMarkText}>经</Text></View>
-            <View><Text style={styles.brandName}>经典</Text><Text style={styles.brandSubtitle}>四书五经 · 日日读</Text></View>
-          </View>
-          <Pressable onPress={() => setSettingsOpen(true)} style={({ pressed }) => [styles.settingsButton, pressed && styles.pressed]} accessibilityLabel="阅读设置">
-            <Text style={styles.settingsGlyph}>⚙</Text>
-          </Pressable>
+          {screen === "chapters" || screen === "search" ? (
+            <View style={styles.subTopBar}>
+              <Pressable onPress={closeSubScreen} style={({ pressed }) => [styles.backButton, pressed && styles.pressed]} accessibilityLabel="返回">
+                <Text style={styles.backButtonText}>←</Text>
+              </Pressable>
+              <Text style={styles.topBarTitle} numberOfLines={1}>{screen === "chapters" ? (demoBooks.find((item) => item.id === outlineBookId)?.title || "篇目") : "检索"}</Text>
+            </View>
+          ) : (
+            <View style={styles.topBarMain}>
+              <View style={styles.brand}>
+                <View style={styles.brandMark}><Text style={styles.brandMarkText}>经</Text></View>
+                <View><Text style={styles.brandName}>经典</Text><Text style={styles.brandSubtitle}>四书五经 · 日日读</Text></View>
+              </View>
+              <View style={styles.topBarActions}>
+                <Pressable onPress={() => openSearch(screen)} style={({ pressed }) => [styles.settingsButton, pressed && styles.pressed]} accessibilityLabel="检索">
+                  <Text style={styles.searchGlyph}>⌕</Text>
+                </Pressable>
+                <Pressable onPress={() => setSettingsOpen(true)} style={({ pressed }) => [styles.settingsButton, pressed && styles.pressed]} accessibilityLabel="阅读设置">
+                  <Text style={styles.settingsGlyph}>⚙</Text>
+                </Pressable>
+              </View>
+            </View>
+          )}
         </View>
 
         <View style={styles.body}>
@@ -929,6 +1089,43 @@ const styles = StyleSheet.create({
   savedNote: { marginTop: 7, paddingTop: 8, borderTopWidth: 1, borderTopColor: "#F0EEE8", color: "#7F887E", fontSize: 10, lineHeight: 17 },
   savedCardFooter: { marginTop: 8, paddingTop: 8, borderTopWidth: 1, borderTopColor: "#F0EEE8", flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   savedCitation: { color: "#A2A59B", fontSize: 8 },
+  topBarMain: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  subTopBar: { flex: 1, flexDirection: "row", alignItems: "center", gap: 12 },
+  topBarActions: { flexDirection: "row", alignItems: "center", gap: 8 },
+  backButton: { width: 36, height: 36, borderRadius: 18, backgroundColor: "#ECEFE8", alignItems: "center", justifyContent: "center" },
+  backButtonText: { color: COLORS.green, fontSize: 18, lineHeight: 22 },
+  topBarTitle: { flex: 1, color: COLORS.ink, fontFamily: "serif", fontSize: 16, fontWeight: "600" },
+  searchGlyph: { color: COLORS.green, fontSize: 18 },
+  continueButton: { minHeight: 46, marginBottom: 16, borderRadius: 12, alignItems: "center", justifyContent: "center", backgroundColor: COLORS.green },
+  continueButtonText: { color: "#FFFDF8", fontSize: 12, fontWeight: "600", letterSpacing: 0.4 },
+  chapterCard: { marginBottom: 8, overflow: "hidden", borderWidth: 1, borderColor: "#E8E6DE", borderRadius: 12, backgroundColor: COLORS.paper },
+  chapterHeader: { minHeight: 48, paddingHorizontal: 12, flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  chapterHeaderCopy: { flex: 1, paddingRight: 10 },
+  chapterName: { color: "#465B4C", fontFamily: "serif", fontSize: 14, fontWeight: "600" },
+  chapterMeta: { marginTop: 3, color: "#9BA397", fontSize: 8 },
+  chapterChevron: { color: "#A0A79C", fontSize: 17 },
+  chapterBody: { paddingHorizontal: 12, paddingBottom: 11, borderTopWidth: 1, borderTopColor: "#F0EEE8" },
+  chapterJump: { marginTop: 10, paddingVertical: 9, borderRadius: 8, alignItems: "center", backgroundColor: "#EEF3EC" },
+  chapterJumpText: { color: "#56705A", fontSize: 9, fontWeight: "600" },
+  lessonRow: { minHeight: 36, paddingVertical: 7, flexDirection: "row", alignItems: "center", gap: 8, borderTopWidth: 1, borderTopColor: "#F5F3ED" },
+  lessonUnit: { minWidth: 42, color: "#A47D4D", fontSize: 9 },
+  lessonUnitRead: { color: "#8CA18E" },
+  lessonPreview: { flex: 1, color: "#687669", fontSize: 10 },
+  lessonArrow: { color: "#B3B8AD", fontSize: 12 },
+  searchScreen: { flex: 1, minHeight: 0 },
+  searchBoxWrap: { paddingHorizontal: 18, paddingTop: 12, paddingBottom: 10, backgroundColor: COLORS.background },
+  searchBox: { minHeight: 42, paddingHorizontal: 12, borderWidth: 1, borderColor: "#E3E1D8", borderRadius: 11, flexDirection: "row", alignItems: "center", gap: 8, backgroundColor: COLORS.paper },
+  searchIcon: { color: "#9A937F", fontSize: 15 },
+  searchInput: { flex: 1, color: COLORS.ink, fontSize: 12 },
+  searchClear: { width: 22, height: 22, borderRadius: 11, alignItems: "center", justifyContent: "center", backgroundColor: "#ECE9E0" },
+  searchClearText: { color: "#889188", fontSize: 13, lineHeight: 15 },
+  searchHint: { marginTop: 10, padding: 14, borderWidth: 1, borderStyle: "dashed", borderColor: "#DEDED5", borderRadius: 15, alignItems: "center" },
+  searchHintTitle: { color: "#5A6B5E", fontFamily: "serif", fontSize: 13 },
+  searchHintText: { marginTop: 6, color: "#9AA196", fontSize: 9, lineHeight: 16, textAlign: "center" },
+  searchCount: { marginBottom: 10, color: "#9AA196", fontSize: 8 },
+  searchResult: { marginBottom: 8, padding: 12, borderWidth: 1, borderColor: "#E8E6DE", borderRadius: 12, backgroundColor: COLORS.paper },
+  searchResultMeta: { color: "#A47D4D", fontSize: 8 },
+  searchResultSnippet: { marginTop: 7, color: "#43584A", fontFamily: "serif", fontSize: 14, lineHeight: 22 },
   tabBar: { minHeight: 63, paddingHorizontal: 26, paddingTop: 6, paddingBottom: Platform.OS === "ios" ? 12 : 7, borderTopWidth: 1, borderTopColor: "#E6E4DC", flexDirection: "row", alignItems: "center", justifyContent: "space-around", backgroundColor: "#FBFAF6" },
   tabItem: { minWidth: 54, alignItems: "center", justifyContent: "center", gap: 2 },
   tabSymbol: { color: "#9DA49A", fontSize: 17, lineHeight: 20 },
