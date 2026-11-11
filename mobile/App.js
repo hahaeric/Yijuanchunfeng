@@ -14,6 +14,8 @@ import { StatusBar } from "expo-status-bar";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Font from "expo-font";
 
+const { getStoredValueWithMigration } = require("./src/storage-migration");
+
 const {
   demoBooks,
   demoLessons,
@@ -45,7 +47,8 @@ const {
   normalizeReadingFontStyle
 } = require("./src/reader-layout");
 
-const STORAGE_KEY = "jingri-mobile-full-corpus-v2";
+const STORAGE_KEY = "yijuan-chunfeng-mobile-full-corpus-v2";
+const LEGACY_STORAGE_KEYS = ["jingri-mobile-full-corpus-v2"];
 const COLORS = {
   background: "#F4F2EA",
   paper: "#FEFDF9",
@@ -63,11 +66,11 @@ const COLORS = {
 };
 
 const READING_FONT_FAMILIES = {
-  seal: "JingriSeal",
-  lishu: "JingriLishu",
-  kai: "JingriKai",
-  xing: "JingriXing",
-  cao: "JingriCao"
+  seal: "YijuanChunfengSeal",
+  lishu: "YijuanChunfengLishu",
+  kai: "YijuanChunfengKai",
+  xing: "YijuanChunfengXing",
+  cao: "YijuanChunfengCao"
 };
 
 const READING_FONT_ASSETS = {
@@ -277,7 +280,7 @@ export default function App() {
 
   useEffect(() => {
     let mounted = true;
-    AsyncStorage.getItem(STORAGE_KEY)
+    getStoredValueWithMigration(AsyncStorage, STORAGE_KEY, LEGACY_STORAGE_KEYS)
       .then((raw) => {
         if (!mounted || !raw) return;
         const saved = JSON.parse(raw);
