@@ -4,13 +4,16 @@ import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
 const {
+  DEFAULT_READING_FONT_STYLE,
   DEFAULT_READING_FONT_SIZE,
   getVerticalGlyph,
   MAX_READING_FONT_SIZE,
   MIN_READING_FONT_SIZE,
+  READING_FONT_OPTIONS,
   adjustReadingFontSize,
   makeVerticalColumns,
-  normalizeReadingFontSize
+  normalizeReadingFontSize,
+  normalizeReadingFontStyle
 } = require("../mobile/src/reader-layout.js");
 const { demoLessons, getLessonBlocks } = require("../mobile/src/model.js");
 
@@ -25,6 +28,15 @@ test("阅读字号支持连续调整、兼容旧设置并限制在可读范围",
   assert.equal(adjustReadingFontSize(29, -1), 27);
   assert.equal(adjustReadingFontSize(MAX_READING_FONT_SIZE, 1), MAX_READING_FONT_SIZE);
   assert.equal(adjustReadingFontSize(MIN_READING_FONT_SIZE, -1), MIN_READING_FONT_SIZE);
+});
+
+test("阅读书体支持默认与篆隶楷行草，兼容无效的旧设置", () => {
+  assert.deepEqual(READING_FONT_OPTIONS.map(({ value }) => value), ["default", "seal", "lishu", "kai", "xing", "cao"]);
+  assert.equal(normalizeReadingFontStyle(undefined), DEFAULT_READING_FONT_STYLE);
+  for (const { value } of READING_FONT_OPTIONS) {
+    assert.equal(normalizeReadingFontStyle(value), value);
+  }
+  assert.equal(normalizeReadingFontStyle("unavailable-font"), DEFAULT_READING_FONT_STYLE);
 });
 
 test("竖排分栏逐字保留拼音、标点与对话顺序", () => {

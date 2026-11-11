@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Font from "expo-font";
 
 const {
   demoBooks,
@@ -22,18 +23,22 @@ const {
   getLessonBlocks,
   getLessonText,
   getTransition,
+  previousLessonIndex,
   savePosition,
   toggleFavorite,
   updateNote
 } = require("./src/model");
 const {
   DEFAULT_READING_FONT_SIZE,
+  DEFAULT_READING_FONT_STYLE,
   getVerticalGlyph,
   MAX_READING_FONT_SIZE,
   MIN_READING_FONT_SIZE,
+  READING_FONT_OPTIONS,
   adjustReadingFontSize,
   makeVerticalColumns,
-  normalizeReadingFontSize
+  normalizeReadingFontSize,
+  normalizeReadingFontStyle
 } = require("./src/reader-layout");
 
 const STORAGE_KEY = "jingri-mobile-full-corpus-v2";
@@ -53,15 +58,29 @@ const COLORS = {
   rose: "#A8725C"
 };
 
-const defaultSettings = { script: "simplified", layout: "horizontal", fontSize: DEFAULT_READING_FONT_SIZE, showPinyin: true };
+const READING_FONT_FAMILIES = {
+  seal: "JingriSeal",
+  lishu: "JingriLishu",
+  kai: "JingriKai",
+  xing: "JingriXing",
+  cao: "JingriCao"
+};
 
-function getNextActionLabel(transition) {
-  if (transition.type === "end") return "已读完九部经典";
-  if (transition.type === "book") return `本书读完 · 进入《${transition.nextLesson.book}》`;
-  if (transition.type === "chapter") return `本篇读完 · 进入${transition.nextLesson.chapter}`;
-  if (transition.type === "section") return `进入下一节 · ${transition.nextLesson.section}`;
-  return "下一句";
-}
+const READING_FONT_ASSETS = {
+  seal: require("./assets/fonts/ShuowenSeal.ttf"),
+  lishu: require("./assets/fonts/AlimamaDaoLiTi.ttf"),
+  kai: require("./assets/fonts/MaShanZheng-Regular.ttf"),
+  xing: require("./assets/fonts/ZhiMangXing-Regular.ttf"),
+  cao: require("./assets/fonts/LiuJianMaoCao-Regular.ttf")
+};
+
+const defaultSettings = {
+  script: "simplified",
+  layout: "horizontal",
+  fontSize: DEFAULT_READING_FONT_SIZE,
+  fontStyle: DEFAULT_READING_FONT_STYLE,
+  showPinyin: true
+};
 
 function localDateKey() {
   const date = new Date();
@@ -92,16 +111,16 @@ function Disclosure({ title, symbol, open, onPress, children }) {
   );
 }
 
-function SegmentedChoice({ options, value, onChange }) {
+function SegmentedChoice({ options, value, onChange, containerStyle, optionStyle, labelStyle }) {
   return (
-    <View style={styles.segmentedChoice}>
+    <View style={[styles.segmentedChoice, containerStyle]}>
       {options.map((option) => (
         <Pressable
           key={option.value}
           onPress={() => onChange(option.value)}
-          style={[styles.segmentOption, value === option.value && styles.segmentOptionActive]}
+          style={[styles.segmentOption, optionStyle, value === option.value && styles.segmentOptionActive]}
         >
-          <Text style={[styles.segmentOptionText, value === option.value && styles.segmentOptionTextActive]}>{option.label}</Text>
+          <Text style={[styles.segmentOptionText, labelStyle, value === option.value && styles.segmentOptionTextActive]}>{option.label}</Text>
         </Pressable>
       ))}
     </View>
@@ -182,7 +201,7 @@ function ReadingBlocks({ lesson, blocks, showPinyin, fontSize, textStyle }) {
   );
 }
 
-function VerticalReadingBlocks({ lesson, blocks, showPinyin, fontSize, height }) {
+function VerticalReadingBlocks({ lesson, blocks, showPinyin, fontSize, fontFamily, height }) {
   const scrollRef = useRef(null);
   const pinyinSize = Math.max(8, Math.round(fontSize * 0.36));
   const pinyinHeight = Math.max(12, Math.round(fontSize * 0.48));
@@ -191,7 +210,7 @@ function VerticalReadingBlocks({ lesson, blocks, showPinyin, fontSize, height })
   const rowsPerColumn = Math.max(1, Math.floor(height / columnHeight));
   const columnWidth = Math.max(fontSize + 12, Math.round(pinyinSize * 3.5));
   const columnsByBlock = makeVerticalColumns(blocks, lesson.pinyinUnits, rowsPerColumn);
-  const textStyle = [styles.sentenceText, { fontSize, lineHeight: characterLineHeight }];
+  const textStyle = [styles.sentenceText, { fontSize, lineHeight: characterLineHeight }, fontFamily ? { fontFamily } : null];
 
   return (
     <ScrollView
@@ -229,6 +248,7 @@ export default function App() {
   const [readLessonIds, setReadLessonIds] = useState([]);
   const [todayReadIds, setTodayReadIds] = useState([]);
   const [settings, setSettings] = useState(defaultSettings);
+  const [loadedFontStyles, setLoadedFontStyles] = useState(() => new Set());
   const [storageReady, setStorageReady] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [savedTab, setSavedTab] = useState("favorites");
@@ -243,6 +263,8 @@ export default function App() {
   const nextLesson = transition.nextLesson;
   const todayCount = todayReadIds.length;
   const readingFontSize = normalizeReadingFontSize(settings.fontSize);
+  const readingFontStyle = normalizeReadingFontStyle(settings.fontStyle);
+  const readingFontFamily = loadedFontStyles.has(readingFontStyle) ? READING_FONT_FAMILIES[readingFontStyle] : undefined;
 
   useEffect(() => {
     let mounted = true;
@@ -261,7 +283,8 @@ export default function App() {
         setSettings({
           ...defaultSettings,
           ...savedSettings,
-          fontSize: normalizeReadingFontSize(savedSettings.fontSize ?? defaultSettings.fontSize)
+          fontSize: normalizeReadingFontSize(savedSettings.fontSize ?? defaultSettings.fontSize),
+          fontStyle: normalizeReadingFontStyle(savedSettings.fontStyle ?? defaultSettings.fontStyle)
         });
         setSavedTab(saved.savedTab || "favorites");
         if (saved.dateKey === localDateKey() && Array.isArray(saved.todayReadIds)) {
@@ -280,6 +303,25 @@ export default function App() {
       if (toastTimer.current) clearTimeout(toastTimer.current);
     };
   }, []);
+
+  useEffect(() => {
+    if (readingFontStyle === DEFAULT_READING_FONT_STYLE) return undefined;
+    const fontFamily = READING_FONT_FAMILIES[readingFontStyle];
+    if (Font.isLoaded(fontFamily)) {
+      setLoadedFontStyles((previous) => previous.has(readingFontStyle) ? previous : new Set(previous).add(readingFontStyle));
+      return undefined;
+    }
+
+    let active = true;
+    Font.loadAsync(fontFamily, READING_FONT_ASSETS[readingFontStyle])
+      .then(() => {
+        if (active) setLoadedFontStyles((previous) => new Set(previous).add(readingFontStyle));
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [readingFontStyle]);
 
   useEffect(() => {
     if (!storageReady) return;
@@ -329,6 +371,17 @@ export default function App() {
     scrollRef.current?.scrollTo({ y: 0, animated: false });
   }
 
+  function goToPreviousLesson() {
+    const previousIndex = previousLessonIndex(currentIndex);
+    if (previousIndex < 0) return;
+    const previousLesson = demoLessons[previousIndex];
+    setCurrentIndex(previousIndex);
+    setPositions((previous) => savePosition(previous, previousLesson.bookId, previousLesson.id));
+    setNoteOpen(false);
+    setNoteDraft("");
+    scrollRef.current?.scrollTo({ y: 0, animated: false });
+  }
+
   function stopReading() {
     markCurrentRead();
     setPositions((previous) => savePosition(previous, currentLesson.bookId, currentLesson.id));
@@ -369,10 +422,10 @@ export default function App() {
 
   function renderCurrentPassage() {
     const size = normalizeReadingFontSize(settings.fontSize);
-    const textStyle = [styles.sentenceText, { fontSize: size }];
+    const textStyle = [styles.sentenceText, { fontSize: size }, readingFontFamily ? { fontFamily: readingFontFamily } : null];
     const blocks = getLessonBlocks(currentLesson, settings.script);
     if (settings.layout === "vertical") {
-      return <VerticalReadingBlocks key={`${currentLesson.id}-${settings.script}-${settings.showPinyin}-${size}`} lesson={currentLesson} blocks={blocks} showPinyin={settings.showPinyin} fontSize={size} height={380} />;
+      return <VerticalReadingBlocks key={`${currentLesson.id}-${settings.script}-${settings.showPinyin}-${readingFontStyle}-${size}`} lesson={currentLesson} blocks={blocks} showPinyin={settings.showPinyin} fontSize={size} fontFamily={readingFontFamily} height={380} />;
     }
     return (
       <ReadingBlocks lesson={currentLesson} blocks={blocks} showPinyin={settings.showPinyin} fontSize={size} textStyle={textStyle} />
@@ -390,7 +443,8 @@ export default function App() {
     const favorite = favorites.includes(currentLesson.id);
     const note = notes[currentLesson.id] || "";
     return (
-      <ScrollView ref={scrollRef} style={styles.scroll} contentContainerStyle={styles.screenContent} showsVerticalScrollIndicator={false}>
+      <View style={styles.todayScreen}>
+      <ScrollView ref={scrollRef} style={styles.scroll} contentContainerStyle={[styles.screenContent, styles.todayScrollContent]} showsVerticalScrollIndicator={false}>
         <View style={styles.screenHeading}>
           <View style={styles.eyebrowRow}>
             <View style={styles.eyebrowLine} />
@@ -413,7 +467,7 @@ export default function App() {
           <Text style={styles.goalFoot}>没有每日句数限制，读完当前内容后可以继续。</Text>
         </View>
 
-        <View style={styles.readerCard}>
+        <View key={currentLesson.id} style={styles.readerCard}>
           <View style={styles.readerTop}>
             <View style={styles.bookPill}><Text style={styles.bookPillText}>《{currentLesson.book}》</Text></View>
             <Text style={styles.readerLocation}>{location}</Text>
@@ -459,10 +513,6 @@ export default function App() {
           {todayCount > 0 ? <View style={styles.readToday}><Text style={styles.readTodayCheck}>✓</Text><Text style={styles.readTodayText}>今日已读 {todayCount} 则，继续阅读不设上限。</Text></View> : null}
           <View style={styles.readerActions}>
             <Pressable onPress={stopReading} style={({ pressed }) => [styles.pauseButton, pressed && styles.pressed]}><Text style={styles.pauseButtonText}>今天读到这里</Text></Pressable>
-            <Pressable onPress={continueReading} disabled={!nextLesson} style={({ pressed }) => [styles.nextButton, !nextLesson && styles.nextButtonDisabled, pressed && nextLesson && styles.pressed]}>
-              <Text style={styles.nextButtonText}>{getNextActionLabel(transition)}</Text>
-              <Text style={styles.nextButtonArrow}>{nextLesson ? "→" : "✓"}</Text>
-            </Pressable>
           </View>
           <Text style={styles.demoDisclaimer}>拼音为程序自动注音，非邓启铜版；古汉语异读可能需要校订。</Text>
         </View>
@@ -478,6 +528,30 @@ export default function App() {
           <Text style={styles.pathBookSubtitle}>已读进度 {bookProgress}% · 随时可以继续</Text>
         </View>
       </ScrollView>
+      <View style={styles.navigationDock}>
+        <Pressable
+          onPress={goToPreviousLesson}
+          disabled={currentIndex === 0}
+          accessibilityRole="button"
+          accessibilityLabel="上一句"
+          accessibilityState={{ disabled: currentIndex === 0 }}
+          style={({ pressed }) => [styles.previousButton, currentIndex === 0 && styles.navigationButtonDisabled, pressed && currentIndex > 0 && styles.pressed]}
+        >
+          <Text style={[styles.previousButtonText, currentIndex === 0 && styles.navigationButtonTextDisabled]}>←　上一句</Text>
+        </Pressable>
+        <Pressable
+          onPress={continueReading}
+          disabled={!nextLesson}
+          accessibilityRole="button"
+          accessibilityLabel="下一句"
+          accessibilityState={{ disabled: !nextLesson }}
+          style={({ pressed }) => [styles.nextButton, !nextLesson && styles.navigationButtonDisabled, pressed && nextLesson && styles.pressed]}
+        >
+          <Text style={styles.nextButtonText}>{nextLesson ? "下一句" : "已读完"}</Text>
+          <Text style={styles.nextButtonArrow}>{nextLesson ? "→" : "✓"}</Text>
+        </Pressable>
+      </View>
+      </View>
     );
   }
 
@@ -566,7 +640,7 @@ export default function App() {
                 ) : <Text style={styles.savedMeta}>个人笔记</Text>}
               </View>
               <Pressable onPress={() => openSavedLesson(lesson.id)}>
-                <ReadingBlocks lesson={lesson} blocks={getLessonBlocks(lesson, settings.script)} showPinyin={settings.showPinyin} fontSize={17} textStyle={styles.savedQuote} />
+                <ReadingBlocks lesson={lesson} blocks={getLessonBlocks(lesson, settings.script)} showPinyin={settings.showPinyin} fontSize={17} textStyle={[styles.savedQuote, readingFontFamily ? { fontFamily: readingFontFamily } : null]} />
               </Pressable>
               {savedTab === "notes" ? <Text style={styles.savedNote}>{notes[lesson.id]}</Text> : null}
               <View style={styles.savedCardFooter}><Text style={styles.savedCitation}>{lesson.citation}</Text><Pressable onPress={() => openSavedLesson(lesson.id)}><Text style={styles.pathLink}>回到原文　→</Text></Pressable></View>
@@ -635,6 +709,16 @@ export default function App() {
                 <SegmentedChoice options={[{ value: "horizontal", label: "横排" }, { value: "vertical", label: "竖排" }]} value={settings.layout} onChange={(value) => setSettings((previous) => ({ ...previous, layout: value }))} />
               </View>
               <View style={styles.settingRow}>
+                <View><Text style={styles.settingTitle}>字体样式</Text><Text style={styles.settingHint}>篆隶楷行草</Text></View>
+                <SegmentedChoice
+                  options={READING_FONT_OPTIONS.map((option) => ({ ...option, label: option.value === "default" ? "默认" : option.label.slice(0, 1) }))}
+                  value={readingFontStyle}
+                  onChange={(value) => setSettings((previous) => ({ ...previous, fontStyle: value }))}
+                  containerStyle={styles.fontStyleChoice}
+                  optionStyle={styles.fontStyleOption}
+                />
+              </View>
+              <View style={styles.settingRow}>
                 <View><Text style={styles.settingTitle}>原文字号</Text><Text style={styles.settingHint}>逐级调整，拼音同步缩放</Text></View>
                 <View style={styles.fontSizeControls}>
                   <Pressable
@@ -694,8 +778,10 @@ const styles = StyleSheet.create({
   settingsButton: { width: 36, height: 36, borderRadius: 18, backgroundColor: "#ECEFE8", alignItems: "center", justifyContent: "center" },
   settingsGlyph: { color: COLORS.green, fontSize: 18 },
   body: { flex: 1, minHeight: 0 },
+  todayScreen: { flex: 1, minHeight: 0 },
   scroll: { flex: 1 },
   screenContent: { paddingHorizontal: 18, paddingTop: 21, paddingBottom: 26 },
+  todayScrollContent: { paddingBottom: 15 },
   screenHeading: { marginBottom: 17 },
   eyebrowRow: { flexDirection: "row", alignItems: "center", gap: 7, marginBottom: 8 },
   eyebrowLine: { width: 15, height: 1, backgroundColor: COLORS.gold },
@@ -779,10 +865,15 @@ const styles = StyleSheet.create({
   readToday: { flexDirection: "row", alignItems: "center", gap: 7, marginTop: 12 },
   readTodayCheck: { width: 17, height: 17, overflow: "hidden", borderRadius: 9, color: "#55775D", backgroundColor: "#EAF1E8", fontSize: 10, textAlign: "center", lineHeight: 17 },
   readTodayText: { color: "#68816B", fontSize: 9 },
-  readerActions: { marginTop: 15, gap: 5 },
+  readerActions: { marginTop: 13 },
   pauseButton: { alignItems: "center", paddingVertical: 10 },
   pauseButtonText: { color: "#859085", fontSize: 10 },
-  nextButton: { minHeight: 47, paddingHorizontal: 15, borderRadius: 12, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10, backgroundColor: COLORS.green },
+  navigationDock: { paddingHorizontal: 18, paddingTop: 9, paddingBottom: 9, borderTopWidth: 1, borderTopColor: "#E8E5DC", flexDirection: "row", alignItems: "center", gap: 8, backgroundColor: COLORS.background },
+  previousButton: { flex: 1, minHeight: 48, paddingHorizontal: 8, borderWidth: 1, borderColor: "#E1E4DC", borderRadius: 12, alignItems: "center", justifyContent: "center", backgroundColor: COLORS.paper },
+  previousButtonText: { color: "#63756A", fontSize: 11, fontWeight: "600" },
+  navigationButtonDisabled: { opacity: 0.55 },
+  navigationButtonTextDisabled: { color: "#A5AAA0" },
+  nextButton: { flex: 2, minHeight: 48, paddingHorizontal: 15, borderRadius: 12, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10, backgroundColor: COLORS.green },
   nextButtonDisabled: { backgroundColor: "#9BA99D" },
   nextButtonText: { color: "#FFFDF8", fontSize: 12, fontWeight: "600", letterSpacing: 0.4 },
   nextButtonArrow: { color: "#D8E5D8", fontSize: 16 },
@@ -845,7 +936,7 @@ const styles = StyleSheet.create({
   tabLabel: { color: "#9BA297", fontSize: 8 },
   tabLabelActive: { color: "#4F6956", fontWeight: "600" },
   tabIndicator: { position: "absolute", top: -7, width: 16, height: 2, borderRadius: 2, backgroundColor: COLORS.green },
-  toast: { position: "absolute", zIndex: 15, bottom: 74, left: 24, right: 24, alignItems: "center", paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10, backgroundColor: "#304B3C", shadowColor: "#18241B", shadowOpacity: 0.2, shadowRadius: 12, elevation: 6 },
+  toast: { position: "absolute", zIndex: 15, bottom: 140, left: 24, right: 24, alignItems: "center", paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10, backgroundColor: "#304B3C", shadowColor: "#18241B", shadowOpacity: 0.2, shadowRadius: 12, elevation: 6 },
   toastText: { color: "#F9F8F1", fontSize: 10, textAlign: "center" },
   pressed: { opacity: 0.76, transform: [{ scale: 0.985 }] },
   modalRoot: { flex: 1, justifyContent: "flex-end" },
@@ -866,6 +957,8 @@ const styles = StyleSheet.create({
   fontSizeButtonText: { color: COLORS.green, fontSize: 17, lineHeight: 20 },
   fontSizeValue: { minWidth: 29, color: COLORS.green, fontSize: 12, fontWeight: "600", textAlign: "center" },
   segmentedChoice: { flexDirection: "row", gap: 3, padding: 3, borderWidth: 1, borderColor: "#E9E7E0", borderRadius: 8, backgroundColor: "#F1F0EA" },
+  fontStyleChoice: { gap: 1, padding: 2 },
+  fontStyleOption: { paddingHorizontal: 4, paddingVertical: 6 },
   segmentOption: { paddingHorizontal: 8, paddingVertical: 6, borderRadius: 6 },
   segmentOptionActive: { backgroundColor: COLORS.paper, shadowColor: "#26362A", shadowOpacity: 0.07, shadowRadius: 3, elevation: 1 },
   segmentOptionText: { color: "#91988E", fontSize: 8 },

@@ -23,6 +23,11 @@ function nextLessonIndex(index, lessons = demoLessons) {
   return current + 1 < lessons.length ? current + 1 : -1;
 }
 
+function previousLessonIndex(index, lessons = demoLessons) {
+  if (!Number.isInteger(index) || index <= 0 || index >= lessons.length) return -1;
+  return index - 1;
+}
+
 function getTransition(index, lessons = demoLessons) {
   if (index < 0 || index >= lessons.length) return { type: "end", nextIndex: -1, nextLesson: null };
   const current = lessons[index];
@@ -123,6 +128,7 @@ module.exports = {
   getLessonText,
   getPositionIndex,
   getProgress,
+  previousLessonIndex,
   getTransition,
   nextLessonIndex,
   savePosition,

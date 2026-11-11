@@ -15,6 +15,7 @@ const {
   getPositionIndex,
   getProgress,
   getTransition,
+  previousLessonIndex,
   nextLessonIndex,
   savePosition,
   toggleFavorite,
@@ -273,6 +274,28 @@ test("篇章边界和书目边界会被区分并明确返回", () => {
   const bookTransition = getTransition(endOfAnalects);
   assert.equal(bookTransition.type, "book");
   assert.equal(bookTransition.nextLesson.bookId, "mengzi");
+});
+
+test("上一句和下一句始终以当前论语章句为准", () => {
+  const currentIndex = demoLessons.findIndex((lesson) => lesson.id === "lunyu-165");
+  const currentLesson = demoLessons[currentIndex];
+  const transition = getTransition(currentIndex);
+  const previousIndex = previousLessonIndex(currentIndex);
+
+  assert.equal(currentLesson.chapter, "为政");
+  assert.equal(transition.type, "next");
+  assert.equal(transition.nextLesson.id, "lunyu-166");
+  assert.equal(transition.nextLesson.chapter, currentLesson.chapter);
+  assert.equal(previousIndex, currentIndex - 1);
+  assert.equal(demoLessons[previousIndex].chapter, currentLesson.chapter);
+
+  const endOfXueEr = demoLessons.findLastIndex((lesson) => lesson.bookId === "lunyu" && lesson.chapter === "学而");
+  const firstOfWeizheng = endOfXueEr + 1;
+  assert.equal(getTransition(endOfXueEr).type, "chapter");
+  assert.equal(getTransition(firstOfWeizheng).type, "next");
+  assert.equal(previousLessonIndex(0), -1);
+  assert.equal(previousLessonIndex(demoLessons.length), -1);
+  assert.equal(previousLessonIndex(0, []), -1);
 });
 
 test("连续阅读不限每日数量，只有读完整个本地语料后才结束", () => {
