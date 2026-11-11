@@ -2,6 +2,7 @@
   "expo": {
     "name": "经日",
     "slug": "jingri-classics",
+    "owner": "a114324s-team",
     "scheme": "jingri",
     "version": "0.1.0",
     "orientation": "portrait",
