@@ -92,35 +92,62 @@ const defaultSettings = {
   showPinyin: true
 };
 
-function normalizePinyinSyllable(value) {
+const PINYIN_TONE_MARKS = {
+  a: ["ā", "á", "ǎ", "à"],
+  e: ["ē", "é", "ě", "è"],
+  i: ["ī", "í", "ǐ", "ì"],
+  o: ["ō", "ó", "ǒ", "ò"],
+  u: ["ū", "ú", "ǔ", "ù"],
+  ü: ["ǖ", "ǘ", "ǚ", "ǜ"]
+};
+const PINYIN_MARKS = new Map(Object.entries(PINYIN_TONE_MARKS).flatMap(([base, marks]) => (
+  marks.map((mark, index) => [mark, { base, tone: index + 1 }])
+)));
+
+function splitPinyinTone(value) {
   const normalized = String(value ?? "").normalize("NFC").trim().toLowerCase().replace(/v/g, "ü");
   const numbered = normalized.match(/^(.+)([1-5])$/u);
-  if (!numbered) return normalized;
-  const [, base, toneText] = numbered;
-  const tone = Number(toneText);
-  if (tone === 5) return base;
-  const toneMarks = {
-    a: ["ā", "á", "ǎ", "à"],
-    e: ["ē", "é", "ě", "è"],
-    i: ["ī", "í", "ǐ", "ì"],
-    o: ["ō", "ó", "ǒ", "ò"],
-    u: ["ū", "ú", "ǔ", "ù"],
-    ü: ["ǖ", "ǘ", "ǚ", "ǜ"]
-  };
-  let vowelIndex = base.indexOf("a");
-  if (vowelIndex < 0) vowelIndex = base.indexOf("e");
-  if (vowelIndex < 0 && base.includes("ou")) vowelIndex = base.indexOf("o");
+  if (numbered) {
+    const parsed = splitPinyinTone(numbered[1]);
+    return { base: parsed.base, tone: Number(numbered[2]) === 5 ? 0 : Number(numbered[2]) };
+  }
+  let base = "";
+  let tone = null;
+  for (const character of normalized) {
+    const marked = PINYIN_MARKS.get(character);
+    if (marked) {
+      base += marked.base;
+      tone = marked.tone;
+    } else {
+      base += character;
+    }
+  }
+  return { base, tone };
+}
+
+function applyPinyinTone(value, selectedTone) {
+  const parsed = splitPinyinTone(value);
+  const tone = selectedTone ?? parsed.tone ?? 0;
+  if (tone === 0) return parsed.base;
+  let vowelIndex = parsed.base.indexOf("a");
+  if (vowelIndex < 0) vowelIndex = parsed.base.indexOf("e");
+  if (vowelIndex < 0 && parsed.base.includes("ou")) vowelIndex = parsed.base.indexOf("o");
   if (vowelIndex < 0) {
-    for (let index = base.length - 1; index >= 0; index -= 1) {
-      if (toneMarks[base[index]]) {
+    for (let index = parsed.base.length - 1; index >= 0; index -= 1) {
+      if (PINYIN_TONE_MARKS[parsed.base[index]]) {
         vowelIndex = index;
         break;
       }
     }
   }
-  if (vowelIndex < 0) return normalized;
-  const vowel = base[vowelIndex];
-  return `${base.slice(0, vowelIndex)}${toneMarks[vowel][tone - 1]}${base.slice(vowelIndex + 1)}`;
+  if (vowelIndex < 0) return parsed.base;
+  const vowel = parsed.base[vowelIndex];
+  return `${parsed.base.slice(0, vowelIndex)}${PINYIN_TONE_MARKS[vowel][tone - 1]}${parsed.base.slice(vowelIndex + 1)}`;
+}
+
+function normalizePinyinSyllable(value) {
+  const parsed = splitPinyinTone(value);
+  return applyPinyinTone(parsed.base, parsed.tone ?? 0);
 }
 
 function isValidPinyinSyllable(value) {
@@ -340,6 +367,7 @@ export default function App() {
   const [pinyinCorrections, setPinyinCorrections] = useState({});
   const [pinyinEditorTarget, setPinyinEditorTarget] = useState(null);
   const [pinyinEditorDraft, setPinyinEditorDraft] = useState("");
+  const [pinyinEditorTone, setPinyinEditorTone] = useState(0);
   const [pinyinEditorError, setPinyinEditorError] = useState("");
   const [loadedFontStyles, setLoadedFontStyles] = useState(() => new Set());
   const [storageReady, setStorageReady] = useState(false);
@@ -458,6 +486,8 @@ export default function App() {
     const originalCharacter = [...currentLesson.text][characterIndex];
     const key = pinyinCorrectionKey(currentLesson.id, characterIndex);
     const savedCorrection = pinyinCorrections[key];
+    const currentReading = savedCorrection?.correctedPinyin || currentPinyin || "";
+    const parsedReading = splitPinyinTone(currentReading);
     setPinyinEditorTarget({
       lessonId: currentLesson.id,
       citation: currentLesson.citation,
@@ -465,22 +495,24 @@ export default function App() {
       character: originalCharacter || displayedCharacter,
       displayedCharacter,
       originalPinyin: currentLesson.pinyinUnits?.[characterIndex] || "",
-      currentPinyin: savedCorrection?.correctedPinyin || currentPinyin,
+      currentPinyin: currentReading,
       hasOverride: Boolean(savedCorrection)
     });
-    setPinyinEditorDraft(savedCorrection?.correctedPinyin || currentPinyin || "");
+    setPinyinEditorDraft(parsedReading.base);
+    setPinyinEditorTone(parsedReading.tone ?? 0);
     setPinyinEditorError("");
   }
 
   function closePinyinEditor() {
     setPinyinEditorTarget(null);
     setPinyinEditorDraft("");
+    setPinyinEditorTone(0);
     setPinyinEditorError("");
   }
 
   function savePinyinCorrection() {
     if (!pinyinEditorTarget) return;
-    const correctedPinyin = normalizePinyinSyllable(pinyinEditorDraft);
+    const correctedPinyin = applyPinyinTone(pinyinEditorDraft, pinyinEditorTone);
     if (!isValidPinyinSyllable(correctedPinyin)) {
       setPinyinEditorError("请输入一个拼音音节，例如 wéi 或 wei2。");
       return;
@@ -1135,17 +1167,40 @@ export default function App() {
               </Text>
               <TextInput
                 value={pinyinEditorDraft}
-                onChangeText={(value) => { setPinyinEditorDraft(value); setPinyinEditorError(""); }}
+                onChangeText={(value) => {
+                  const parsed = splitPinyinTone(value);
+                  setPinyinEditorDraft(parsed.base);
+                  if (parsed.tone !== null) setPinyinEditorTone(parsed.tone);
+                  setPinyinEditorError("");
+                }}
                 autoCapitalize="none"
                 autoCorrect={false}
                 maxLength={8}
-                placeholder="输入一个拼音音节，如 wéi"
+                placeholder="输入拼音字母，如 qi"
                 placeholderTextColor="#A0A69B"
                 accessibilityLabel="拼音"
                 style={styles.pinyinEditorInput}
               />
+              <View style={styles.pinyinToneChoices}>
+                {[
+                  { value: 1, label: "一声" },
+                  { value: 2, label: "二声" },
+                  { value: 3, label: "三声" },
+                  { value: 4, label: "四声" },
+                  { value: 0, label: "轻声" }
+                ].map((tone) => (
+                  <Pressable
+                    key={tone.value}
+                    onPress={() => { setPinyinEditorTone(tone.value); setPinyinEditorError(""); }}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: pinyinEditorTone === tone.value }}
+                    style={[styles.pinyinToneChoice, pinyinEditorTone === tone.value && styles.pinyinToneChoiceActive]}
+                  ><Text style={[styles.pinyinToneChoiceText, pinyinEditorTone === tone.value && styles.pinyinToneChoiceTextActive]}>{tone.label}</Text></Pressable>
+                ))}
+              </View>
+              <Text style={styles.pinyinEditorPreview}>拼音预览：{applyPinyinTone(pinyinEditorDraft, pinyinEditorTone) || "—"}</Text>
               {pinyinEditorError ? <Text style={styles.pinyinEditorError}>{pinyinEditorError}</Text> : null}
-              <Text style={styles.pinyinEditorHint}>保存后，这篇原文在横排和竖排中的拼音都会更新。</Text>
+              <Text style={styles.pinyinEditorHint}>输入拼音字母后选声调，也可以直接输入 qi3 这样的数字声调。</Text>
               <View style={styles.pinyinEditorActions}>
                 <Pressable onPress={closePinyinEditor} style={styles.noteCancel}><Text style={styles.noteCancelText}>取消</Text></Pressable>
                 <Pressable onPress={resetPinyinCorrection} disabled={!pinyinEditorTarget?.hasOverride} style={[styles.noteCancel, !pinyinEditorTarget?.hasOverride && styles.noteActionDisabled]}><Text style={styles.noteCancelText}>恢复默认</Text></Pressable>
@@ -1400,6 +1455,12 @@ const styles = StyleSheet.create({
   pinyinEditorSheet: { paddingHorizontal: 20, paddingTop: 9, paddingBottom: Platform.OS === "ios" ? 31 : 22, borderTopLeftRadius: 22, borderTopRightRadius: 22, borderWidth: 1, borderColor: "#E6E3D9", backgroundColor: COLORS.paper },
   pinyinEditorContext: { marginBottom: 9, color: "#657367", fontFamily: "serif", fontSize: 13, textAlign: "center" },
   pinyinEditorInput: { minHeight: 48, paddingHorizontal: 12, borderWidth: 1, borderColor: "#DDE3DA", borderRadius: 10, color: COLORS.ink, backgroundColor: "#FFFEFB", fontSize: 18, textAlign: "center" },
+  pinyinToneChoices: { marginTop: 10, flexDirection: "row", flexWrap: "wrap", justifyContent: "center", gap: 6 },
+  pinyinToneChoice: { minWidth: 47, paddingHorizontal: 9, paddingVertical: 8, borderWidth: 1, borderColor: "#E7E5DC", borderRadius: 9, alignItems: "center", backgroundColor: "#F7F6F0" },
+  pinyinToneChoiceActive: { borderColor: "#315440", backgroundColor: "#EAF0E9" },
+  pinyinToneChoiceText: { color: "#7D887D", fontSize: 10 },
+  pinyinToneChoiceTextActive: { color: COLORS.green, fontWeight: "700" },
+  pinyinEditorPreview: { marginTop: 9, color: COLORS.gold, fontSize: 13, fontWeight: "600", textAlign: "center" },
   pinyinEditorError: { marginTop: 7, color: COLORS.rose, fontSize: 9, textAlign: "center" },
   pinyinEditorHint: { marginTop: 8, color: "#939B91", fontSize: 9, textAlign: "center" },
   pinyinEditorActions: { marginTop: 12, flexDirection: "row", alignItems: "center", justifyContent: "flex-end", gap: 8 },
