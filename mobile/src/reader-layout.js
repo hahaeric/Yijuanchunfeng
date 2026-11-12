@@ -56,6 +56,7 @@ function makeVerticalColumns(blocks, pinyinUnits, rowsPerColumn) {
 
   return blocks.map((block) => {
     const characters = [...block];
+    const blockOffset = characterOffset;
     const units = (pinyinUnits || []).slice(characterOffset, characterOffset + characters.length);
     characterOffset += characters.length;
 
@@ -63,7 +64,8 @@ function makeVerticalColumns(blocks, pinyinUnits, rowsPerColumn) {
     for (let start = 0; start < characters.length; start += columnLength) {
       columns.push(characters.slice(start, start + columnLength).map((character, index) => ({
         character,
-        pinyin: units[start + index] || ""
+        pinyin: units[start + index] || "",
+        characterIndex: blockOffset + start + index
       })));
     }
     return columns;

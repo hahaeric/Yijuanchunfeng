@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "corrections": [
+    { "lessonId": "lunyu-149", "index": 6, "character": "为", "originalPinyin": "wèi", "correctedPinyin": "wéi", "source": "pdf-manual-review", "sourcePdfPage": 11 },
+    { "lessonId": "lunyu-149", "index": 10, "character": "弟", "originalPinyin": "dì", "correctedPinyin": "tì", "source": "pdf-manual-review", "sourcePdfPage": 11 },
+    { "lessonId": "lunyu-149", "index": 13, "character": "好", "originalPinyin": "hǎo", "correctedPinyin": "hào", "source": "pdf-manual-review", "sourcePdfPage": 11 },
+    { "lessonId": "lunyu-149", "index": 18, "character": "鲜", "originalPinyin": "xiān", "correctedPinyin": "xiǎn", "source": "pdf-manual-review", "sourcePdfPage": 11 },
+    { "lessonId": "lunyu-149", "index": 53, "character": "为", "originalPinyin": "wèi", "correctedPinyin": "wéi", "source": "pdf-manual-review", "sourcePdfPage": 11 },
+    { "lessonId": "lunyu-150", "index": 9, "character": "鲜", "originalPinyin": "xiān", "correctedPinyin": "xiǎn", "source": "pdf-manual-review", "sourcePdfPage": 11 },
+    { "lessonId": "lunyu-151", "index": 0, "character": "曾", "originalPinyin": "céng", "correctedPinyin": "zēng", "source": "pdf-manual-review", "sourcePdfPage": 11 },
+    { "lessonId": "lunyu-190", "index": 19, "character": "乐", "originalPinyin": "lè", "correctedPinyin": "yuè", "source": "pdf-manual-review", "sourcePdfPage": 22 },
+    { "lessonId": "lunyu-191", "index": 25, "character": "丧", "originalPinyin": "sàng", "correctedPinyin": "sāng", "source": "pdf-manual-review", "sourcePdfPage": 22 },
+    { "lessonId": "lunyu-199", "index": 16, "character": "与", "originalPinyin": "yǔ", "correctedPinyin": "yù", "source": "pdf-manual-review", "sourcePdfPage": 24 },
+    { "lessonId": "lunyu-219", "index": 7, "character": "好", "originalPinyin": "hǎo", "correctedPinyin": "hào", "source": "pdf-manual-review", "sourcePdfPage": 30 },
+    { "lessonId": "lunyu-219", "index": 11, "character": "恶", "originalPinyin": "è", "correctedPinyin": "wù", "source": "pdf-manual-review", "sourcePdfPage": 30 },
+    { "lessonId": "lunyu-219", "index": 25, "character": "恶", "originalPinyin": "è", "correctedPinyin": "wù", "source": "pdf-manual-review", "sourcePdfPage": 30 },
+    { "lessonId": "lunyu-219", "index": 31, "character": "为", "originalPinyin": "wèi", "correctedPinyin": "wéi", "source": "pdf-manual-review", "sourcePdfPage": 30 },
+    { "lessonId": "lunyu-221", "index": 4, "character": "朝", "originalPinyin": "cháo", "correctedPinyin": "zhāo", "source": "pdf-manual-review", "sourcePdfPage": 30 },
+    { "lessonId": "lunyu-287", "index": 18, "character": "乐", "originalPinyin": "lè", "correctedPinyin": "yào", "source": "pdf-manual-review", "sourcePdfPage": 46 },
+    { "lessonId": "lunyu-615", "index": 47, "character": "钻", "originalPinyin": "zuàn", "correctedPinyin": "zuān", "source": "pdf-manual-review", "sourcePdfPage": 140 },
+    { "lessonId": "lunyu-615", "index": 102, "character": "乐", "originalPinyin": "lè", "correctedPinyin": "yuè", "source": "pdf-manual-review", "sourcePdfPage": 140 },
+    { "lessonId": "lunyu-615", "index": 107, "character": "处", "originalPinyin": "chù", "correctedPinyin": "chǔ", "source": "pdf-manual-review", "sourcePdfPage": 140 },
+    { "lessonId": "lunyu-616", "index": 25, "character": "为", "originalPinyin": "wèi", "correctedPinyin": "wéi", "source": "pdf-manual-review", "sourcePdfPage": 140 },
+    { "lessonId": "daxue-2", "index": 142, "character": "为", "originalPinyin": "wèi", "correctedPinyin": "wéi", "source": "pdf-manual-review", "sourcePdfPage": 160 },
+    { "lessonId": "daxue-2", "index": 159, "character": "薄", "originalPinyin": "báo", "correctedPinyin": "bó", "source": "pdf-manual-review", "sourcePdfPage": 160 },
+    { "lessonId": "daxue-2", "index": 164, "character": "薄", "originalPinyin": "báo", "correctedPinyin": "bó", "source": "pdf-manual-review", "sourcePdfPage": 160 },
+    { "lessonId": "zhongyong-92", "index": 29, "character": "从", "originalPinyin": "cóng", "correctedPinyin": "cōng", "source": "pdf-manual-review", "sourcePdfPage": 200 },
+    { "lessonId": "zhongyong-92", "index": 31, "character": "中", "originalPinyin": "zhōng", "correctedPinyin": "zhòng", "source": "pdf-manual-review", "sourcePdfPage": 200 }
+  ]
+}

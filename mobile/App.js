@@ -4,6 +4,7 @@ import {
   Platform,
   Pressable,
   SafeAreaView,
+  Share,
   ScrollView,
   StyleSheet,
   Text,
@@ -19,6 +20,7 @@ const { getStoredValueWithMigration } = require("./src/storage-migration");
 const {
   demoBooks,
   demoLessons,
+  projectPinyinCorrectionCount,
   getBookPosition,
   getBookProgress,
   getChapterOutline,
@@ -90,6 +92,64 @@ const defaultSettings = {
   showPinyin: true
 };
 
+function normalizePinyinSyllable(value) {
+  const normalized = String(value ?? "").normalize("NFC").trim().toLowerCase().replace(/v/g, "ü");
+  const numbered = normalized.match(/^(.+)([1-5])$/u);
+  if (!numbered) return normalized;
+  const [, base, toneText] = numbered;
+  const tone = Number(toneText);
+  if (tone === 5) return base;
+  const toneMarks = {
+    a: ["ā", "á", "ǎ", "à"],
+    e: ["ē", "é", "ě", "è"],
+    i: ["ī", "í", "ǐ", "ì"],
+    o: ["ō", "ó", "ǒ", "ò"],
+    u: ["ū", "ú", "ǔ", "ù"],
+    ü: ["ǖ", "ǘ", "ǚ", "ǜ"]
+  };
+  let vowelIndex = base.indexOf("a");
+  if (vowelIndex < 0) vowelIndex = base.indexOf("e");
+  if (vowelIndex < 0 && base.includes("ou")) vowelIndex = base.indexOf("o");
+  if (vowelIndex < 0) {
+    for (let index = base.length - 1; index >= 0; index -= 1) {
+      if (toneMarks[base[index]]) {
+        vowelIndex = index;
+        break;
+      }
+    }
+  }
+  if (vowelIndex < 0) return normalized;
+  const vowel = base[vowelIndex];
+  return `${base.slice(0, vowelIndex)}${toneMarks[vowel][tone - 1]}${base.slice(vowelIndex + 1)}`;
+}
+
+function isValidPinyinSyllable(value) {
+  return /^\p{Script=Latin}{1,8}[1-5]?$/u.test(value);
+}
+
+function pinyinCorrectionKey(lessonId, characterIndex) {
+  return `${lessonId}:${characterIndex}`;
+}
+
+function normalizeStoredPinyinCorrections(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  const lessonsById = new Map(demoLessons.map((lesson) => [lesson.id, lesson]));
+  const normalized = {};
+  for (const correction of Object.values(value)) {
+    if (!correction || typeof correction !== "object") continue;
+    const lesson = lessonsById.get(correction.lessonId);
+    const characterIndex = correction.index;
+    const character = [...(lesson?.text || "")][characterIndex];
+    const correctedPinyin = normalizePinyinSyllable(correction.correctedPinyin);
+    if (!lesson || !Number.isInteger(characterIndex) || characterIndex < 0 || character !== correction.character || !isValidPinyinSyllable(correctedPinyin)) continue;
+    normalized[pinyinCorrectionKey(correction.lessonId, characterIndex)] = {
+      ...correction,
+      correctedPinyin
+    };
+  }
+  return normalized;
+}
+
 function localDateKey() {
   const date = new Date();
   return [date.getFullYear(), String(date.getMonth() + 1).padStart(2, "0"), String(date.getDate()).padStart(2, "0")].join("-");
@@ -135,7 +195,7 @@ function SegmentedChoice({ options, value, onChange, containerStyle, optionStyle
   );
 }
 
-function PinyinAnnotatedLine({ text, pinyinUnits, fontSize, textStyle }) {
+function PinyinAnnotatedLine({ text, pinyinUnits, fontSize, textStyle, characterOffset = 0, onEditPinyin }) {
   const characters = [...text];
   if (!Array.isArray(pinyinUnits) || pinyinUnits.length !== characters.length) {
     return <Text style={textStyle}>{text}</Text>;
@@ -159,7 +219,7 @@ function PinyinAnnotatedLine({ text, pinyinUnits, fontSize, textStyle }) {
         suffix += characters[index + 1];
         index += 1;
       }
-      groups.push({ prefix, character, suffix, pinyin: pinyinUnits[pinyinIndex] });
+      groups.push({ prefix, character, suffix, pinyin: pinyinUnits[pinyinIndex], characterIndex: characterOffset + pinyinIndex });
       prefix = "";
       continue;
     }
@@ -179,7 +239,17 @@ function PinyinAnnotatedLine({ text, pinyinUnits, fontSize, textStyle }) {
         return (
           <View key={`${index}-${group.character || group.text}`} style={styles.rubyCell}>
             <View style={[styles.rubyPinyinSlot, { height: pinyinHeight }]}>
-              {hasPinyin ? <Text style={[styles.rubyPinyin, { fontSize: pinyinSize, lineHeight: pinyinHeight }]}>{group.pinyin}</Text> : null}
+              {hasPinyin ? (
+                <Pressable
+                  onPress={() => onEditPinyin?.(group.characterIndex, group.character, group.pinyin)}
+                  hitSlop={5}
+                  accessibilityRole="button"
+                  accessibilityLabel={`修改${group.character}的拼音，当前${group.pinyin}`}
+                  style={styles.pinyinTouchTarget}
+                >
+                  <Text style={[styles.rubyPinyin, { fontSize: pinyinSize, lineHeight: pinyinHeight }]}>{group.pinyin}</Text>
+                </Pressable>
+              ) : null}
             </View>
             <Text style={textStyle}>{group.character ? `${group.prefix}${group.character}${group.suffix}` : group.text}</Text>
           </View>
@@ -189,18 +259,19 @@ function PinyinAnnotatedLine({ text, pinyinUnits, fontSize, textStyle }) {
   );
 }
 
-function ReadingBlocks({ lesson, blocks, showPinyin, fontSize, textStyle }) {
+function ReadingBlocks({ lesson, blocks, showPinyin, fontSize, textStyle, pinyinUnits, onEditPinyin }) {
   let characterOffset = 0;
   return (
     <View style={styles.readingBlocks}>
       {blocks.map((block, index) => {
         const count = [...block].length;
-        const units = (lesson.pinyinUnits || []).slice(characterOffset, characterOffset + count);
+        const blockOffset = characterOffset;
+        const units = (pinyinUnits || []).slice(characterOffset, characterOffset + count);
         characterOffset += count;
         return (
           <View key={`block-${index}`} style={index > 0 ? styles.dialogueBlockGap : null}>
             {showPinyin
-              ? <PinyinAnnotatedLine text={block} pinyinUnits={units} fontSize={fontSize} textStyle={textStyle} />
+              ? <PinyinAnnotatedLine text={block} pinyinUnits={units} fontSize={fontSize} textStyle={textStyle} characterOffset={blockOffset} onEditPinyin={onEditPinyin} />
               : <Text style={textStyle}>{block}</Text>}
           </View>
         );
@@ -209,7 +280,7 @@ function ReadingBlocks({ lesson, blocks, showPinyin, fontSize, textStyle }) {
   );
 }
 
-function VerticalReadingBlocks({ lesson, blocks, showPinyin, fontSize, fontFamily, height }) {
+function VerticalReadingBlocks({ lesson, blocks, pinyinUnits, showPinyin, fontSize, fontFamily, height, onEditPinyin }) {
   const scrollRef = useRef(null);
   const pinyinSize = Math.max(8, Math.round(fontSize * 0.36));
   const pinyinHeight = Math.max(12, Math.round(fontSize * 0.48));
@@ -217,7 +288,7 @@ function VerticalReadingBlocks({ lesson, blocks, showPinyin, fontSize, fontFamil
   const columnHeight = characterLineHeight + (showPinyin ? pinyinHeight : 0);
   const rowsPerColumn = Math.max(1, Math.floor(height / columnHeight));
   const columnWidth = Math.max(fontSize + 12, Math.round(pinyinSize * 3.5));
-  const columnsByBlock = makeVerticalColumns(blocks, lesson.pinyinUnits, rowsPerColumn);
+  const columnsByBlock = makeVerticalColumns(blocks, pinyinUnits, rowsPerColumn);
   const textStyle = [styles.sentenceText, { fontSize, lineHeight: characterLineHeight }, fontFamily ? { fontFamily } : null];
 
   return (
@@ -233,9 +304,19 @@ function VerticalReadingBlocks({ lesson, blocks, showPinyin, fontSize, fontFamil
         <View key={`vertical-block-${blockIndex}`} style={[styles.verticalDialogueBlock, blockIndex > 0 && styles.verticalDialogueBlockGap]}>
           {columns.map((column, columnIndex) => (
             <View key={`column-${columnIndex}`} style={[styles.verticalColumn, { width: columnWidth }]}>
-              {column.map(({ character, pinyin }, characterIndex) => (
+              {column.map(({ character, pinyin, characterIndex: sourceCharacterIndex }, characterIndex) => (
                 <View key={`character-${characterIndex}`} style={[styles.verticalCell, { minHeight: columnHeight }]}>
-                  {showPinyin ? <Text style={[styles.verticalPinyin, { height: pinyinHeight, fontSize: pinyinSize, lineHeight: pinyinHeight }]}>{pinyin}</Text> : null}
+                  {showPinyin ? (
+                    <Pressable
+                      onPress={() => onEditPinyin?.(sourceCharacterIndex, character, pinyin)}
+                      hitSlop={5}
+                      accessibilityRole="button"
+                      accessibilityLabel={`修改${character}的拼音，当前${pinyin}`}
+                      style={styles.pinyinTouchTarget}
+                    >
+                      <Text style={[styles.verticalPinyin, { height: pinyinHeight, fontSize: pinyinSize, lineHeight: pinyinHeight }]}>{pinyin}</Text>
+                    </Pressable>
+                  ) : null}
                   <Text style={[textStyle, styles.verticalCharacter]}>{getVerticalGlyph(character)}</Text>
                 </View>
               ))}
@@ -256,6 +337,10 @@ export default function App() {
   const [readLessonIds, setReadLessonIds] = useState([]);
   const [todayReadIds, setTodayReadIds] = useState([]);
   const [settings, setSettings] = useState(defaultSettings);
+  const [pinyinCorrections, setPinyinCorrections] = useState({});
+  const [pinyinEditorTarget, setPinyinEditorTarget] = useState(null);
+  const [pinyinEditorDraft, setPinyinEditorDraft] = useState("");
+  const [pinyinEditorError, setPinyinEditorError] = useState("");
   const [loadedFontStyles, setLoadedFontStyles] = useState(() => new Set());
   const [storageReady, setStorageReady] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -300,6 +385,7 @@ export default function App() {
         setNotes(saved.notes && typeof saved.notes === "object" ? saved.notes : {});
         setPositions(saved.positions && typeof saved.positions === "object" ? saved.positions : {});
         setReadLessonIds(Array.isArray(saved.readLessonIds) ? saved.readLessonIds : []);
+        setPinyinCorrections(normalizeStoredPinyinCorrections(saved.pinyinCorrections));
         const savedSettings = saved.settings || {};
         setSettings({
           ...defaultSettings,
@@ -353,18 +439,119 @@ export default function App() {
       notes,
       positions,
       readLessonIds,
+      pinyinCorrections,
       settings,
       savedTab,
       todayReadIds,
       dateKey: todayKey.current
     };
     AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(payload)).catch(() => {});
-  }, [storageReady, currentIndex, screen, favorites, notes, positions, readLessonIds, settings, savedTab, todayReadIds]);
+  }, [storageReady, currentIndex, screen, favorites, notes, positions, readLessonIds, pinyinCorrections, settings, savedTab, todayReadIds]);
 
   function notify(message) {
     setToast(message);
     if (toastTimer.current) clearTimeout(toastTimer.current);
     toastTimer.current = setTimeout(() => setToast(""), 2300);
+  }
+
+  function openPinyinEditor(characterIndex, displayedCharacter, currentPinyin) {
+    const originalCharacter = [...currentLesson.text][characterIndex];
+    const key = pinyinCorrectionKey(currentLesson.id, characterIndex);
+    const savedCorrection = pinyinCorrections[key];
+    setPinyinEditorTarget({
+      lessonId: currentLesson.id,
+      citation: currentLesson.citation,
+      characterIndex,
+      character: originalCharacter || displayedCharacter,
+      displayedCharacter,
+      originalPinyin: currentLesson.pinyinUnits?.[characterIndex] || "",
+      currentPinyin: savedCorrection?.correctedPinyin || currentPinyin,
+      hasOverride: Boolean(savedCorrection)
+    });
+    setPinyinEditorDraft(savedCorrection?.correctedPinyin || currentPinyin || "");
+    setPinyinEditorError("");
+  }
+
+  function closePinyinEditor() {
+    setPinyinEditorTarget(null);
+    setPinyinEditorDraft("");
+    setPinyinEditorError("");
+  }
+
+  function savePinyinCorrection() {
+    if (!pinyinEditorTarget) return;
+    const correctedPinyin = normalizePinyinSyllable(pinyinEditorDraft);
+    if (!isValidPinyinSyllable(correctedPinyin)) {
+      setPinyinEditorError("请输入一个拼音音节，例如 wéi 或 wei2。");
+      return;
+    }
+
+    const { lessonId, characterIndex, character, originalPinyin } = pinyinEditorTarget;
+    const key = pinyinCorrectionKey(lessonId, characterIndex);
+    setPinyinCorrections((previous) => {
+      const next = { ...previous };
+      if (correctedPinyin === originalPinyin) {
+        delete next[key];
+      } else {
+        next[key] = {
+          lessonId,
+          index: characterIndex,
+          character,
+          originalPinyin,
+          correctedPinyin,
+          citation: currentLesson.citation,
+          source: "manual-in-app",
+          updatedAt: new Date().toISOString()
+        };
+      }
+      return next;
+    });
+    closePinyinEditor();
+    notify(correctedPinyin === originalPinyin ? "已恢复默认拼音。" : "拼音已修改并保存在本机。");
+  }
+
+  function resetPinyinCorrection() {
+    if (!pinyinEditorTarget?.hasOverride) return;
+    const key = pinyinCorrectionKey(pinyinEditorTarget.lessonId, pinyinEditorTarget.characterIndex);
+    setPinyinCorrections((previous) => {
+      const next = { ...previous };
+      delete next[key];
+      return next;
+    });
+    closePinyinEditor();
+    notify("已恢复默认拼音。");
+  }
+
+  async function exportPinyinCorrections() {
+    const corrections = Object.values(pinyinCorrections)
+      .sort((left, right) => left.lessonId.localeCompare(right.lessonId) || left.index - right.index);
+    if (corrections.length === 0) {
+      notify("还没有手动校正的拼音。");
+      return;
+    }
+    const content = JSON.stringify({ version: 1, corrections }, null, 2);
+    try {
+      if (Platform.OS === "web") {
+        if (globalThis.navigator?.clipboard?.writeText) {
+          try {
+            await globalThis.navigator.clipboard.writeText(content);
+            notify("校正表已复制，可以发给我合入项目。");
+            return;
+          } catch {
+            // Fall back to the browser prompt when clipboard access is denied.
+          }
+        }
+        if (typeof globalThis.prompt === "function") {
+          globalThis.prompt("复制拼音校正表 JSON", content);
+          return;
+        }
+        notify("当前浏览器不支持导出校正表。");
+        return;
+      }
+      await Share.share({ title: "一卷春风拼音校正表", message: content });
+    } catch {
+      notify("导出失败，请稍后再试。");
+    }
   }
 
   function markCurrentRead() {
@@ -465,11 +652,15 @@ export default function App() {
     const size = normalizeReadingFontSize(settings.fontSize);
     const textStyle = [styles.sentenceText, { fontSize: size }, readingFontFamily ? { fontFamily: readingFontFamily } : null];
     const blocks = getLessonBlocks(currentLesson, settings.script);
+    const pinyinUnits = (currentLesson.pinyinUnits || []).map((pinyin, characterIndex) => (
+      pinyinCorrections[pinyinCorrectionKey(currentLesson.id, characterIndex)]?.correctedPinyin || pinyin
+    ));
+    const onEditPinyin = (characterIndex, character, pinyin) => openPinyinEditor(characterIndex, character, pinyin);
     if (settings.layout === "vertical") {
-      return <VerticalReadingBlocks key={`${currentLesson.id}-${settings.script}-${settings.showPinyin}-${readingFontStyle}-${size}`} lesson={currentLesson} blocks={blocks} showPinyin={settings.showPinyin} fontSize={size} fontFamily={readingFontFamily} height={380} />;
+      return <VerticalReadingBlocks key={`${currentLesson.id}-${settings.script}-${settings.showPinyin}-${readingFontStyle}-${size}`} lesson={currentLesson} blocks={blocks} pinyinUnits={pinyinUnits} showPinyin={settings.showPinyin} fontSize={size} fontFamily={readingFontFamily} height={380} onEditPinyin={onEditPinyin} />;
     }
     return (
-      <ReadingBlocks lesson={currentLesson} blocks={blocks} showPinyin={settings.showPinyin} fontSize={size} textStyle={textStyle} />
+      <ReadingBlocks lesson={currentLesson} blocks={blocks} pinyinUnits={pinyinUnits} showPinyin={settings.showPinyin} fontSize={size} textStyle={textStyle} onEditPinyin={onEditPinyin} />
     );
   }
 
@@ -916,7 +1107,50 @@ export default function App() {
                   ><Text style={styles.fontSizeButtonText}>+</Text></Pressable>
                 </View>
               </View>
-              <Text style={styles.sheetFootnote}>设置、收藏、笔记和进度保存在当前设备。拼音为程序自动注音，仅作阅读辅助；古汉语异读与不同底本请参照来源说明。</Text>
+              <View style={styles.settingRow}>
+                <View><Text style={styles.settingTitle}>拼音校正表</Text><Text style={styles.settingHint}>项目已校正 {projectPinyinCorrectionCount} 处；本机另改 {Object.keys(pinyinCorrections).length} 处</Text></View>
+                <Pressable onPress={exportPinyinCorrections} style={({ pressed }) => [styles.correctionExportButton, pressed && styles.pressed]}>
+                  <Text style={styles.correctionExportText}>导出</Text>
+                </Pressable>
+              </View>
+              <Text style={styles.sheetFootnote}>设置和拼音校正保存在当前设备。点按阅读页面上方的拼音即可修改。</Text>
+            </View>
+          </View>
+        </Modal>
+
+        <Modal visible={Boolean(pinyinEditorTarget)} transparent animationType="slide" onRequestClose={closePinyinEditor}>
+          <View style={styles.modalRoot}>
+            <Pressable style={styles.modalScrim} onPress={closePinyinEditor} />
+            <View style={styles.pinyinEditorSheet}>
+              <View style={styles.sheetHandle} />
+              <View style={styles.sheetHeader}>
+                <View>
+                  <Text style={styles.sheetTitle}>修改拼音</Text>
+                  <Text style={styles.sheetSubtitle}>{pinyinEditorTarget?.citation}</Text>
+                </View>
+                <Pressable onPress={closePinyinEditor} style={styles.sheetClose}><Text style={styles.sheetCloseText}>×</Text></Pressable>
+              </View>
+              <Text style={styles.pinyinEditorContext}>
+                {pinyinEditorTarget?.displayedCharacter}　当前：{pinyinEditorTarget?.currentPinyin}　默认：{pinyinEditorTarget?.originalPinyin}
+              </Text>
+              <TextInput
+                value={pinyinEditorDraft}
+                onChangeText={(value) => { setPinyinEditorDraft(value); setPinyinEditorError(""); }}
+                autoCapitalize="none"
+                autoCorrect={false}
+                maxLength={8}
+                placeholder="输入一个拼音音节，如 wéi"
+                placeholderTextColor="#A0A69B"
+                accessibilityLabel="拼音"
+                style={styles.pinyinEditorInput}
+              />
+              {pinyinEditorError ? <Text style={styles.pinyinEditorError}>{pinyinEditorError}</Text> : null}
+              <Text style={styles.pinyinEditorHint}>保存后，这篇原文在横排和竖排中的拼音都会更新。</Text>
+              <View style={styles.pinyinEditorActions}>
+                <Pressable onPress={closePinyinEditor} style={styles.noteCancel}><Text style={styles.noteCancelText}>取消</Text></Pressable>
+                <Pressable onPress={resetPinyinCorrection} disabled={!pinyinEditorTarget?.hasOverride} style={[styles.noteCancel, !pinyinEditorTarget?.hasOverride && styles.noteActionDisabled]}><Text style={styles.noteCancelText}>恢复默认</Text></Pressable>
+                <Pressable onPress={savePinyinCorrection} style={styles.noteSave}><Text style={styles.noteSaveText}>保存</Text></Pressable>
+              </View>
             </View>
           </View>
         </Modal>
@@ -997,6 +1231,7 @@ const styles = StyleSheet.create({
   rubyWrap: { width: "100%", flexDirection: "row", flexWrap: "wrap", justifyContent: "center", alignItems: "flex-end" },
   rubyCell: { alignItems: "center", justifyContent: "flex-end" },
   rubyPinyinSlot: { minWidth: 8, alignItems: "center", justifyContent: "flex-end" },
+  pinyinTouchTarget: { minWidth: 18, minHeight: 12, alignItems: "center", justifyContent: "center" },
   rubyPinyin: { color: "#9B8665", fontFamily: "sans-serif", textAlign: "center" },
   pinyinText: { marginBottom: 9, color: "#9B8665", fontSize: 12, lineHeight: 21, textAlign: "center", letterSpacing: 0.2 },
   sentenceText: { color: "#2A3B31", fontFamily: "serif", fontWeight: "500", letterSpacing: 0.6, lineHeight: 43, textAlign: "center" },
@@ -1036,6 +1271,7 @@ const styles = StyleSheet.create({
   noteActions: { flexDirection: "row", justifyContent: "flex-end", alignItems: "center", gap: 7, marginTop: 7 },
   noteCancel: { paddingHorizontal: 10, paddingVertical: 8 },
   noteCancelText: { color: "#889188", fontSize: 10 },
+  noteActionDisabled: { opacity: 0.45 },
   noteSave: { paddingHorizontal: 13, paddingVertical: 8, borderRadius: 8, backgroundColor: COLORS.green },
   noteSaveText: { color: "#FFFFFF", fontSize: 10, fontWeight: "600" },
   readToday: { flexDirection: "row", alignItems: "center", gap: 7, marginTop: 12 },
@@ -1161,6 +1397,14 @@ const styles = StyleSheet.create({
   sheetSubtitle: { marginTop: 4, color: "#9BA197", fontSize: 9 },
   sheetClose: { width: 29, height: 29, borderRadius: 15, borderWidth: 1, borderColor: "#EEECE4", alignItems: "center", justifyContent: "center" },
   sheetCloseText: { color: "#7F897F", fontSize: 19, lineHeight: 22 },
+  pinyinEditorSheet: { paddingHorizontal: 20, paddingTop: 9, paddingBottom: Platform.OS === "ios" ? 31 : 22, borderTopLeftRadius: 22, borderTopRightRadius: 22, borderWidth: 1, borderColor: "#E6E3D9", backgroundColor: COLORS.paper },
+  pinyinEditorContext: { marginBottom: 9, color: "#657367", fontFamily: "serif", fontSize: 13, textAlign: "center" },
+  pinyinEditorInput: { minHeight: 48, paddingHorizontal: 12, borderWidth: 1, borderColor: "#DDE3DA", borderRadius: 10, color: COLORS.ink, backgroundColor: "#FFFEFB", fontSize: 18, textAlign: "center" },
+  pinyinEditorError: { marginTop: 7, color: COLORS.rose, fontSize: 9, textAlign: "center" },
+  pinyinEditorHint: { marginTop: 8, color: "#939B91", fontSize: 9, textAlign: "center" },
+  pinyinEditorActions: { marginTop: 12, flexDirection: "row", alignItems: "center", justifyContent: "flex-end", gap: 8 },
+  correctionExportButton: { paddingHorizontal: 13, paddingVertical: 8, borderRadius: 8, backgroundColor: COLORS.green },
+  correctionExportText: { color: "#FFFFFF", fontSize: 9, fontWeight: "600" },
   settingRow: { paddingVertical: 13, borderTopWidth: 1, borderTopColor: "#EFEEE8", flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 9 },
   settingTitle: { color: "#5D6D60", fontSize: 10, fontWeight: "600" },
   settingHint: { marginTop: 4, color: "#A0A69B", fontSize: 8 },

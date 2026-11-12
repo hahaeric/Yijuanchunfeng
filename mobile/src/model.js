@@ -1,7 +1,74 @@
 const corpus = require("./data/classics.json");
+const pinyinCorrections = require("./data/pinyin-corrections.json");
 
 const demoBooks = corpus.books;
-const demoLessons = corpus.lessons;
+function formatPinyin(text, units) {
+  const openingMarks = new Set(["“", "‘", "（", "《", "「", "『"]);
+  const closingMarks = new Set(["”", "’", "）", "》", "」", "』"]);
+  const punctuation = new Set(["，", "。", "；", "：", "？", "！", "、", ",", ".", "!", "?", ";", ":"]);
+  const characters = [...text];
+  let result = "";
+  let separateNext = false;
+  characters.forEach((character, index) => {
+    if (/\p{Script=Han}/u.test(character)) {
+      if (separateNext) result += " ";
+      result += units[index] || "";
+      separateNext = true;
+    } else if (/\s/u.test(character)) {
+      if (result && !result.endsWith(" ")) result += " ";
+      separateNext = false;
+    } else if (openingMarks.has(character) || punctuation.has(character) || closingMarks.has(character)) {
+      result = result.trimEnd() + character;
+      separateNext = closingMarks.has(character);
+    } else {
+      if (separateNext) result += " ";
+      result += character;
+      separateNext = true;
+    }
+  });
+  return result.trim();
+}
+
+if (pinyinCorrections.version !== 1 || !Array.isArray(pinyinCorrections.corrections)) {
+  throw new Error("拼音校正表格式无效");
+}
+
+const correctionsByLesson = new Map();
+const correctionKeys = new Set();
+for (const correction of pinyinCorrections.corrections) {
+  const { lessonId, index, character, correctedPinyin } = correction;
+  const key = `${lessonId}:${index}`;
+  if (typeof lessonId !== "string" || !Number.isInteger(index) || index < 0 ||
+    typeof character !== "string" || [...character].length !== 1 ||
+    typeof correctedPinyin !== "string" || !/^\p{Script=Latin}{1,8}[1-5]?$/u.test(correctedPinyin.normalize("NFC"))) {
+    throw new Error(`拼音校正表中存在无效记录：${JSON.stringify(correction)}`);
+  }
+  if (correctionKeys.has(key)) throw new Error(`拼音校正表中存在重复位置：${key}`);
+  correctionKeys.add(key);
+  const corrections = correctionsByLesson.get(lessonId) || [];
+  corrections.push(correction);
+  correctionsByLesson.set(lessonId, corrections);
+}
+
+const appliedCorrectionKeys = new Set();
+const demoLessons = corpus.lessons.map((lesson) => {
+  const corrections = correctionsByLesson.get(lesson.id) || [];
+  if (corrections.length === 0) return lesson;
+  const characters = [...lesson.text];
+  const pinyinUnits = [...lesson.pinyinUnits];
+  for (const correction of corrections) {
+    if (characters[correction.index] !== correction.character) {
+      throw new Error(`拼音校正位置与《${lesson.citation}》不匹配`);
+    }
+    pinyinUnits[correction.index] = correction.correctedPinyin.normalize("NFC");
+    appliedCorrectionKeys.add(`${lesson.id}:${correction.index}`);
+  }
+  return { ...lesson, pinyinUnits, pinyin: formatPinyin(lesson.text, pinyinUnits) };
+});
+if (appliedCorrectionKeys.size !== correctionKeys.size) {
+  const missing = [...correctionKeys].filter((key) => !appliedCorrectionKeys.has(key));
+  throw new Error(`拼音校正表引用了不存在的篇目或位置：${missing.join(", ")}`);
+}
 const lessonsByBook = new Map(demoBooks.map((book) => [
   book.id,
   demoLessons.filter((lesson) => lesson.bookId === book.id)
@@ -188,6 +255,7 @@ module.exports = {
   corpus,
   demoBooks,
   demoLessons,
+  projectPinyinCorrectionCount: correctionKeys.size,
   getBookLessons,
   getBookPosition,
   getBookProgress,
