@@ -4,7 +4,7 @@ import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
 const editionOverrides = require("../mobile/src/data/edition-overrides.json");
-const { demoBooks, demoLessons, getLessonBlocks, getLessonSourceNote } = require("../mobile/src/model.js");
+const { corpus, demoBooks, demoLessons, getLessonBlocks, getLessonSourceNote } = require("../mobile/src/model.js");
 
 const xueEr = demoLessons.filter((lesson) => lesson.bookId === "lunyu" && lesson.chapter === "学而");
 const configuredXueEr = editionOverrides.chapterOverrides.find(
@@ -13,6 +13,18 @@ const configuredXueEr = editionOverrides.chapterOverrides.find(
 
 function readingsFor(lesson) {
   return lesson.pinyinUnits.filter(Boolean).join(" ");
+}
+
+function automaticReadingsFor(configuredLesson) {
+  const sourceId = configuredLesson.pinyinSourceId || configuredLesson.id;
+  const source = corpus.lessons.find((lesson) => lesson.id === sourceId);
+  const sourceHan = [...source.text].flatMap((character, index) =>
+    /\p{Script=Han}/u.test(character) ? [{ character, pinyin: source.pinyinUnits[index] }] : []);
+  const targetHan = [...configuredLesson.text].filter((character) => /\p{Script=Han}/u.test(character));
+  const start = sourceHan.findIndex((_item, index) =>
+    targetHan.every((character, offset) => sourceHan[index + offset]?.character === character));
+  assert.ok(start >= 0, `${configuredLesson.id} 应能与自动注音来源对齐`);
+  return sourceHan.slice(start, start + targetHan.length).map((item) => item.pinyin).join(" ");
 }
 
 test("《学而篇》以邓启铜注释本的十七则替换通行本首篇", () => {
@@ -46,24 +58,25 @@ test("PDF 里的句读差异和第十五、十六则拆分被完整保留", () =
   assert.equal(xueEr[16].text, "子曰：“不患人之不己知，患不知人也。”");
 });
 
-test("十七则逐字拼音均来自版本覆盖表，不再使用声调变调结果", () => {
+test("十七则只覆盖文字和标点，拼音逐字沿用项目自动注音", () => {
   assert.equal(configuredXueEr.lessons.length, xueEr.length);
   for (const [index, configuredLesson] of configuredXueEr.lessons.entries()) {
     const lesson = xueEr[index];
     assert.equal(lesson.id, configuredLesson.id);
     assert.equal(lesson.text, configuredLesson.text);
     assert.equal(lesson.traditionalText, configuredLesson.traditionalText);
-    assert.equal(readingsFor(lesson), configuredLesson.readings.normalize("NFC"));
+    assert.equal(Object.hasOwn(configuredLesson, "readings"), false);
+    assert.equal(readingsFor(lesson), automaticReadingsFor(configuredLesson));
   }
 
-  assert.match(readingsFor(xueEr[0]), /zhī bù yì yuè/u);
-  assert.match(readingsFor(xueEr[1]), /xiào tì ér hào/u);
-  assert.match(readingsFor(xueEr[5]), /chū zé tì/u);
-  assert.match(readingsFor(xueEr[7]), /jūn zǐ bù zhòng zé bù wēi/u);
-  assert.match(readingsFor(xueEr[8]), /^zēng zǐ/u);
-  assert.match(readingsFor(xueEr[10]), /fù mò guān/u);
-  assert.match(readingsFor(xueEr[11]), /hé wéi guì.*sī wéi měi/u);
-  assert.match(readingsFor(xueEr[16]), /zǐ yuē bù huàn/u);
+  assert.match(readingsFor(xueEr[0]), /zhī bú yì yuè/u);
+  assert.match(readingsFor(xueEr[1]), /qí wèi rén.*xiào dì/u);
+  assert.match(readingsFor(xueEr[5]), /chū zé dì/u);
+  assert.match(readingsFor(xueEr[7]), /jūn zǐ bú zhòng/u);
+  assert.match(readingsFor(xueEr[8]), /^céng zǐ/u);
+  assert.match(readingsFor(xueEr[10]), /fù méi guān/u);
+  assert.match(readingsFor(xueEr[11]), /hé wèi guì.*sī wèi měi/u);
+  assert.match(readingsFor(xueEr[16]), /zǐ yuē bú huàn/u);
 });
 
 test("版本来源随章句进入模型，校勘小字不混入正文", () => {
@@ -72,12 +85,13 @@ test("版本来源随章句进入模型，校勘小字不混入正文", () => {
   for (const lesson of xueEr) {
     assert.equal(lesson.editionSource.id, edition.id);
     assert.equal(lesson.editionSource.isbn, "978-7-305-13127-1");
+    assert.equal(lesson.editionSource.pinyinMode, "automatic");
     assert.deepEqual(lesson.editionSource.sourcePdfPages, [11, 12, 13, 14, 15]);
     assert.doesNotMatch(lesson.text, /悌|毋|歟|汎/u);
   }
   assert.match(demoBooks.find((book) => book.id === "lunyu").editionNote,
-    /《学而篇》正文、标点和拼音已按邓启铜注释本/u);
-  assert.equal(getLessonSourceNote(xueEr[0]), "本则正文、标点和拼音已按邓启铜注释本核校。");
+    /《学而篇》正文和标点已按邓启铜注释本.*拼音仍为程序自动注音/u);
+  assert.equal(getLessonSourceNote(xueEr[0]), "本则正文和标点已按邓启铜注释本核校；拼音为程序自动注音。");
   assert.match(getLessonSourceNote(demoLessons.find((lesson) => lesson.bookId === "mengzi")),
     /拼音为程序自动注音，非邓启铜版/u);
 });

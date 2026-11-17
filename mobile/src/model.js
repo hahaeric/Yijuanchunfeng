@@ -42,24 +42,28 @@ for (const edition of editionOverrides.editions) {
   editionsById.set(edition.id, edition);
 }
 
-function buildEditionPinyinUnits(text, readings, citation) {
-  if (typeof readings !== "string" || !readings.trim()) {
-    throw new Error(`${citation}缺少版本拼音`);
+function buildAlignedPinyinUnits(text, sourceLesson, citation) {
+  if (!sourceLesson || !Array.isArray(sourceLesson.pinyinUnits) ||
+    sourceLesson.pinyinUnits.length !== [...sourceLesson.text].length) {
+    throw new Error(`${citation}缺少可用的自动拼音来源`);
   }
-  const syllables = readings.normalize("NFC").trim().split(/\s+/u);
-  const characters = [...text];
-  const hanCount = characters.filter((character) => /\p{Script=Han}/u.test(character)).length;
-  if (syllables.length !== hanCount) {
-    throw new Error(`${citation}的版本拼音数量与汉字数量不一致：${syllables.length}/${hanCount}`);
-  }
-  for (const syllable of syllables) {
-    if (!/^\p{Script=Latin}{1,8}[1-5]?$/u.test(syllable)) {
-      throw new Error(`${citation}包含无效版本拼音：${syllable}`);
+  const sourceHan = [...sourceLesson.text].flatMap((character, index) =>
+    /\p{Script=Han}/u.test(character)
+      ? [{ character, pinyin: sourceLesson.pinyinUnits[index] }]
+      : []);
+  const targetHan = [...text].filter((character) => /\p{Script=Han}/u.test(character));
+  const matches = [];
+  for (let start = 0; start <= sourceHan.length - targetHan.length; start += 1) {
+    if (targetHan.every((character, offset) => sourceHan[start + offset].character === character)) {
+      matches.push(start);
     }
   }
-  let readingIndex = 0;
-  return characters.map((character) =>
-    /\p{Script=Han}/u.test(character) ? syllables[readingIndex++] : "");
+  if (matches.length !== 1) {
+    throw new Error(`${citation}无法唯一对齐自动拼音来源：${sourceLesson.id}`);
+  }
+  let readingIndex = matches[0];
+  return [...text].map((character) =>
+    /\p{Script=Han}/u.test(character) ? sourceHan[readingIndex++].pinyin : "");
 }
 
 function validateDialogueRanges(ranges, textLength, citation) {
@@ -109,7 +113,9 @@ function applyEditionOverrides(baseLessons) {
       }
       const unitLabel = `第${item.number}则`;
       const citation = `《${book.title}·${chapter}·${unitLabel}》`;
-      const pinyinUnits = buildEditionPinyinUnits(item.text, item.readings, citation);
+      const pinyinSourceId = item.pinyinSourceId || item.id;
+      const pinyinSourceLesson = baseLessons.find((lesson) => lesson.id === pinyinSourceId);
+      const pinyinUnits = buildAlignedPinyinUnits(item.text, pinyinSourceLesson, citation);
       const dialogueRanges = validateDialogueRanges(item.dialogueRanges, [...item.text].length, citation);
       return {
         id: item.id,
@@ -126,7 +132,8 @@ function applyEditionOverrides(baseLessons) {
         ...(dialogueRanges ? { dialogueRanges } : {}),
         editionSource: {
           ...edition,
-          sourcePdfPages
+          sourcePdfPages,
+          pinyinMode: "automatic"
         }
       };
     });
@@ -195,7 +202,7 @@ const demoBooks = corpus.books.map((book) => {
   return {
     ...book,
     lessonCount: bookLessons.length,
-    editionNote: `${chapterNames}正文、标点和拼音已按${edition.annotator}注释本（${edition.publisher}${publishedYear ? `，${publishedYear}` : ""}）核校；其余篇章仍沿用通行本。`
+    editionNote: `${chapterNames}正文和标点已按${edition.annotator}注释本（${edition.publisher}${publishedYear ? `，${publishedYear}` : ""}）核校；拼音仍为程序自动注音。其余篇章沿用通行本。`
   };
 });
 const lessonsByBook = new Map(demoBooks.map((book) => [
@@ -307,7 +314,7 @@ function getLessonText(lesson, script = "simplified") {
 
 function getLessonSourceNote(lesson) {
   if (lesson?.editionSource) {
-    return `本则正文、标点和拼音已按${lesson.editionSource.annotator}注释本核校。`;
+    return `本则正文和标点已按${lesson.editionSource.annotator}注释本核校；拼音为程序自动注音。`;
   }
   return "拼音为程序自动注音，非邓启铜版；古汉语异读可能需要校订。";
 }
