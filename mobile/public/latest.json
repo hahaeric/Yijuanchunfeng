@@ -1,10 +1,22 @@
 {
   "platform": "android",
-  "version": "0.1.0",
-  "androidVersionCode": 2,
-  "apkParts": [],
-  "apkPartSizes": [],
-  "apkSizeBytes": 0,
-  "apkMd5": "",
-  "releaseNotes": ""
+  "version": "0.1.1",
+  "androidVersionCode": 3,
+  "apkParts": [
+    "https://yijuanchunfeng-updates--update-feed.expo.app/releases/v0.1.1-3-1794899887562/part-000.bin",
+    "https://yijuanchunfeng-updates--update-feed.expo.app/releases/v0.1.1-3-1794899887562/part-001.bin",
+    "https://yijuanchunfeng-updates--update-feed.expo.app/releases/v0.1.1-3-1794899887562/part-002.bin",
+    "https://yijuanchunfeng-updates--update-feed.expo.app/releases/v0.1.1-3-1794899887562/part-003.bin",
+    "https://yijuanchunfeng-updates--update-feed.expo.app/releases/v0.1.1-3-1794899887562/part-004.bin"
+  ],
+  "apkPartSizes": [
+    20971520,
+    20971520,
+    20971520,
+    20971520,
+    13310352
+  ],
+  "apkSizeBytes": 97196432,
+  "apkMd5": "74a8cf78992939cf6adb5b068040345c",
+  "releaseNotes": "新增应用内统一更新；《学而篇》文字和标点按邓启铜版核校，拼音使用程序自动注音。"
 }
