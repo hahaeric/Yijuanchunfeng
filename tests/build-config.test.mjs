@@ -1,13 +1,44 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
+import updateClient from "../mobile/src/update-client.js";
 
 const easConfig = JSON.parse(readFileSync(new URL("../mobile/eas.json", import.meta.url), "utf8"));
 const appConfig = JSON.parse(readFileSync(new URL("../mobile/app.json", import.meta.url), "utf8"));
+const mobilePackage = JSON.parse(readFileSync(new URL("../mobile/package.json", import.meta.url), "utf8"));
+const androidUpdateFeed = JSON.parse(readFileSync(new URL("../mobile/public/latest.json", import.meta.url), "utf8"));
 
 test("EAS preview profile creates an internally distributable Android APK", () => {
   assert.equal(easConfig.build.preview.distribution, "internal");
   assert.equal(easConfig.build.preview.android.buildType, "apk");
+  assert.equal(easConfig.build.preview.channel, "preview");
+});
+
+test("release APK is configured for prompted Expo updates and Android package updates", () => {
+  assert.equal(appConfig.expo.version, "0.1.1");
+  assert.equal(appConfig.expo.android.versionCode, 3);
+  assert.equal(appConfig.expo.runtimeVersion.policy, "appVersion");
+  assert.equal(appConfig.expo.updates.url, `https://u.expo.dev/${appConfig.expo.extra.eas.projectId}`);
+  assert.equal(appConfig.expo.updates.checkAutomatically, "NEVER");
+  assert.ok(appConfig.expo.android.permissions.includes("android.permission.REQUEST_INSTALL_PACKAGES"));
+  assert.equal(appConfig.expo.extra.androidUpdateManifestUrl, updateClient.ANDROID_UPDATE_MANIFEST_URL);
+  assert.equal(mobilePackage.dependencies.expo, "~57.0.33");
+  assert.equal(mobilePackage.dependencies["expo-updates"], "~57.0.28");
+  assert.equal(mobilePackage.dependencies["expo-application"], "~57.0.3");
+  assert.equal(mobilePackage.dependencies["expo-file-system"], "~57.0.7");
+  assert.equal(mobilePackage.dependencies["expo-intent-launcher"], "~57.0.1");
+});
+
+test("native APK update feed stays on the installed-or-older version until a build is published", () => {
+  assert.equal(androidUpdateFeed.platform, "android");
+  assert.ok(Number.isSafeInteger(androidUpdateFeed.androidVersionCode));
+  assert.ok(androidUpdateFeed.androidVersionCode <= appConfig.expo.android.versionCode);
+  if (androidUpdateFeed.androidVersionCode === appConfig.expo.android.versionCode) {
+    assert.ok(androidUpdateFeed.apkParts.length > 0);
+    assert.equal(androidUpdateFeed.apkPartSizes.length, androidUpdateFeed.apkParts.length);
+    assert.equal(androidUpdateFeed.apkPartSizes.reduce((total, size) => total + size, 0), androidUpdateFeed.apkSizeBytes);
+    assert.match(androidUpdateFeed.apkMd5, /^[a-f0-9]{32}$/u);
+  }
 });
 
 test("Expo project is configured under the provided team account", () => {

@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Modal,
   Platform,
   Pressable,
@@ -13,9 +14,15 @@ import {
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Application from "expo-application";
+import * as FileSystem from "expo-file-system/legacy";
+import * as ModernFileSystem from "expo-file-system";
 import * as Font from "expo-font";
+import * as IntentLauncher from "expo-intent-launcher";
+import * as Updates from "expo-updates";
 
 const { getStoredValueWithMigration } = require("./src/storage-migration");
+const { ANDROID_UPDATE_MANIFEST_URL, fetchAndroidUpdateOffer } = require("./src/update-client");
 
 const {
   demoBooks,
@@ -377,6 +384,11 @@ export default function App() {
   const [noteOpen, setNoteOpen] = useState(false);
   const [noteDraft, setNoteDraft] = useState("");
   const [toast, setToast] = useState("");
+  const [pendingUpdate, setPendingUpdate] = useState(null);
+  const [checkingUpdates, setCheckingUpdates] = useState(false);
+  const [applyingUpdate, setApplyingUpdate] = useState(false);
+  const [updateProgress, setUpdateProgress] = useState(null);
+  const [updateError, setUpdateError] = useState("");
   const [outlineBookId, setOutlineBookId] = useState(null);
   const [openChapterKey, setOpenChapterKey] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -386,6 +398,8 @@ export default function App() {
   const readerCardOffset = useRef(0);
   const pendingReaderScroll = useRef(false);
   const todayKey = useRef(localDateKey());
+  const checkingUpdatesRef = useRef(false);
+  const startupUpdateCheckDone = useRef(false);
   const currentLesson = demoLessons[currentIndex];
   const transition = getTransition(currentIndex);
   const nextLesson = transition.nextLesson;
@@ -441,6 +455,13 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    if (!storageReady || Platform.OS !== "android" || startupUpdateCheckDone.current) return undefined;
+    startupUpdateCheckDone.current = true;
+    const timer = setTimeout(() => checkForAppUpdates({ silent: true }), 1200);
+    return () => clearTimeout(timer);
+  }, [storageReady]);
+
+  useEffect(() => {
     if (readingFontStyle === DEFAULT_READING_FONT_STYLE) return undefined;
     const fontFamily = READING_FONT_FAMILIES[readingFontStyle];
     if (Font.isLoaded(fontFamily)) {
@@ -481,6 +502,154 @@ export default function App() {
     setToast(message);
     if (toastTimer.current) clearTimeout(toastTimer.current);
     toastTimer.current = setTimeout(() => setToast(""), 2300);
+  }
+
+  async function checkForAppUpdates({ silent = false } = {}) {
+    if (checkingUpdatesRef.current) return;
+    checkingUpdatesRef.current = true;
+    setCheckingUpdates(true);
+    setUpdateError("");
+    let manifestCheckFailed = false;
+
+    try {
+      if (Platform.OS === "android") {
+        try {
+          const offer = await fetchAndroidUpdateOffer(
+            ANDROID_UPDATE_MANIFEST_URL,
+            Application.nativeBuildVersion || 0
+          );
+          if (offer) {
+            setSettingsOpen(false);
+            setPendingUpdate(offer);
+            return;
+          }
+        } catch {
+          manifestCheckFailed = true;
+        }
+      }
+
+      if (Updates.isEnabled && !__DEV__) {
+        const update = await Updates.checkForUpdateAsync();
+        if (update.isAvailable) {
+          setSettingsOpen(false);
+          setPendingUpdate({
+            kind: "ota",
+            version: typeof update.manifest?.version === "string" ? update.manifest.version : "",
+            releaseNotes: "内容与界面更新已就绪。"
+          });
+          return;
+        }
+      }
+
+      if (!silent) {
+        const noOtaRuntime = !Updates.isEnabled || __DEV__;
+        notify(manifestCheckFailed
+          ? (noOtaRuntime ? "更新服务器暂时不可用，请稍后重试。" : "APK 更新源暂不可用，内容更新已检查。")
+          : (noOtaRuntime ? "开发预览无法检查内容更新。" : "当前已是最新版本。"));
+      }
+    } catch {
+      if (!silent) notify("检查更新失败，请稍后重试。");
+    } finally {
+      checkingUpdatesRef.current = false;
+      setCheckingUpdates(false);
+    }
+  }
+
+  async function applyPendingUpdate() {
+    if (!pendingUpdate || applyingUpdate) return;
+    setApplyingUpdate(true);
+    setUpdateProgress(null);
+    setUpdateError("");
+
+    try {
+      if (pendingUpdate.kind === "ota") {
+        const result = await Updates.fetchUpdateAsync();
+        if (result.isNew) {
+          await Updates.reloadAsync();
+          return;
+        }
+        setPendingUpdate(null);
+        notify("没有可应用的新内容。");
+        return;
+      }
+
+      if (Platform.OS !== "android") throw new Error("此安装包更新仅支持 Android。");
+      if (!FileSystem.cacheDirectory) throw new Error("无法访问应用缓存目录。");
+
+      const apkPath = `${FileSystem.cacheDirectory}yijuan-chunfeng-update.apk`;
+      const existing = await FileSystem.getInfoAsync(apkPath);
+      if (existing.exists) await FileSystem.deleteAsync(apkPath, { idempotent: true });
+
+      const assembledFile = new ModernFileSystem.File(apkPath);
+      assembledFile.create({ overwrite: true });
+      const outputHandle = assembledFile.open(ModernFileSystem.FileMode.Append);
+      let completedBytes = 0;
+
+      try {
+        for (let partIndex = 0; partIndex < pendingUpdate.apkParts.length; partIndex += 1) {
+          const partPath = `${FileSystem.cacheDirectory}yijuan-chunfeng-update-${partIndex}.bin`;
+          const existingPart = await FileSystem.getInfoAsync(partPath);
+          if (existingPart.exists) await FileSystem.deleteAsync(partPath, { idempotent: true });
+
+          const partTask = FileSystem.createDownloadResumable(
+            pendingUpdate.apkParts[partIndex],
+            partPath,
+            {},
+            ({ totalBytesWritten }) => {
+              setUpdateProgress(Math.min(1, (completedBytes + totalBytesWritten) / pendingUpdate.apkSizeBytes));
+            }
+          );
+          const partResult = await partTask.downloadAsync();
+          if (!partResult?.uri) throw new Error("更新分片下载未完成。");
+
+          const partHandle = new ModernFileSystem.File(partResult.uri).open(ModernFileSystem.FileMode.ReadOnly);
+          const expectedPartSize = pendingUpdate.apkPartSizes[partIndex];
+          try {
+            if (partHandle.size !== expectedPartSize) throw new Error("更新分片大小不正确。");
+            let partBytesRead = 0;
+            while (partBytesRead < expectedPartSize) {
+              const bytes = partHandle.readBytes(Math.min(1024 * 1024, expectedPartSize - partBytesRead));
+              if (!bytes.length) throw new Error("更新分片读取不完整。");
+              outputHandle.writeBytes(bytes);
+              partBytesRead += bytes.length;
+              setUpdateProgress(Math.min(1, (completedBytes + partBytesRead) / pendingUpdate.apkSizeBytes));
+            }
+          } finally {
+            partHandle.close();
+          }
+
+          completedBytes += expectedPartSize;
+          await FileSystem.deleteAsync(partPath, { idempotent: true });
+        }
+      } finally {
+        outputHandle.close();
+      }
+
+      const assembledInfo = await FileSystem.getInfoAsync(apkPath, { md5: true });
+      if (assembledInfo.size !== pendingUpdate.apkSizeBytes || assembledInfo.md5?.toLowerCase() !== pendingUpdate.apkMd5) {
+        throw new Error("更新包校验失败。");
+      }
+
+      const contentUri = await FileSystem.getContentUriAsync(apkPath);
+      const installerResult = await IntentLauncher.startActivityAsync("android.intent.action.VIEW", {
+        data: contentUri,
+        type: "application/vnd.android.package-archive",
+        flags: 1
+      });
+
+      if (installerResult.resultCode === IntentLauncher.ResultCode.Canceled) {
+        setUpdateError("系统安装未完成，您可以再次点击更新。");
+      } else {
+        setPendingUpdate(null);
+      }
+    } catch {
+      setUpdateError(pendingUpdate.kind === "ota"
+        ? "更新下载失败，请检查网络后重试。"
+        : "下载或启动系统安装失败，请检查网络和安装权限后重试。");
+    } finally {
+      setApplyingUpdate(false);
+      setUpdateProgress(null);
+    }
   }
 
   function openPinyinEditor(characterIndex, displayedCharacter, currentPinyin) {
@@ -1146,7 +1315,80 @@ export default function App() {
                   <Text style={styles.correctionExportText}>导出</Text>
                 </Pressable>
               </View>
+              <View style={styles.settingRow}>
+                <View>
+                  <Text style={styles.settingTitle}>应用更新</Text>
+                  <Text style={styles.settingHint}>当前版本 {Application.nativeApplicationVersion || "开发预览"}</Text>
+                </View>
+                <Pressable
+                  onPress={() => checkForAppUpdates()}
+                  disabled={checkingUpdates}
+                  accessibilityRole="button"
+                  accessibilityLabel="检查应用更新"
+                  style={({ pressed }) => [styles.updateCheckButton, checkingUpdates && styles.updateButtonDisabled, pressed && styles.pressed]}
+                >
+                  {checkingUpdates
+                    ? <ActivityIndicator color="#315440" size="small" />
+                    : <Text style={styles.updateCheckText}>检查更新</Text>}
+                </Pressable>
+              </View>
               <Text style={styles.sheetFootnote}>设置和拼音校正保存在当前设备。点按阅读页面上方的拼音即可修改。</Text>
+            </View>
+          </View>
+        </Modal>
+
+        <Modal
+          visible={Boolean(pendingUpdate)}
+          transparent
+          animationType="fade"
+          onRequestClose={() => { if (!applyingUpdate) setPendingUpdate(null); }}
+        >
+          <View style={styles.updateModalRoot}>
+            <Pressable
+              style={styles.modalScrim}
+              onPress={() => { if (!applyingUpdate) setPendingUpdate(null); }}
+            />
+            <View style={styles.updateSheet}>
+              <Text style={styles.updateTitle}>{pendingUpdate?.kind === "native" ? "发现应用更新" : "发现内容更新"}</Text>
+              {pendingUpdate?.kind === "native" ? (
+                <Text style={styles.updateVersion}>一卷春风 v{pendingUpdate.version}</Text>
+              ) : null}
+              <Text style={styles.updateDescription}>
+                {applyingUpdate
+                  ? pendingUpdate?.kind === "native" ? "正在下载安装包…" : "正在下载更新，完成后应用将自动重启。"
+                  : pendingUpdate?.kind === "native"
+                    ? `${pendingUpdate.releaseNotes || "优化应用体验。"}\n\n下载完成后将打开 Android 系统安装确认。`
+                    : pendingUpdate?.releaseNotes || "内容和界面已有新版本，更新后应用将自动重启。"}
+              </Text>
+              {applyingUpdate ? (
+                <View style={styles.updateProgressWrap}>
+                  {updateProgress === null ? (
+                    <ActivityIndicator color="#315440" />
+                  ) : (
+                    <View style={styles.updateProgressTrack}>
+                      <View style={[styles.updateProgressFill, { width: `${Math.round(updateProgress * 100)}%` }]} />
+                    </View>
+                  )}
+                  {updateProgress !== null ? <Text style={styles.updateProgressText}>{Math.round(updateProgress * 100)}%</Text> : null}
+                </View>
+              ) : null}
+              {updateError ? <Text style={styles.updateError}>{updateError}</Text> : null}
+              <View style={styles.updateActions}>
+                <Pressable
+                  onPress={() => setPendingUpdate(null)}
+                  disabled={applyingUpdate}
+                  style={({ pressed }) => [styles.updateLaterButton, applyingUpdate && styles.updateButtonDisabled, pressed && styles.pressed]}
+                >
+                  <Text style={styles.updateLaterText}>稍后</Text>
+                </Pressable>
+                <Pressable
+                  onPress={applyPendingUpdate}
+                  disabled={applyingUpdate}
+                  style={({ pressed }) => [styles.updateNowButton, applyingUpdate && styles.updateButtonDisabled, pressed && styles.pressed]}
+                >
+                  <Text style={styles.updateNowText}>{applyingUpdate ? "请稍候…" : "立即更新"}</Text>
+                </Pressable>
+              </View>
             </View>
           </View>
         </Modal>
@@ -1447,6 +1689,24 @@ const styles = StyleSheet.create({
   modalRoot: { flex: 1, justifyContent: "flex-end" },
   modalScrim: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(35,46,37,0.31)" },
   settingsSheet: { paddingHorizontal: 20, paddingTop: 9, paddingBottom: Platform.OS === "ios" ? 31 : 22, borderTopLeftRadius: 22, borderTopRightRadius: 22, borderWidth: 1, borderColor: "#E6E3D9", backgroundColor: COLORS.paper },
+  updateModalRoot: { flex: 1, justifyContent: "center", paddingHorizontal: 24 },
+  updateSheet: { paddingHorizontal: 21, paddingTop: 23, paddingBottom: 18, borderWidth: 1, borderColor: "#E6E3D9", borderRadius: 18, backgroundColor: COLORS.paper },
+  updateTitle: { color: "#35493B", fontFamily: "serif", fontSize: 19, fontWeight: "600", textAlign: "center" },
+  updateVersion: { marginTop: 8, color: COLORS.gold, fontSize: 11, textAlign: "center" },
+  updateDescription: { marginTop: 13, color: "#7D887D", fontSize: 11, lineHeight: 18, textAlign: "center" },
+  updateProgressWrap: { marginTop: 16, alignItems: "center", gap: 7 },
+  updateProgressTrack: { width: "100%", height: 7, overflow: "hidden", borderRadius: 5, backgroundColor: "#E9E8E0" },
+  updateProgressFill: { height: "100%", borderRadius: 5, backgroundColor: COLORS.green },
+  updateProgressText: { color: COLORS.muted, fontSize: 9 },
+  updateError: { marginTop: 11, color: COLORS.rose, fontSize: 9, lineHeight: 15, textAlign: "center" },
+  updateActions: { marginTop: 19, flexDirection: "row", justifyContent: "flex-end", alignItems: "center", gap: 8 },
+  updateLaterButton: { minWidth: 76, paddingHorizontal: 14, paddingVertical: 10, borderWidth: 1, borderColor: "#E1E4DC", borderRadius: 9, alignItems: "center", backgroundColor: COLORS.paper },
+  updateLaterText: { color: "#63756A", fontSize: 10, fontWeight: "600" },
+  updateNowButton: { minWidth: 104, paddingHorizontal: 15, paddingVertical: 10, borderRadius: 9, alignItems: "center", backgroundColor: COLORS.green },
+  updateNowText: { color: "#FFFDF8", fontSize: 10, fontWeight: "600" },
+  updateCheckButton: { minWidth: 78, minHeight: 34, paddingHorizontal: 9, borderWidth: 1, borderColor: "#DDE5DB", borderRadius: 9, alignItems: "center", justifyContent: "center", backgroundColor: "#F2F6F1" },
+  updateCheckText: { color: COLORS.green, fontSize: 9, fontWeight: "600" },
+  updateButtonDisabled: { opacity: 0.55 },
   sheetHandle: { alignSelf: "center", width: 33, height: 4, marginBottom: 17, borderRadius: 3, backgroundColor: "#DADBD2" },
   sheetHeader: { marginBottom: 12, flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between" },
   sheetTitle: { color: "#35493B", fontFamily: "serif", fontSize: 19, fontWeight: "600" },

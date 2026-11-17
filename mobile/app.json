@@ -4,7 +4,7 @@
     "slug": "jingri-classics",
     "owner": "a114324s-team",
     "scheme": "yijuanchunfeng",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -14,7 +14,10 @@
     },
     "android": {
       "package": "com.jingri.classics",
-      "versionCode": 2,
+      "versionCode": 3,
+      "permissions": [
+        "android.permission.REQUEST_INSTALL_PACKAGES"
+      ],
       "adaptiveIcon": {
         "backgroundColor": "#AD3A2F",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -26,9 +29,18 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-font"
+      "expo-font",
+      "expo-updates"
     ],
+    "updates": {
+      "url": "https://u.expo.dev/62ed5659-ae18-4945-b961-af4ee9c2780f",
+      "checkAutomatically": "NEVER"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "extra": {
+      "androidUpdateManifestUrl": "https://yijuanchunfeng-updates--update-feed.expo.app/latest.json",
       "eas": {
         "projectId": "62ed5659-ae18-4945-b961-af4ee9c2780f"
       }

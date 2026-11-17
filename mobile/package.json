@@ -5,9 +5,13 @@
   "dependencies": {
     "@expo/metro-runtime": "~57.0.18",
     "@react-native-async-storage/async-storage": "2.2.0",
-    "expo": "~57.0.32",
+    "expo": "~57.0.33",
+    "expo-application": "~57.0.3",
+    "expo-file-system": "~57.0.7",
     "expo-font": "~57.0.4",
+    "expo-intent-launcher": "~57.0.1",
     "expo-status-bar": "~57.0.1",
+    "expo-updates": "~57.0.28",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-native": "0.86.3",
@@ -18,6 +22,8 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
+    "prepare:native-update": "node scripts/prepare-native-update.mjs",
+    "deploy:update-feed": "expo export --platform web && npx eas-cli@latest deploy --dev-domain yijuanchunfeng-updates --alias update-feed --non-interactive",
     "build:data": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/download-classics-data.ps1 && node scripts/build-classics-data.mjs"
   },
   "private": true,

@@ -3,5 +3,8 @@ node_modules/
 .data-source/
 dist/
 .verify-dist/
+.verify-android/
 .verify-reader-layout/
+public/releases/
 .verify-outline/
+deploy.tar.gz
