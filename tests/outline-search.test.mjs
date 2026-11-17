@@ -14,7 +14,7 @@ const {
 const expectedBooks = [
   ["daxue", "大学", 1, 16],
   ["zhongyong", "中庸", 33, 131],
-  ["lunyu", "论语", 20, 512],
+  ["lunyu", "论语", 20, 513],
   ["mengzi", "孟子", 14, 690],
   ["shijing", "诗经", 305, 1319],
   ["shangshu", "尚书", 58, 419],

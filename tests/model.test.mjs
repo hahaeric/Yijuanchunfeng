@@ -25,7 +25,7 @@ const {
 const expectedBooks = [
   ["daxue", "大学", 1, 16],
   ["zhongyong", "中庸", 33, 131],
-  ["lunyu", "论语", 20, 512],
+  ["lunyu", "论语", 20, 513],
   ["mengzi", "孟子", 14, 690],
   ["shijing", "诗经", 305, 1319],
   ["shangshu", "尚书", 58, 419],
@@ -80,7 +80,7 @@ test("九部书按阅读路线收录完整篇章结构和全部导入章句", ()
     demoBooks.map((book) => [book.id, book.title, book.chapterCount, book.lessonCount]),
     expectedBooks
   );
-  assert.equal(demoLessons.length, 5039);
+  assert.equal(demoLessons.length, 5040);
   assert.equal(new Set(demoLessons.map((lesson) => lesson.id)).size, demoLessons.length);
 });
 
@@ -234,8 +234,8 @@ test("《论语》按说话人分段，问答仍保留为同一则阅读内容",
   const lesson = demoLessons.find((item) => item.text.startsWith("子禽问于子贡曰："));
   const blocks = getLessonBlocks(lesson);
   assert.deepEqual(blocks, [
-    "子禽问于子贡曰：“夫子至于是邦也，必闻其政，求之与，抑与之与？”",
-    "子贡曰：“夫子温、良、恭、俭、让以得之。夫子之求之也，其诸异乎人之求之与？”"
+    "子禽问于子贡曰：“夫子至于是邦也，必闻其政。求之与，抑与之与？”",
+    "子贡曰：“夫子温、良、恭、俭、让以得之。夫子之求之也，其诸异乎人之求之与！”"
   ]);
   assert.equal(blocks.join(""), lesson.text);
   assert.equal(getLessonBlocks(lesson, "traditional").join(""), lesson.traditionalText);

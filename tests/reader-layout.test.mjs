@@ -59,12 +59,12 @@ test("阅读卡片滚动位置不会小于页面顶部", () => {
 });
 
 test("竖排分栏逐字保留拼音、标点与对话顺序", () => {
-  const lesson = demoLessons.find((item) => item.id === "lunyu-162");
-  assert.ok(lesson, "应找到《论语·学而》第15则");
+  const lesson = demoLessons.find((item) => item.id === "lunyu-162b");
+  assert.ok(lesson, "应找到邓启铜版《论语·学而》第16则");
   const blocks = getLessonBlocks(lesson, "traditional");
   const columnsByBlock = makeVerticalColumns(blocks, lesson.pinyinUnits, 6);
 
-  assert.equal(columnsByBlock.length, 4, "四轮问答应保留为四个对话段");
+  assert.equal(columnsByBlock.length, 2, "问答应保留为两个对话段");
   assert.deepEqual(columnsByBlock.map((columns) => columns.flat().map((item) => item.character).join("")), blocks);
   assert.equal(columnsByBlock.flat(2).map((item) => item.character).join(""), lesson.traditionalText);
   let characterOffset = 0;
@@ -90,7 +90,7 @@ test("书名号只在竖排呈现为竖排专用字形", () => {
   assert.equal(getVerticalGlyph("》"), "︾");
   assert.equal(getVerticalGlyph("诗"), "诗");
 
-  const lesson = demoLessons.find((item) => item.id === "lunyu-162");
+  const lesson = demoLessons.find((item) => item.id === "lunyu-162b");
   assert.ok(lesson.traditionalText.includes("《詩》"), "繁体原文仍保留横排底本标点");
   assert.deepEqual(getLessonBlocks(lesson, "traditional").join(""), lesson.traditionalText);
 });

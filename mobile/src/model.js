@@ -1,7 +1,7 @@
 const corpus = require("./data/classics.json");
+const editionOverrides = require("./data/edition-overrides.json");
 const pinyinCorrections = require("./data/pinyin-corrections.json");
 
-const demoBooks = corpus.books;
 function formatPinyin(text, units) {
   const openingMarks = new Set(["“", "‘", "（", "《", "「", "『"]);
   const closingMarks = new Set(["”", "’", "）", "》", "」", "』"]);
@@ -29,6 +29,122 @@ function formatPinyin(text, units) {
   return result.trim();
 }
 
+if (editionOverrides.version !== 1 || !Array.isArray(editionOverrides.editions) ||
+  !Array.isArray(editionOverrides.chapterOverrides)) {
+  throw new Error("版本覆盖表格式无效");
+}
+
+const editionsById = new Map();
+for (const edition of editionOverrides.editions) {
+  if (!edition || typeof edition.id !== "string" || !edition.id || editionsById.has(edition.id)) {
+    throw new Error("版本覆盖表中存在无效或重复的版本");
+  }
+  editionsById.set(edition.id, edition);
+}
+
+function buildEditionPinyinUnits(text, readings, citation) {
+  if (typeof readings !== "string" || !readings.trim()) {
+    throw new Error(`${citation}缺少版本拼音`);
+  }
+  const syllables = readings.normalize("NFC").trim().split(/\s+/u);
+  const characters = [...text];
+  const hanCount = characters.filter((character) => /\p{Script=Han}/u.test(character)).length;
+  if (syllables.length !== hanCount) {
+    throw new Error(`${citation}的版本拼音数量与汉字数量不一致：${syllables.length}/${hanCount}`);
+  }
+  for (const syllable of syllables) {
+    if (!/^\p{Script=Latin}{1,8}[1-5]?$/u.test(syllable)) {
+      throw new Error(`${citation}包含无效版本拼音：${syllable}`);
+    }
+  }
+  let readingIndex = 0;
+  return characters.map((character) =>
+    /\p{Script=Han}/u.test(character) ? syllables[readingIndex++] : "");
+}
+
+function validateDialogueRanges(ranges, textLength, citation) {
+  if (ranges === undefined) return undefined;
+  if (!Array.isArray(ranges) || ranges.length < 2) {
+    throw new Error(`${citation}的对话分段无效`);
+  }
+  let expectedStart = 0;
+  for (const range of ranges) {
+    if (!range || range.start !== expectedStart || !Number.isInteger(range.end) || range.end <= range.start) {
+      throw new Error(`${citation}的对话分段不连续`);
+    }
+    expectedStart = range.end;
+  }
+  if (expectedStart !== textLength) throw new Error(`${citation}的对话分段未覆盖完整正文`);
+  return ranges.map((range) => ({ ...range }));
+}
+
+function applyEditionOverrides(baseLessons) {
+  const lessons = [...baseLessons];
+  const overriddenChapters = [];
+
+  for (const chapterOverride of editionOverrides.chapterOverrides) {
+    const { editionId, bookId, chapter } = chapterOverride;
+    const edition = editionsById.get(editionId);
+    const book = corpus.books.find((item) => item.id === bookId);
+    if (!edition || !book || typeof chapter !== "string" || !Array.isArray(chapterOverride.lessons) ||
+      chapterOverride.lessons.length === 0) {
+      throw new Error(`版本覆盖表中的篇章配置无效：${bookId || "?"}/${chapter || "?"}`);
+    }
+
+    const indexes = lessons
+      .map((lesson, index) => (lesson.bookId === bookId && lesson.chapter === chapter ? index : -1))
+      .filter((index) => index >= 0);
+    if (indexes.length === 0 || indexes.some((index, offset) => index !== indexes[0] + offset)) {
+      throw new Error(`版本覆盖表找不到连续篇章：${book.title}·${chapter}`);
+    }
+
+    const sourcePdfPages = Array.isArray(chapterOverride.sourcePdfPages)
+      ? [...chapterOverride.sourcePdfPages]
+      : [];
+    const replacement = chapterOverride.lessons.map((item) => {
+      if (!item || typeof item.id !== "string" || !Number.isInteger(item.number) || item.number < 1 ||
+        typeof item.text !== "string" || typeof item.traditionalText !== "string" ||
+        [...item.text].length !== [...item.traditionalText].length) {
+        throw new Error(`版本覆盖表中的章句无效：${book.title}·${chapter}`);
+      }
+      const unitLabel = `第${item.number}则`;
+      const citation = `《${book.title}·${chapter}·${unitLabel}》`;
+      const pinyinUnits = buildEditionPinyinUnits(item.text, item.readings, citation);
+      const dialogueRanges = validateDialogueRanges(item.dialogueRanges, [...item.text].length, citation);
+      return {
+        id: item.id,
+        bookId,
+        book: book.title,
+        chapter,
+        section: "",
+        unitLabel,
+        text: item.text,
+        traditionalText: item.traditionalText,
+        pinyin: formatPinyin(item.text, pinyinUnits),
+        pinyinUnits,
+        citation,
+        ...(dialogueRanges ? { dialogueRanges } : {}),
+        editionSource: {
+          ...edition,
+          sourcePdfPages
+        }
+      };
+    });
+
+    lessons.splice(indexes[0], indexes.length, ...replacement);
+    overriddenChapters.push({ bookId, chapter, edition });
+  }
+
+  const lessonIds = new Set();
+  for (const lesson of lessons) {
+    if (lessonIds.has(lesson.id)) throw new Error(`版本覆盖后章句编号重复：${lesson.id}`);
+    lessonIds.add(lesson.id);
+  }
+  return { lessons, overriddenChapters };
+}
+
+const editionResult = applyEditionOverrides(corpus.lessons);
+
 if (pinyinCorrections.version !== 1 || !Array.isArray(pinyinCorrections.corrections)) {
   throw new Error("拼音校正表格式无效");
 }
@@ -51,7 +167,7 @@ for (const correction of pinyinCorrections.corrections) {
 }
 
 const appliedCorrectionKeys = new Set();
-const demoLessons = corpus.lessons.map((lesson) => {
+const demoLessons = editionResult.lessons.map((lesson) => {
   const corrections = correctionsByLesson.get(lesson.id) || [];
   if (corrections.length === 0) return lesson;
   const characters = [...lesson.text];
@@ -69,6 +185,19 @@ if (appliedCorrectionKeys.size !== correctionKeys.size) {
   const missing = [...correctionKeys].filter((key) => !appliedCorrectionKeys.has(key));
   throw new Error(`拼音校正表引用了不存在的篇目或位置：${missing.join(", ")}`);
 }
+const demoBooks = corpus.books.map((book) => {
+  const bookLessons = demoLessons.filter((lesson) => lesson.bookId === book.id);
+  const chapterOverrides = editionResult.overriddenChapters.filter((item) => item.bookId === book.id);
+  if (chapterOverrides.length === 0) return { ...book, lessonCount: bookLessons.length };
+  const chapterNames = chapterOverrides.map((item) => `《${item.chapter}篇》`).join("、");
+  const edition = chapterOverrides[0].edition;
+  const publishedYear = typeof edition.published === "string" ? edition.published.slice(0, 4) : "";
+  return {
+    ...book,
+    lessonCount: bookLessons.length,
+    editionNote: `${chapterNames}正文、标点和拼音已按${edition.annotator}注释本（${edition.publisher}${publishedYear ? `，${publishedYear}` : ""}）核校；其余篇章仍沿用通行本。`
+  };
+});
 const lessonsByBook = new Map(demoBooks.map((book) => [
   book.id,
   demoLessons.filter((lesson) => lesson.bookId === book.id)
@@ -176,6 +305,13 @@ function getLessonText(lesson, script = "simplified") {
   return script === "traditional" ? lesson.traditionalText : lesson.text;
 }
 
+function getLessonSourceNote(lesson) {
+  if (lesson?.editionSource) {
+    return `本则正文、标点和拼音已按${lesson.editionSource.annotator}注释本核校。`;
+  }
+  return "拼音为程序自动注音，非邓启铜版；古汉语异读可能需要校订。";
+}
+
 function getLessonBlocks(lesson, script = "simplified") {
   const characters = [...getLessonText(lesson, script)];
   const ranges = lesson.dialogueRanges;
@@ -264,6 +400,7 @@ module.exports = {
   getChapterProgress,
   getFirstUnreadLessonId,
   getLessonBlocks,
+  getLessonSourceNote,
   getLessonText,
   getPositionIndex,
   getProgress,

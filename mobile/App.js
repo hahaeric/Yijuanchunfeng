@@ -28,6 +28,7 @@ const {
   getFirstUnreadLessonId,
   getPositionIndex,
   getLessonBlocks,
+  getLessonSourceNote,
   getLessonText,
   getTransition,
   previousLessonIndex,
@@ -782,7 +783,7 @@ export default function App() {
           <View style={styles.readerActions}>
             <Pressable onPress={stopReading} style={({ pressed }) => [styles.pauseButton, pressed && styles.pressed]}><Text style={styles.pauseButtonText}>今天读到这里</Text></Pressable>
           </View>
-          <Text style={styles.demoDisclaimer}>拼音为程序自动注音，非邓启铜版；古汉语异读可能需要校订。</Text>
+          <Text style={styles.demoDisclaimer}>{getLessonSourceNote(currentLesson)}</Text>
         </View>
 
         <View style={styles.pathCard}>

@@ -1,0 +1,146 @@
+{
+  "version": 1,
+  "editions": [
+    {
+      "id": "deng-qitong-2014",
+      "name": "国学经典大字注音全本·论语",
+      "annotator": "邓启铜",
+      "publisher": "南京大学出版社",
+      "published": "2014-05",
+      "isbn": "978-7-305-13127-1",
+      "note": "正文、标点和拼音以用户提供的扫描版为准；黑底通假字、异体字提示不并入正文。"
+    }
+  ],
+  "chapterOverrides": [
+    {
+      "editionId": "deng-qitong-2014",
+      "bookId": "lunyu",
+      "chapter": "学而",
+      "sourcePdfPages": [11, 12, 13, 14, 15],
+      "lessons": [
+        {
+          "id": "lunyu-148",
+          "number": 1,
+          "text": "子曰：“学而时习之，不亦说乎？有朋自远方来，不亦乐乎？人不知而不愠，不亦君子乎？”",
+          "traditionalText": "子曰：“學而時習之，不亦說乎？有朋自遠方來，不亦樂乎？人不知而不慍，不亦君子乎？”",
+          "readings": "zǐ yuē xué ér shí xí zhī bù yì yuè hū yǒu péng zì yuǎn fāng lái bù yì lè hū rén bù zhī ér bù yùn bù yì jūn zǐ hū"
+        },
+        {
+          "id": "lunyu-149",
+          "number": 2,
+          "text": "有子曰：“其为人也孝弟，而好犯上者，鲜矣；不好犯上，而好作乱者，未之有也。君子务本，本立而道生。孝弟也者，其为仁之本与！”",
+          "traditionalText": "有子曰：“其為人也孝弟，而好犯上者，鮮矣；不好犯上，而好作亂者，未之有也。君子務本，本立而道生。孝弟也者，其為仁之本與！”",
+          "readings": "yǒu zǐ yuē qí wéi rén yě xiào tì ér hào fàn shàng zhě xiǎn yǐ bù hǎo fàn shàng ér hào zuò luàn zhě wèi zhī yǒu yě jūn zǐ wù běn běn lì ér dào shēng xiào tì yě zhě qí wéi rén zhī běn yú"
+        },
+        {
+          "id": "lunyu-150",
+          "number": 3,
+          "text": "子曰：“巧言令色，鲜矣仁。”",
+          "traditionalText": "子曰：“巧言令色，鮮矣仁。”",
+          "readings": "zǐ yuē qiǎo yán lìng sè xiǎn yǐ rén"
+        },
+        {
+          "id": "lunyu-151",
+          "number": 4,
+          "text": "曾子曰：“吾日三省吾身：为人谋而不忠乎？与朋友交而不信乎？传不习乎？”",
+          "traditionalText": "曾子曰：“吾日三省吾身：為人謀而不忠乎？與朋友交而不信乎？傳不習乎？”",
+          "readings": "zēng zǐ yuē wú rì sān xǐng wú shēn wèi rén móu ér bù zhōng hū yǔ péng yǒu jiāo ér bù xìn hū chuán bù xí hū"
+        },
+        {
+          "id": "lunyu-152",
+          "number": 5,
+          "text": "子曰：“道千乘之国，敬事而信，节用而爱人，使民以时。”",
+          "traditionalText": "子曰：“道千乘之國，敬事而信，節用而愛人，使民以時。”",
+          "readings": "zǐ yuē dào qiān shèng zhī guó jìng shì ér xìn jié yòng ér ài rén shǐ mín yǐ shí"
+        },
+        {
+          "id": "lunyu-153",
+          "number": 6,
+          "text": "子曰：“弟子入则孝，出则弟，谨而信，泛爱众，而亲仁。行有余力，则以学文。”",
+          "traditionalText": "子曰：“弟子入則孝，出則弟，謹而信，泛愛眾，而親仁。行有餘力，則以學文。”",
+          "readings": "zǐ yuē dì zǐ rù zé xiào chū zé tì jǐn ér xìn fàn ài zhòng ér qīn rén xíng yǒu yú lì zé yǐ xué wén"
+        },
+        {
+          "id": "lunyu-154",
+          "number": 7,
+          "text": "子夏曰：“贤贤易色；事父母，能竭其力；事君，能致其身；与朋友交，言而有信。虽曰未学，吾必谓之学矣。”",
+          "traditionalText": "子夏曰：“賢賢易色；事父母，能竭其力；事君，能致其身；與朋友交，言而有信。雖曰未學，吾必謂之學矣。”",
+          "readings": "zǐ xià yuē xián xián yì sè shì fù mǔ néng jié qí lì shì jūn néng zhì qí shēn yǔ péng yǒu jiāo yán ér yǒu xìn suī yuē wèi xué wú bì wèi zhī xué yǐ"
+        },
+        {
+          "id": "lunyu-155",
+          "number": 8,
+          "text": "子曰：“君子不重，则不威；学，则不固。主忠信。无友不如己者。过，则勿惮改。”",
+          "traditionalText": "子曰：“君子不重，則不威；學，則不固。主忠信。無友不如己者。過，則勿憚改。”",
+          "readings": "zǐ yuē jūn zǐ bù zhòng zé bù wēi xué zé bù gù zhǔ zhōng xìn wú yǒu bù rú jǐ zhě guò zé wù dàn gǎi"
+        },
+        {
+          "id": "lunyu-156",
+          "number": 9,
+          "text": "曾子曰：“慎终追远，民德归厚矣。”",
+          "traditionalText": "曾子曰：“慎終追遠，民德歸厚矣。”",
+          "readings": "zēng zǐ yuē shèn zhōng zhuī yuǎn mín dé guī hòu yǐ"
+        },
+        {
+          "id": "lunyu-157",
+          "number": 10,
+          "text": "子禽问于子贡曰：“夫子至于是邦也，必闻其政。求之与，抑与之与？”子贡曰：“夫子温、良、恭、俭、让以得之。夫子之求之也，其诸异乎人之求之与！”",
+          "traditionalText": "子禽問於子貢曰：“夫子至於是邦也，必聞其政。求之與，抑與之與？”子貢曰：“夫子溫、良、恭、儉、讓以得之。夫子之求之也，其諸異乎人之求之與！”",
+          "readings": "zǐ qín wèn yú zǐ gòng yuē fū zǐ zhì yú shì bāng yě bì wén qí zhèng qiú zhī yú yì yǔ zhī yú zǐ gòng yuē fū zǐ wēn liáng gōng jiǎn ràng yǐ dé zhī fū zǐ zhī qiú zhī yě qí zhū yì hū rén zhī qiú zhī yú",
+          "dialogueRanges": [{ "start": 0, "end": 32 }, { "start": 32, "end": 70 }]
+        },
+        {
+          "id": "lunyu-158",
+          "number": 11,
+          "text": "子曰：“父在，观其志；父没，观其行。三年无改于父之道，可谓孝矣。”",
+          "traditionalText": "子曰：“父在，觀其志；父沒，觀其行。三年無改於父之道，可謂孝矣。”",
+          "readings": "zǐ yuē fù zài guān qí zhì fù mò guān qí xíng sān nián wú gǎi yú fù zhī dào kě wèi xiào yǐ"
+        },
+        {
+          "id": "lunyu-159",
+          "number": 12,
+          "text": "有子曰：“礼之用，和为贵。先王之道，斯为美，小大由之。有所不行，知和而和，不以礼节之，亦不可行也。”",
+          "traditionalText": "有子曰：“禮之用，和為貴。先王之道，斯為美，小大由之。有所不行，知和而和，不以禮節之，亦不可行也。”",
+          "readings": "yǒu zǐ yuē lǐ zhī yòng hé wéi guì xiān wáng zhī dào sī wéi měi xiǎo dà yóu zhī yǒu suǒ bù xíng zhī hé ér hé bù yǐ lǐ jié zhī yì bù kě xíng yě"
+        },
+        {
+          "id": "lunyu-160",
+          "number": 13,
+          "text": "有子曰：“信近于义，言可复也。恭近于礼，远耻辱也。因不失其亲，亦可宗也。”",
+          "traditionalText": "有子曰：“信近於義，言可復也。恭近於禮，遠恥辱也。因不失其親，亦可宗也。”",
+          "readings": "yǒu zǐ yuē xìn jìn yú yì yán kě fù yě gōng jìn yú lǐ yuǎn chǐ rǔ yě yīn bù shī qí qīn yì kě zōng yě"
+        },
+        {
+          "id": "lunyu-161",
+          "number": 14,
+          "text": "子曰：“君子食无求饱，居无求安，敏于事而慎于言，就有道而正焉，可谓好学也已。”",
+          "traditionalText": "子曰：“君子食無求飽，居無求安，敏於事而慎於言，就有道而正焉，可謂好學也已。”",
+          "readings": "zǐ yuē jūn zǐ shí wú qiú bǎo jū wú qiú ān mǐn yú shì ér shèn yú yán jiù yǒu dào ér zhèng yān kě wèi hào xué yě yǐ"
+        },
+        {
+          "id": "lunyu-162",
+          "number": 15,
+          "text": "子贡曰：“贫而无谄，富而无骄，何如？”子曰：“可也；未若贫而乐，富而好礼者也。”",
+          "traditionalText": "子貢曰：“貧而無諂，富而無驕，何如？”子曰：“可也；未若貧而樂，富而好禮者也。”",
+          "readings": "zǐ gòng yuē pín ér wú chǎn fù ér wú jiāo hé rú zǐ yuē kě yě wèi ruò pín ér lè fù ér hào lǐ zhě yě",
+          "dialogueRanges": [{ "start": 0, "end": 19 }, { "start": 19, "end": 40 }]
+        },
+        {
+          "id": "lunyu-162b",
+          "number": 16,
+          "text": "子贡曰：“《诗》云：‘如切如磋，如琢如磨’，其斯之谓与？”子曰：“赐也，始可与言《诗》已矣！告诸往而知来者。”",
+          "traditionalText": "子貢曰：“《詩》雲：‘如切如磋，如琢如磨’，其斯之謂與？”子曰：“賜也，始可與言《詩》已矣！告諸往而知來者。”",
+          "readings": "zǐ gòng yuē shī yún rú qiē rú cuō rú zhuó rú mó qí sī zhī wèi yú zǐ yuē cì yě shǐ kě yǔ yán shī yǐ yǐ gào zhū wǎng ér zhī lái zhě",
+          "dialogueRanges": [{ "start": 0, "end": 29 }, { "start": 29, "end": 55 }]
+        },
+        {
+          "id": "lunyu-163",
+          "number": 17,
+          "text": "子曰：“不患人之不己知，患不知人也。”",
+          "traditionalText": "子曰：“不患人之不己知，患不知人也。”",
+          "readings": "zǐ yuē bù huàn rén zhī bù jǐ zhī huàn bù zhī rén yě"
+        }
+      ]
+    }
+  ]
+}
