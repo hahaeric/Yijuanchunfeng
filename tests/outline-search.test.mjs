@@ -12,7 +12,7 @@ const {
 } = require("../mobile/src/model.js");
 
 const expectedBooks = [
-  ["daxue", "大学", 1, 16],
+  ["daxue", "大学", 11, 17],
   ["zhongyong", "中庸", 33, 131],
   ["lunyu", "论语", 20, 513],
   ["mengzi", "孟子", 14, 690],

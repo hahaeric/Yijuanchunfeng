@@ -1,6 +1,8 @@
 const corpus = require("./data/classics.json");
 const editionOverrides = require("./data/edition-overrides.json");
 const pinyinCorrections = require("./data/pinyin-corrections.json");
+const suppliedEdition = require("./data/supplied-edition.json");
+const { applySuppliedEdition } = require("./supplied-edition");
 
 function formatPinyin(text, units) {
   const openingMarks = new Set(["“", "‘", "（", "《", "「", "『"]);
@@ -174,7 +176,7 @@ for (const correction of pinyinCorrections.corrections) {
 }
 
 const appliedCorrectionKeys = new Set();
-const demoLessons = editionResult.lessons.map((lesson) => {
+const correctedLessons = editionResult.lessons.map((lesson) => {
   const corrections = correctionsByLesson.get(lesson.id) || [];
   if (corrections.length === 0) return lesson;
   const characters = [...lesson.text];
@@ -192,8 +194,15 @@ if (appliedCorrectionKeys.size !== correctionKeys.size) {
   const missing = [...correctionKeys].filter((key) => !appliedCorrectionKeys.has(key));
   throw new Error(`拼音校正表引用了不存在的篇目或位置：${missing.join(", ")}`);
 }
+const demoLessons = applySuppliedEdition(correctedLessons, suppliedEdition, formatPinyin);
 const demoBooks = corpus.books.map((book) => {
   const bookLessons = demoLessons.filter((lesson) => lesson.bookId === book.id);
+  if (suppliedEdition.books.some(item => item.id === book.id)) return {
+    ...book,
+    lessonCount: bookLessons.length,
+    chapterCount: new Set(bookLessons.map(l => l.chapter)).size,
+    editionNote: `全文依据用户提供的${suppliedEdition.edition.annotator}注释本 PDF 和 Word 整理；拼音为程序自动注音。`
+  };
   const chapterOverrides = editionResult.overriddenChapters.filter((item) => item.bookId === book.id);
   if (chapterOverrides.length === 0) return { ...book, lessonCount: bookLessons.length };
   const chapterNames = chapterOverrides.map((item) => `《${item.chapter}篇》`).join("、");
@@ -314,6 +323,9 @@ function getLessonText(lesson, script = "simplified") {
 
 function getLessonSourceNote(lesson) {
   if (lesson?.editionSource) {
+    if (lesson.editionSource.scope === "book") {
+      return `${lesson.sourceNote ? `${lesson.sourceNote} ` : ""}正文依据${lesson.editionSource.annotator}注释本整理（PDF 第${lesson.editionSource.sourcePdfPages.join("、")}页）；拼音为程序自动注音。`;
+    }
     return `本则正文和标点已按${lesson.editionSource.annotator}注释本核校；拼音为程序自动注音。`;
   }
   return "拼音为程序自动注音，非邓启铜版；古汉语异读可能需要校订。";
@@ -396,6 +408,8 @@ function searchLessons(query, lessons = demoLessons) {
 
 module.exports = {
   corpus,
+  legacyLessons: correctedLessons,
+  contentRevision: suppliedEdition.contentRevision,
   demoBooks,
   demoLessons,
   projectPinyinCorrectionCount: correctionKeys.size,

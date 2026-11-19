@@ -21,12 +21,14 @@ import * as Font from "expo-font";
 import * as IntentLauncher from "expo-intent-launcher";
 import * as Updates from "expo-updates";
 
-const { getStoredValueWithMigration } = require("./src/storage-migration");
+const { getStoredValueWithMigration, migrateReaderSnapshot } = require("./src/storage-migration");
 const { ANDROID_UPDATE_MANIFEST_URL, fetchAndroidUpdateOffer } = require("./src/update-client");
 
 const {
   demoBooks,
   demoLessons,
+  legacyLessons,
+  contentRevision,
   projectPinyinCorrectionCount,
   getBookPosition,
   getBookProgress,
@@ -420,7 +422,7 @@ export default function App() {
     getStoredValueWithMigration(AsyncStorage, STORAGE_KEY, LEGACY_STORAGE_KEYS)
       .then((raw) => {
         if (!mounted || !raw) return;
-        const saved = JSON.parse(raw);
+        const saved = migrateReaderSnapshot(JSON.parse(raw), legacyLessons, demoLessons, contentRevision);
         const index = Math.max(0, Math.min(Number(saved.currentIndex) || 0, demoLessons.length - 1));
         setCurrentIndex(index);
         setScreen(["today", "library", "saved"].includes(saved.screen) ? saved.screen : "today");
@@ -484,6 +486,8 @@ export default function App() {
     if (!storageReady) return;
     const payload = {
       currentIndex,
+      currentLessonId: currentLesson.id,
+      contentRevision,
       screen,
       favorites,
       notes,
@@ -700,6 +704,7 @@ export default function App() {
           index: characterIndex,
           character,
           originalPinyin,
+          sourceText: currentLesson.text,
           correctedPinyin,
           citation: currentLesson.citation,
           source: "manual-in-app",

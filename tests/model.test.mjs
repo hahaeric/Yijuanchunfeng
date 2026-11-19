@@ -23,7 +23,7 @@ const {
 } = require("../mobile/src/model.js");
 
 const expectedBooks = [
-  ["daxue", "大学", 1, 16],
+  ["daxue", "大学", 11, 17],
   ["zhongyong", "中庸", 33, 131],
   ["lunyu", "论语", 20, 513],
   ["mengzi", "孟子", 14, 690],
@@ -80,7 +80,7 @@ test("九部书按阅读路线收录完整篇章结构和全部导入章句", ()
     demoBooks.map((book) => [book.id, book.title, book.chapterCount, book.lessonCount]),
     expectedBooks
   );
-  assert.equal(demoLessons.length, 5040);
+  assert.equal(demoLessons.length, 5041);
   assert.equal(new Set(demoLessons.map((lesson) => lesson.id)).size, demoLessons.length);
 });
 
@@ -321,7 +321,7 @@ test("阅读进度按各书真实章句总数计算，且位置卡可显示分�
   const first = demoLessons[getBookStartIndex("daxue")];
   assert.equal(getBookProgress([], "daxue"), 0);
   assert.equal(getBookProgress([first.id], "daxue"), 6);
-  assert.deepEqual(getBookPosition(first.id), { position: 1, total: 16 });
+  assert.deepEqual(getBookPosition(first.id), { position: 1, total: 17 });
   assert.equal(getProgress(0, 0), 0);
 });
 

@@ -83,15 +83,15 @@ test("版本来源随章句进入模型，校勘小字不混入正文", () => {
   const edition = editionOverrides.editions[0];
   assert.deepEqual(configuredXueEr.sourcePdfPages, [11, 12, 13, 14, 15]);
   for (const lesson of xueEr) {
-    assert.equal(lesson.editionSource.id, edition.id);
+    assert.equal(lesson.editionSource.id, "deng-qitong-2014-three-books");
     assert.equal(lesson.editionSource.isbn, "978-7-305-13127-1");
     assert.equal(lesson.editionSource.pinyinMode, "automatic");
-    assert.deepEqual(lesson.editionSource.sourcePdfPages, [11, 12, 13, 14, 15]);
+    assert.ok(lesson.editionSource.sourcePdfPages.every(page => page >= 11 && page <= 15));
     assert.doesNotMatch(lesson.text, /悌|毋|歟|汎/u);
   }
   assert.match(demoBooks.find((book) => book.id === "lunyu").editionNote,
-    /《学而篇》正文和标点已按邓启铜注释本.*拼音仍为程序自动注音/u);
-  assert.equal(getLessonSourceNote(xueEr[0]), "本则正文和标点已按邓启铜注释本核校；拼音为程序自动注音。");
+    /全文依据用户提供的邓启铜注释本 PDF 和 Word 整理；拼音为程序自动注音/u);
+  assert.match(getLessonSourceNote(xueEr[0]), /正文依据邓启铜注释本整理.*PDF 第11页.*拼音为程序自动注音/u);
   assert.match(getLessonSourceNote(demoLessons.find((lesson) => lesson.bookId === "mengzi")),
     /拼音为程序自动注音，非邓启铜版/u);
 });
