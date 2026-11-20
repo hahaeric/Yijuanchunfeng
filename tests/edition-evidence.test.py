@@ -15,6 +15,10 @@ def region(x, y, width, height, text):
 
 
 class EditionEvidenceTests(unittest.TestCase):
+    def test_row_crop_keeps_missed_glyph_spaces_and_stays_inside_page(self):
+        row = {'regions': [{'box': region(1, 1, 80, 80, '孟')[0]}, {'box': region(800, 1, 80, 80, '子')[0]}]}
+        self.assertEqual(module.row_rectangle(row, (850, 2800)), (0, 0, 850, 83))
+
     def test_small_pinyin_notes_and_side_labels_are_not_body(self):
         page = {'bookId': 'test', 'page': 12, 'imageSize': [2000, 2800], 'lines': [
             region(200, 200, 400, 35, 'meng zi yue'),

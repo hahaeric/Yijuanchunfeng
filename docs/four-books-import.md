@@ -16,4 +16,6 @@ python tests/ocr-evidence.test.py
 python tests/edition-evidence.test.py
 ```
 
+初识结果保留不覆盖，`mobile/scripts/rerecognize-edition-rows.py` 可将同一正文行里分散的单字框合并裁切，用 PP-OCRv5 server 模型复识，保存逐字坐标、置信度和初识对照。这一步尤其用于旧模型易混淆的“曰 / 日”、手写体和生僻字。复识结果仍是核对材料，不自动等同于发布正文。维护依赖使用 `pypdf`、`rapidocr_onnxruntime==1.4.4`、`rapidocr==3.10.0` 和 ONNX Runtime，均与手机应用依赖隔离。
+
 计划保留原阅读条目 ID，并核对全文、目录及各书首尾。《诗经》按篇、诗章核对；《易经》扫描本将《彖》《象》《文言》穿插在卦文中，需要逐条对应应用原有内容，避免漏段和重复。后续完成差异核对、数据生成、阅读数据兼容及全部测试后，才能提交正文并发布客户端内容更新。未核实的 OCR 结果不标为已校订全文。

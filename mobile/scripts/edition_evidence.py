@@ -32,6 +32,16 @@ def join_regions(regions):
     return result
 
 
+def row_rectangle(row, image_size):
+    boxes = [bounds(region['box']) for region in row['regions']]
+    width, height = image_size
+    rectangle = (max(0, int(min(b[0] for b in boxes)) - 2), max(0, int(min(b[1] for b in boxes)) - 2),
+                 min(width, int(max(b[2] for b in boxes)) + 2), min(height, int(max(b[3] for b in boxes)) + 2))
+    if rectangle[0] >= rectangle[2] or rectangle[1] >= rectangle[3]:
+        raise ValueError('Empty source row crop')
+    return rectangle
+
+
 def extract_body_rows(data, minimum_height=.018, left_margin=.06, right_margin=.94):
     width, height = data['imageSize']
     rows = []
