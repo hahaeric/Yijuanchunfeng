@@ -11,6 +11,10 @@ import sys
 import time
 
 
+def is_non_body_text(text):
+    return bool(text.strip()) and not any('\u3400' <= c <= '\u9fff' or '\U00020000' <= c <= '\U000323af' for c in text)
+
+
 def select_pages(spec, total):
     if total < 1:
         raise ValueError('PDF has no pages')
@@ -83,6 +87,16 @@ def main():
         page = reader.pages[number - 1]
         images = list(page.images)
         if not images:
+            text = page.extract_text()
+            if is_non_body_text(text):
+                data = {'bookId': args.book, 'page': number, 'sourceSha256': digest,
+                        'imageSize': [float(page.mediabox.width), float(page.mediabox.height)],
+                        'kind': 'non-body-text-layer', 'sourceText': text, 'lines': []}
+                temporary = target.with_suffix('.partial')
+                temporary.write_text(json.dumps(data, ensure_ascii=False), encoding='utf-8')
+                temporary.replace(target)
+                print(f'{args.book} {number}: non-body text layer retained', flush=True)
+                continue
             raise ValueError(f'No raster image on page {number}; render this page before OCR')
         image = max(images, key=lambda item: item.image.width * item.image.height).image.convert('RGB')
         if image.width > 2400:

@@ -11,6 +11,11 @@ spec.loader.exec_module(module)
 
 
 class OcrEvidenceTests(unittest.TestCase):
+    def test_non_raster_chinese_text_is_not_silently_discarded(self):
+        self.assertTrue(module.is_non_body_text('Document generated; {"pages":397}'))
+        self.assertFalse(module.is_non_body_text('孟子曰：仁义而已矣。'))
+        self.assertFalse(module.is_non_body_text(''))
+
     def test_body_filter_retains_large_single_characters_and_rejects_small_pinyin(self):
         body = [[100, 100], [180, 100], [180, 180], [100, 180]]
         pinyin = [[100, 60], [180, 60], [180, 98], [100, 98]]
