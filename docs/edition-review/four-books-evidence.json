@@ -9764,7 +9764,8 @@
           "totalHan": 24,
           "sourceStart": 3515,
           "sourceEnd": 3525,
-          "oldTextSha256": "8337de8f9f8d1f0a153c11de82f8e6811a6d809a216746aba36425182cf63485"
+          "oldTextSha256": "8337de8f9f8d1f0a153c11de82f8e6811a6d809a216746aba36425182cf63485",
+          "pageReview": "manual-original-page-verification"
         },
         {
           "id": "shijing-1524",
@@ -9775,16 +9776,20 @@
           "totalHan": 16,
           "sourceStart": 3525,
           "sourceEnd": 3527,
-          "oldTextSha256": "b7e7ef68da50c5453faaa52f47f3d1e7df2583f50fffd9796783039a0607a8e8"
+          "oldTextSha256": "b7e7ef68da50c5453faaa52f47f3d1e7df2583f50fffd9796783039a0607a8e8",
+          "pageReview": "manual-original-page-verification"
         },
         {
           "id": "shijing-1525",
-          "pages": [],
+          "pages": [
+            56
+          ],
           "matchedHan": 0,
           "totalHan": 16,
           "sourceStart": null,
           "sourceEnd": null,
-          "oldTextSha256": "61d2b756a275873be0ebcc1e39b51d4cef81217ac9fb1657957de57c7efac14b"
+          "oldTextSha256": "61d2b756a275873be0ebcc1e39b51d4cef81217ac9fb1657957de57c7efac14b",
+          "pageReview": "manual-original-page-verification"
         },
         {
           "id": "shijing-1526",
@@ -9795,7 +9800,8 @@
           "totalHan": 24,
           "sourceStart": 3527,
           "sourceEnd": 3531,
-          "oldTextSha256": "d8e939a4b4960bc5b66810eca7891dfd37d1e9e645cbaaa55ed29fc7f04c309f"
+          "oldTextSha256": "d8e939a4b4960bc5b66810eca7891dfd37d1e9e645cbaaa55ed29fc7f04c309f",
+          "pageReview": "manual-original-page-verification"
         },
         {
           "id": "shijing-1527",
@@ -22713,31 +22719,38 @@
         {
           "id": "shangshu-2692",
           "pages": [
-            23
+            24
           ],
           "matchedHan": 1,
           "totalHan": 34,
           "sourceStart": 486,
           "sourceEnd": 487,
-          "oldTextSha256": "93d3357e4d8088a15524e514de67ac7894df1a6ce206d3b451bbeeda58658f53"
+          "oldTextSha256": "93d3357e4d8088a15524e514de67ac7894df1a6ce206d3b451bbeeda58658f53",
+          "pageReview": "manual-original-page-verification"
         },
         {
           "id": "shangshu-2693",
-          "pages": [],
+          "pages": [
+            25
+          ],
           "matchedHan": 0,
           "totalHan": 20,
           "sourceStart": null,
           "sourceEnd": null,
-          "oldTextSha256": "2e71d5f2eed7d12ad5030537fca532a450ce89b49c4b2355d15e29c9c12eccb8"
+          "oldTextSha256": "2e71d5f2eed7d12ad5030537fca532a450ce89b49c4b2355d15e29c9c12eccb8",
+          "pageReview": "manual-original-page-verification"
         },
         {
           "id": "shangshu-2694",
-          "pages": [],
+          "pages": [
+            25
+          ],
           "matchedHan": 0,
           "totalHan": 6,
           "sourceStart": null,
           "sourceEnd": null,
-          "oldTextSha256": "77d3703336a3c60a85e51c62b8ad2d870abd57931f25a909cc4c1097e76644bb"
+          "oldTextSha256": "77d3703336a3c60a85e51c62b8ad2d870abd57931f25a909cc4c1097e76644bb",
+          "pageReview": "manual-original-page-verification"
         },
         {
           "id": "shangshu-2695",

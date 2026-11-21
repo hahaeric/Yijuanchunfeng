@@ -37,4 +37,22 @@ function applyReviewedChanges(lessons, corrections, normalize = c => c) {
     return { ...lesson, text: chars.join('') };
   });
 }
-module.exports = { applyReviewedChanges };
+function applyStructuralChanges(lessons, changes) {
+  const result = lessons.map(l => ({ ...l }));
+  const seen = new Set();
+  for (const change of changes) {
+    const index = result.findIndex(l => l.id === change.id);
+    if (seen.has(change.id) || index < 0 || result[index].text !== change.expectedText || !change.text?.trim()) throw new Error(`Stale structural review: ${change.id}`);
+    seen.add(change.id);
+    const lesson = { ...result[index], text: change.text, sourcePdfPages: change.sourcePdfPages,
+      ...(change.chapter ? { chapter: change.chapter } : {}) };
+    if (change.afterId) {
+      const anchor = result.find(l => l.id === change.afterId);
+      if (!anchor || anchor.id === lesson.id || anchor.bookId !== lesson.bookId) throw new Error('Invalid structural review anchor');
+      result.splice(index, 1);
+      result.splice(result.findIndex(l => l.id === change.afterId) + 1, 0, lesson);
+    } else result[index] = lesson;
+  }
+  return result;
+}
+module.exports = { applyReviewedChanges, applyStructuralChanges };
