@@ -18,9 +18,10 @@ function applySuppliedEdition(baseLessons, data, formatPinyin) {
       if (/\p{Script=Han}/u.test(c) ? !reading || /\p{Script=Han}/u.test(reading) : reading !== '') throw new Error(`全文版本拼音无效：${item.id}/${i}`);
     });
     const book = previous?.book || baseLessons.find(l => l.bookId === item.bookId)?.book;
-    const lesson = { ...previous, ...item, book, section: '', citation: `《${book}·${item.chapter}·${item.unitLabel}》`,
+    const edition = data.books.find(b => b.id === item.bookId)?.edition || data.edition;
+    const lesson = { ...previous, ...item, book, section: item.section || '', citation: `《${book}·${item.chapter}·${item.unitLabel}》`,
       pinyin: formatPinyin(item.text, item.pinyinUnits),
-      editionSource: { ...data.edition, sourcePdfPages: item.sourcePdfPages, pinyinMode: 'automatic', scope: 'book' } };
+      editionSource: { ...edition, sourcePdfPages: item.sourcePdfPages, pinyinMode: 'automatic', scope: 'book' } };
     // Speaker boundaries are character offsets and must be regenerated after edits.
     delete lesson.dialogueRanges;
     if (item.bookId === 'lunyu') {

@@ -16,8 +16,8 @@ const expectedBooks = [
   ["zhongyong", "中庸", 33, 131],
   ["lunyu", "论语", 20, 513],
   ["mengzi", "孟子", 14, 690],
-  ["shijing", "诗经", 305, 1319],
-  ["shangshu", "尚书", 58, 419],
+  ["shijing", "诗经", 311, 1325],
+  ["shangshu", "尚书", 79, 439],
   ["liji", "礼记", 49, 815],
   ["zhouyi", "周易", 74, 620],
   ["chunqiu", "春秋", 12, 517]

@@ -93,7 +93,7 @@ test("版本来源随章句进入模型，校勘小字不混入正文", () => {
     /全文依据用户提供的邓启铜注释本 PDF 和 Word 整理；拼音为程序自动注音/u);
   assert.match(getLessonSourceNote(xueEr[0]), /正文依据邓启铜注释本整理.*PDF 第11页.*拼音为程序自动注音/u);
   assert.match(getLessonSourceNote(demoLessons.find((lesson) => lesson.bookId === "mengzi")),
-    /拼音为程序自动注音，非邓启铜版/u);
+    /正文依据邓启铜注释本整理.*PDF 第12页.*拼音为程序自动注音/u);
 });
 
 test("拆分后的两组问答在横排、竖排和繁体模式下仍连续对齐", () => {

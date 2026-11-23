@@ -27,8 +27,8 @@ const expectedBooks = [
   ["zhongyong", "中庸", 33, 131],
   ["lunyu", "论语", 20, 513],
   ["mengzi", "孟子", 14, 690],
-  ["shijing", "诗经", 305, 1319],
-  ["shangshu", "尚书", 58, 419],
+  ["shijing", "诗经", 311, 1325],
+  ["shangshu", "尚书", 79, 439],
   ["liji", "礼记", 49, 815],
   ["zhouyi", "周易", 74, 620],
   ["chunqiu", "春秋", 12, 517]
@@ -80,7 +80,7 @@ test("九部书按阅读路线收录完整篇章结构和全部导入章句", ()
     demoBooks.map((book) => [book.id, book.title, book.chapterCount, book.lessonCount]),
     expectedBooks
   );
-  assert.equal(demoLessons.length, 5041);
+  assert.equal(demoLessons.length, 5067);
   assert.equal(new Set(demoLessons.map((lesson) => lesson.id)).size, demoLessons.length);
 });
 
@@ -328,7 +328,7 @@ test("阅读进度按各书真实章句总数计算，且位置卡可显示分�
 test("《尚书》补齐通行五十八篇，《周易》含六十四卦与十翼", () => {
   const shangshu = demoLessons.filter((lesson) => lesson.bookId === "shangshu");
   const zhouyiChapters = new Set(demoLessons.filter((lesson) => lesson.bookId === "zhouyi").map((lesson) => lesson.chapter));
-  assert.equal(new Set(shangshu.map((lesson) => lesson.chapter)).size, 58);
+  assert.equal(new Set(shangshu.map((lesson) => lesson.chapter)).size, 79);
   assert.ok(shangshu.some((lesson) => lesson.chapter === "周书·泰誓上"));
   assert.ok(shangshu.some((lesson) => lesson.chapter === "周书·泰誓中"));
   assert.ok(shangshu.some((lesson) => lesson.chapter === "周书·泰誓下"));
@@ -341,7 +341,7 @@ test("《尚书》补齐通行五十八篇，《周易》含六十四卦与十�
 test("《诗经》305篇均按诗章连续阅读，《春秋》只收十二公经文", () => {
   const shijing = demoLessons.filter((lesson) => lesson.bookId === "shijing");
   const chunqiu = demoLessons.filter((lesson) => lesson.bookId === "chunqiu");
-  assert.equal(new Set(shijing.map((lesson) => lesson.chapter)).size, 305);
+  assert.equal(new Set(shijing.map((lesson) => lesson.chapter)).size, 311);
   assert.ok(shijing.some((lesson) => lesson.chapter.endsWith("关雎") && lesson.section === "第1章"));
   assert.equal(new Set(chunqiu.map((lesson) => lesson.chapter)).size, 12);
   assert.ok(new Set(chunqiu.map((lesson) => `${lesson.chapter}:${lesson.section}`)).size >= 240);

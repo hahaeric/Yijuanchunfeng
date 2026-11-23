@@ -2,6 +2,7 @@ const corpus = require("./data/classics.json");
 const editionOverrides = require("./data/edition-overrides.json");
 const pinyinCorrections = require("./data/pinyin-corrections.json");
 const suppliedEdition = require("./data/supplied-edition.json");
+const fourBooks = require("./data/four-books.json");
 const { applySuppliedEdition } = require("./supplied-edition");
 
 function formatPinyin(text, units) {
@@ -194,9 +195,11 @@ if (appliedCorrectionKeys.size !== correctionKeys.size) {
   const missing = [...correctionKeys].filter((key) => !appliedCorrectionKeys.has(key));
   throw new Error(`拼音校正表引用了不存在的篇目或位置：${missing.join(", ")}`);
 }
-const demoLessons = applySuppliedEdition(correctedLessons, suppliedEdition, formatPinyin);
+const demoLessons = applySuppliedEdition(applySuppliedEdition(correctedLessons, suppliedEdition, formatPinyin), fourBooks, formatPinyin);
 const demoBooks = corpus.books.map((book) => {
   const bookLessons = demoLessons.filter((lesson) => lesson.bookId === book.id);
+  const pdfBook = fourBooks.books.find(item => item.id === book.id);
+  if (pdfBook) return { ...book, lessonCount: bookLessons.length, chapterCount: new Set(bookLessons.map(l => l.chapter)).size, editionNote: `依据用户提供的邓启铜注释本扫描 PDF 整理（${pdfBook.edition.publisher}，${pdfBook.edition.published}）；OCR 辅助差异校对，拼音为程序自动注音。` };
   if (suppliedEdition.books.some(item => item.id === book.id)) return {
     ...book,
     lessonCount: bookLessons.length,
@@ -409,7 +412,7 @@ function searchLessons(query, lessons = demoLessons) {
 module.exports = {
   corpus,
   legacyLessons: correctedLessons,
-  contentRevision: suppliedEdition.contentRevision,
+  contentRevision: `${suppliedEdition.contentRevision}:${fourBooks.contentRevision}`,
   demoBooks,
   demoLessons,
   projectPinyinCorrectionCount: correctionKeys.size,

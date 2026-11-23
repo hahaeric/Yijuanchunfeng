@@ -7,7 +7,8 @@ const OpenCC = require('opencc-js');
 const toTraditional = OpenCC.Converter({ from: 'cn', to: 'tw' });
 const corpus = require('../src/data/classics.json');
 const corrections = require('../src/data/pinyin-corrections.json');
-const input = JSON.parse(fs.readFileSync(new URL('../src/data/supplied-edition-text.json', import.meta.url), 'utf8'));
+const fourBooks = process.argv.includes('--four-books');
+const input = JSON.parse(fs.readFileSync(new URL(fourBooks ? '../src/data/four-books-text.json' : '../src/data/supplied-edition-text.json', import.meta.url), 'utf8'));
 const sources = new Map(corpus.lessons.map(l => [l.id, { ...l, pinyinUnits: [...l.pinyinUnits] }]));
 for (const c of corrections.corrections) sources.get(c.lessonId).pinyinUnits[c.index] = c.correctedPinyin;
 
@@ -39,6 +40,8 @@ const lessons = input.lessons.map(item => {
   const pinyinUnits = alignReadings(item.text, source);
   // Classical contextual readings for the two newly introduced forms.
   [...item.text].forEach((c, i) => {
+    if (c === '𫗧' || c === '餗') pinyinUnits[i] = 'sù';
+    if (c === '夫' && [...item.text][i - 1] === '大') pinyinUnits[i] = 'fū';
     if (c === '菑') pinyinUnits[i] = 'zāi';
     if (c === '为' && [...item.text].slice(i, i + 4).join('') === '为能经纶') pinyinUnits[i] = 'wéi';
   });
@@ -48,7 +51,7 @@ const lessons = input.lessons.map(item => {
 });
 const contentRevision = createHash('sha256').update(JSON.stringify(input)).digest('hex');
 const output = JSON.stringify({ ...input, contentRevision, lessons }, null, 2) + '\n';
-const destination = new URL('../src/data/supplied-edition.json', import.meta.url);
+const destination = new URL(fourBooks ? '../src/data/four-books.json' : '../src/data/supplied-edition.json', import.meta.url);
 if (process.argv.includes('--check')) {
   if (fs.readFileSync(destination, 'utf8').replace(/\r\n/g, '\n') !== output) throw new Error('版本数据需要重新生成');
 } else fs.writeFileSync(destination, output);

@@ -1,0 +1,343 @@
+{
+  "version": 1,
+  "lessons": [
+    {
+      "id": "shangshu-supplied-preface-1",
+      "bookId": "shangshu",
+      "chapter": "商书·帝告厘沃",
+      "section": "篇序",
+      "unitLabel": "篇序",
+      "text": "自契至于成汤，八迁。汤始居亳，从先王居。作《帝告》《厘沃》。",
+      "sourcePdfPages": [
+        111
+      ],
+      "sourceNote": "此篇正文已佚，扫描本收录篇序。",
+      "afterChapter": "夏书·胤征"
+    },
+    {
+      "id": "shangshu-supplied-preface-2",
+      "bookId": "shangshu",
+      "chapter": "商书·汤征",
+      "section": "篇序",
+      "unitLabel": "篇序",
+      "text": "汤征诸侯，葛伯不祀，汤始征之，作《汤征》。",
+      "sourcePdfPages": [
+        112
+      ],
+      "sourceNote": "此篇正文已佚，扫描本收录篇序。",
+      "afterChapter": "商书·帝告厘沃"
+    },
+    {
+      "id": "shangshu-supplied-preface-3",
+      "bookId": "shangshu",
+      "chapter": "商书·汝鸠汝方",
+      "section": "篇序",
+      "unitLabel": "篇序",
+      "text": "伊尹去亳适夏，既丑有夏，复归于亳。入自北门，乃遇汝鸠、汝方。作《汝鸠》《汝方》。",
+      "sourcePdfPages": [
+        113
+      ],
+      "sourceNote": "此篇正文已佚，扫描本收录篇序。",
+      "afterChapter": "商书·汤征"
+    },
+    {
+      "id": "shangshu-supplied-preface-4",
+      "bookId": "shangshu",
+      "chapter": "商书·夏社疑至臣扈",
+      "section": "篇序",
+      "unitLabel": "篇序",
+      "text": "汤既胜夏，欲迁其社，不可。作《夏社》《疑至》《臣扈》。",
+      "sourcePdfPages": [
+        117
+      ],
+      "sourceNote": "此篇正文已佚，扫描本收录篇序。",
+      "afterChapter": "商书·汤誓"
+    },
+    {
+      "id": "shangshu-supplied-preface-5",
+      "bookId": "shangshu",
+      "chapter": "商书·典宝",
+      "section": "篇序",
+      "unitLabel": "篇序",
+      "text": "夏师败绩，汤遂从之，遂伐三朡，俘厥宝玉。谊伯、仲伯作《典宝》。",
+      "sourcePdfPages": [
+        118
+      ],
+      "sourceNote": "此篇正文已佚，扫描本收录篇序。",
+      "afterChapter": "商书·夏社疑至臣扈"
+    },
+    {
+      "id": "shangshu-supplied-preface-6",
+      "bookId": "shangshu",
+      "chapter": "商书·明居",
+      "section": "篇序",
+      "unitLabel": "篇序",
+      "text": "咎单作《明居》。",
+      "sourcePdfPages": [
+        129
+      ],
+      "sourceNote": "此篇正文已佚，扫描本收录篇序。",
+      "afterChapter": "商书·汤诰"
+    },
+    {
+      "id": "shangshu-supplied-preface-7",
+      "bookId": "shangshu",
+      "chapter": "商书·沃丁",
+      "section": "篇序",
+      "unitLabel": "篇序",
+      "text": "沃丁既葬伊尹于亳，咎单遂训伊尹事，作《沃丁》。",
+      "sourcePdfPages": [
+        151
+      ],
+      "sourceNote": "此篇正文已佚，扫描本收录篇序。",
+      "afterChapter": "商书·咸有一德"
+    },
+    {
+      "id": "shangshu-supplied-preface-8",
+      "bookId": "shangshu",
+      "chapter": "商书·咸乂",
+      "section": "篇序",
+      "unitLabel": "篇序",
+      "text": "伊陟相太戊，亳有祥，桑榖共生于朝。伊陟赞于巫咸，作《咸乂》四篇。",
+      "sourcePdfPages": [
+        152
+      ],
+      "sourceNote": "此篇正文已佚，扫描本收录篇序。",
+      "afterChapter": "商书·沃丁"
+    },
+    {
+      "id": "shangshu-supplied-preface-9",
+      "bookId": "shangshu",
+      "chapter": "商书·伊陟原命",
+      "section": "篇序",
+      "unitLabel": "篇序",
+      "text": "太戊赞于伊陟，作《伊陟》《原命》。",
+      "sourcePdfPages": [
+        153
+      ],
+      "sourceNote": "此篇正文已佚，扫描本收录篇序。",
+      "afterChapter": "商书·咸乂"
+    },
+    {
+      "id": "shangshu-supplied-preface-10",
+      "bookId": "shangshu",
+      "chapter": "商书·仲丁",
+      "section": "篇序",
+      "unitLabel": "篇序",
+      "text": "仲丁迁于嚣，作《仲丁》。",
+      "sourcePdfPages": [
+        154
+      ],
+      "sourceNote": "此篇正文已佚，扫描本收录篇序。",
+      "afterChapter": "商书·伊陟原命"
+    },
+    {
+      "id": "shangshu-supplied-preface-11",
+      "bookId": "shangshu",
+      "chapter": "商书·河亶甲",
+      "section": "篇序",
+      "unitLabel": "篇序",
+      "text": "河亶甲居相，作《河亶甲》。",
+      "sourcePdfPages": [
+        155
+      ],
+      "sourceNote": "此篇正文已佚，扫描本收录篇序。",
+      "afterChapter": "商书·仲丁"
+    },
+    {
+      "id": "shangshu-supplied-preface-12",
+      "bookId": "shangshu",
+      "chapter": "商书·祖乙",
+      "section": "篇序",
+      "unitLabel": "篇序",
+      "text": "祖乙圮于耿，作《祖乙》。",
+      "sourcePdfPages": [
+        156
+      ],
+      "sourceNote": "此篇正文已佚，扫描本收录篇序。",
+      "afterChapter": "商书·河亶甲"
+    },
+    {
+      "id": "shangshu-supplied-preface-13",
+      "bookId": "shangshu",
+      "chapter": "周书·分器",
+      "section": "篇序",
+      "unitLabel": "篇序",
+      "text": "武王既胜殷，邦诸侯，班宗彝，作《分器》。",
+      "sourcePdfPages": [
+        234
+      ],
+      "sourceNote": "此篇正文已佚，扫描本收录篇序。",
+      "afterChapter": "周书·洪范"
+    },
+    {
+      "id": "shangshu-supplied-preface-14",
+      "bookId": "shangshu",
+      "chapter": "周书·旅巢命",
+      "section": "篇序",
+      "unitLabel": "篇序",
+      "text": "巢伯来朝，芮伯作《旅巢命》。",
+      "sourcePdfPages": [
+        240
+      ],
+      "sourceNote": "此篇正文已佚，扫描本收录篇序。",
+      "afterChapter": "周书·旅獒"
+    },
+    {
+      "id": "shangshu-supplied-preface-15",
+      "bookId": "shangshu",
+      "chapter": "周书·归禾",
+      "section": "篇序",
+      "unitLabel": "篇序",
+      "text": "唐叔得禾，异亩同颖，献诸天子。王命唐叔归周公于东，作《归禾》。",
+      "sourcePdfPages": [
+        261
+      ],
+      "sourceNote": "此篇正文已佚，扫描本收录篇序。",
+      "afterChapter": "周书·微子之命"
+    },
+    {
+      "id": "shangshu-supplied-preface-16",
+      "bookId": "shangshu",
+      "chapter": "周书·嘉禾",
+      "section": "篇序",
+      "unitLabel": "篇序",
+      "text": "周公既得命禾，旅天子之命，作《嘉禾》。",
+      "sourcePdfPages": [
+        262
+      ],
+      "sourceNote": "此篇正文已佚，扫描本收录篇序。",
+      "afterChapter": "周书·归禾"
+    },
+    {
+      "id": "shangshu-supplied-preface-17",
+      "bookId": "shangshu",
+      "chapter": "周书·成王政",
+      "section": "篇序",
+      "unitLabel": "篇序",
+      "text": "成王东伐淮夷，遂践奄，作《成王政》。",
+      "sourcePdfPages": [
+        332
+      ],
+      "sourceNote": "此篇正文已佚，扫描本收录篇序。",
+      "afterChapter": "周书·蔡仲之命"
+    },
+    {
+      "id": "shangshu-supplied-preface-18",
+      "bookId": "shangshu",
+      "chapter": "周书·将蒲姑",
+      "section": "篇序",
+      "unitLabel": "篇序",
+      "text": "成王既践奄，将迁其君于蒲姑。周公告召公，作《将蒲姑》。",
+      "sourcePdfPages": [
+        333
+      ],
+      "sourceNote": "此篇正文已佚，扫描本收录篇序。",
+      "afterChapter": "周书·成王政"
+    },
+    {
+      "id": "shangshu-supplied-preface-19",
+      "bookId": "shangshu",
+      "chapter": "周书·贿肃慎之命",
+      "section": "篇序",
+      "unitLabel": "篇序",
+      "text": "成王既伐东夷，肃慎来贺。王俾荣伯作《贿肃慎之命》。",
+      "sourcePdfPages": [
+        356
+      ],
+      "sourceNote": "此篇正文已佚，扫描本收录篇序。",
+      "afterChapter": "周书·周官"
+    },
+    {
+      "id": "shangshu-supplied-preface-20",
+      "bookId": "shangshu",
+      "chapter": "周书·亳姑",
+      "section": "篇序",
+      "unitLabel": "篇序",
+      "text": "周公在丰，将没，欲葬成周。公薨，成王葬于毕，告周公，作《亳姑》。",
+      "sourcePdfPages": [
+        357
+      ],
+      "sourceNote": "此篇正文已佚，扫描本收录篇序。",
+      "afterChapter": "周书·贿肃慎之命"
+    },
+    {
+      "id": "shijing-supplied-sheng-1",
+      "bookId": "shijing",
+      "chapter": "小雅·鹿鸣之什·南陔（笙诗）",
+      "section": "",
+      "unitLabel": "说明",
+      "text": "笙诗也，有声无辞。",
+      "sourcePdfPages": [
+        157
+      ],
+      "sourceNote": "扫描本所列笙诗，无传世歌词。",
+      "afterChapter": "小雅·鹿鸣之什·杕杜"
+    },
+    {
+      "id": "shijing-supplied-sheng-2",
+      "bookId": "shijing",
+      "chapter": "小雅·鹿鸣之什·白华（笙诗）",
+      "section": "",
+      "unitLabel": "说明",
+      "text": "笙诗也。",
+      "sourcePdfPages": [
+        157
+      ],
+      "sourceNote": "扫描本所列笙诗，无传世歌词。",
+      "afterChapter": "小雅·鹿鸣之什·南陔（笙诗）"
+    },
+    {
+      "id": "shijing-supplied-sheng-3",
+      "bookId": "shijing",
+      "chapter": "小雅·鹿鸣之什·华黍（笙诗）",
+      "section": "",
+      "unitLabel": "说明",
+      "text": "笙诗也。",
+      "sourcePdfPages": [
+        157
+      ],
+      "sourceNote": "扫描本所列笙诗，无传世歌词。",
+      "afterChapter": "小雅·鹿鸣之什·白华（笙诗）"
+    },
+    {
+      "id": "shijing-supplied-sheng-4",
+      "bookId": "shijing",
+      "chapter": "小雅·鹿鸣之什·由庚（笙诗）",
+      "section": "",
+      "unitLabel": "说明",
+      "text": "笙诗也。",
+      "sourcePdfPages": [
+        158
+      ],
+      "sourceNote": "扫描本所列笙诗，无传世歌词。",
+      "afterChapter": "小雅·鹿鸣之什·鱼丽"
+    },
+    {
+      "id": "shijing-supplied-sheng-5",
+      "bookId": "shijing",
+      "chapter": "小雅·南有嘉鱼之什·崇丘（笙诗）",
+      "section": "",
+      "unitLabel": "说明",
+      "text": "笙诗也。",
+      "sourcePdfPages": [
+        159
+      ],
+      "sourceNote": "扫描本所列笙诗，无传世歌词。",
+      "afterChapter": "小雅·南有嘉鱼之什·南有嘉鱼"
+    },
+    {
+      "id": "shijing-supplied-sheng-6",
+      "bookId": "shijing",
+      "chapter": "小雅·南有嘉鱼之什·由仪（笙诗）",
+      "section": "",
+      "unitLabel": "说明",
+      "text": "笙诗也。",
+      "sourcePdfPages": [
+        161
+      ],
+      "sourceNote": "扫描本所列笙诗，无传世歌词。",
+      "afterChapter": "小雅·南有嘉鱼之什·南山有台"
+    }
+  ]
+}
