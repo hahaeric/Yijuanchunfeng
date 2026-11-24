@@ -35,7 +35,7 @@ export function alignReadings(text, source) {
 }
 
 const lessons = input.lessons.map(item => {
-  const source = sources.get(item.id === 'lunyu-162b' ? 'lunyu-162' : item.id);
+  const source = sources.get(item.sourceLessonId || (item.id === 'lunyu-162b' ? 'lunyu-162' : item.id));
   const traditionalText = toTraditional(item.text);
   const pinyinUnits = alignReadings(item.text, source);
   // Classical contextual readings for the two newly introduced forms.

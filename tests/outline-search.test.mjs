@@ -19,7 +19,7 @@ const expectedBooks = [
   ["shijing", "诗经", 311, 1325],
   ["shangshu", "尚书", 79, 439],
   ["liji", "礼记", 49, 815],
-  ["zhouyi", "周易", 74, 620],
+  ["zhouyi", "周易", 69, 991],
   ["chunqiu", "春秋榖梁传", 12, 1264]
 ];
 

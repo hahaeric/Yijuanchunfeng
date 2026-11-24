@@ -43,6 +43,7 @@ for(const l of lessons){
   if(l.bookId==='zhouyi'){l.chapter=l.chapter.replaceAll('遯','遁');l.section=l.section.replaceAll('遯','遁');}
   if(/[<>0-9a-zA-Z]/.test(l.text))throw new Error(`Unresolved source marker ${l.id}`);
 }
+lessons=require('./zhouyi-order.cjs').arrangeZhouyi(lessons);
 const edition={id:'four-supplied-pdf-editions',annotator:'邓启铜',method:'OCR辅助差异核对，原页复核实字修改及篇序；拼音仍为自动注音。'};
 const output=JSON.stringify({version:1,edition,books,lessons},null,2)+'\n';
 const destination=new URL('../src/data/four-books-text.json',import.meta.url);

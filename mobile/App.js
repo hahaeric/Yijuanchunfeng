@@ -488,6 +488,7 @@ export default function App() {
       currentIndex,
       currentLessonId: currentLesson.id,
       contentRevision,
+      zhouyiOrderVersion: 1,
       screen,
       favorites,
       notes,

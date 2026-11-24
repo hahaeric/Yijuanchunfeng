@@ -8,7 +8,7 @@ const data=require('../mobile/src/data/four-books.json');
 const {corpus,demoLessons,demoBooks,contentRevision,getPositionIndex,getLessonSourceNote}=require('../mobile/src/model.js');
 
 test('四书正式正文和各自出版来源进入客户端，所有原阅读ID仍可定位',()=>{
-  for(const [id,count,chapters,publisher] of [['mengzi',690,14,'东南大学出版社'],['shijing',1325,311,'南京大学出版社'],['shangshu',439,79,'东南大学出版社'],['zhouyi',620,74,'南京大学出版社']]){
+  for(const [id,count,chapters,publisher] of [['mengzi',690,14,'东南大学出版社'],['shijing',1325,311,'南京大学出版社'],['shangshu',439,79,'东南大学出版社'],['zhouyi',991,69,'南京大学出版社']]){
     const lessons=demoLessons.filter(l=>l.bookId===id);
     assert.equal(lessons.length,count);
     assert.equal(new Set(lessons.map(l=>l.chapter)).size,chapters);

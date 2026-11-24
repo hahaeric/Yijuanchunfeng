@@ -41,6 +41,12 @@ function migrateReaderSnapshot(saved, oldLessons, lessons, contentRevision) {
   const previousIndex = Math.max(0, Math.min(Number(value.currentIndex) || 0, oldLessons.length - 1));
   const currentId = value.currentLessonId || oldLessons[previousIndex]?.id;
   const currentIndex = byId.get(currentId)?.i ?? 0;
+  const readLessonIds = new Set(Array.isArray(value.readLessonIds) ? value.readLessonIds : []);
+  if (!value.zhouyiOrderVersion) {
+    for (const lesson of lessons) {
+      if (lesson.sourceLessonId && readLessonIds.has(lesson.sourceLessonId)) readLessonIds.add(lesson.id);
+    }
+  }
   const pinyinCorrections = {};
   const maps = new Map();
   for (const correction of Object.values(value.pinyinCorrections || {})) {
@@ -58,7 +64,7 @@ function migrateReaderSnapshot(saved, oldLessons, lessons, contentRevision) {
     if (index === undefined || [...lesson.text][index] !== correction.character) continue;
     pinyinCorrections[`${lesson.id}:${index}`] = { ...correction, index, sourceText: lesson.text };
   }
-  return { ...value, currentIndex, currentLessonId: lessons[currentIndex]?.id, contentRevision, pinyinCorrections };
+  return { ...value, currentIndex, currentLessonId: lessons[currentIndex]?.id, contentRevision, pinyinCorrections, readLessonIds: [...readLessonIds], zhouyiOrderVersion: 1 };
 }
 
 module.exports = { getStoredValueWithMigration, migrateReaderSnapshot };

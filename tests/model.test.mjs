@@ -30,7 +30,7 @@ const expectedBooks = [
   ["shijing", "诗经", 311, 1325],
   ["shangshu", "尚书", 79, 439],
   ["liji", "礼记", 49, 815],
-  ["zhouyi", "周易", 74, 620],
+  ["zhouyi", "周易", 69, 991],
   ["chunqiu", "春秋榖梁传", 12, 1264]
 ];
 
@@ -80,7 +80,7 @@ test("九部书按阅读路线收录完整篇章结构和全部导入章句", ()
     demoBooks.map((book) => [book.id, book.title, book.chapterCount, book.lessonCount]),
     expectedBooks
   );
-  assert.equal(demoLessons.length, 5814);
+  assert.equal(demoLessons.length, 6185);
   assert.equal(new Set(demoLessons.map((lesson) => lesson.id)).size, demoLessons.length);
 });
 
@@ -332,9 +332,9 @@ test("《尚书》补齐通行五十八篇，《周易》含六十四卦与十�
   assert.ok(shangshu.some((lesson) => lesson.chapter === "周书·泰誓上"));
   assert.ok(shangshu.some((lesson) => lesson.chapter === "周书·泰誓中"));
   assert.ok(shangshu.some((lesson) => lesson.chapter === "周书·泰誓下"));
-  assert.equal(zhouyiChapters.size, 74);
+  assert.equal(zhouyiChapters.size, 69);
   assert.ok(zhouyiChapters.has("乾卦"));
-  assert.ok(zhouyiChapters.has("彖传上"));
+  assert.ok(!zhouyiChapters.has("彖传上"));
   assert.ok(zhouyiChapters.has("系辞传上"));
 });
 
