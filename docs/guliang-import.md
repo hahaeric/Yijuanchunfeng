@@ -32,4 +32,6 @@ OCR维护命令沿用 `ocr-supplied-editions.py`、`rerecognize-edition-rows.py`
 
 ## 发布
 
-Android preview频道发布回执在发布后核验。客户端通过“阅读设置 → 应用更新 → 检查更新”下载并重启，无需重新安装APK。
+2026-11-24：代码提交 `02d06a9` 已推送 GitHub。Android preview频道已发布更新组 `a92d2101-3c69-4ec1-a36e-5b815ea87c99`，Android更新ID为 `01a20b27-ae66-7933-b482-05279c6a824d`，运行时 `0.1.1`。`eas channel:view preview` 已确认频道最新更新指向此组。
+
+客户端通过“阅读设置 → 应用更新 → 检查更新”下载并重启，无需重新安装APK。
