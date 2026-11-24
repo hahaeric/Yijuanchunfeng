@@ -18,6 +18,7 @@
     "react-native-web": "^0.21.2"
   },
   "scripts": {
+    "build:guliang": "node scripts/build-guliang.mjs",
     "build:supplied-edition": "node scripts/build-supplied-edition.mjs",
     "start": "expo start",
     "android": "expo start --android",

@@ -31,7 +31,7 @@ const expectedBooks = [
   ["shangshu", "尚书", 79, 439],
   ["liji", "礼记", 49, 815],
   ["zhouyi", "周易", 74, 620],
-  ["chunqiu", "春秋", 12, 517]
+  ["chunqiu", "春秋榖梁传", 12, 1264]
 ];
 
 function assertPhrasePinyin(lesson, phrase, expected, fromIndex = 0) {
@@ -80,7 +80,7 @@ test("九部书按阅读路线收录完整篇章结构和全部导入章句", ()
     demoBooks.map((book) => [book.id, book.title, book.chapterCount, book.lessonCount]),
     expectedBooks
   );
-  assert.equal(demoLessons.length, 5067);
+  assert.equal(demoLessons.length, 5814);
   assert.equal(new Set(demoLessons.map((lesson) => lesson.id)).size, demoLessons.length);
 });
 
@@ -338,14 +338,16 @@ test("《尚书》补齐通行五十八篇，《周易》含六十四卦与十�
   assert.ok(zhouyiChapters.has("系辞传上"));
 });
 
-test("《诗经》305篇均按诗章连续阅读，《春秋》只收十二公经文", () => {
+test("《诗经》305篇均按诗章连续阅读，《春秋榖梁传》区分十二公经传", () => {
   const shijing = demoLessons.filter((lesson) => lesson.bookId === "shijing");
   const chunqiu = demoLessons.filter((lesson) => lesson.bookId === "chunqiu");
   assert.equal(new Set(shijing.map((lesson) => lesson.chapter)).size, 311);
   assert.ok(shijing.some((lesson) => lesson.chapter.endsWith("关雎") && lesson.section === "第1章"));
   assert.equal(new Set(chunqiu.map((lesson) => lesson.chapter)).size, 12);
   assert.ok(new Set(chunqiu.map((lesson) => `${lesson.chapter}:${lesson.section}`)).size >= 240);
-  assert.ok(chunqiu.every((lesson) => !/左传|公羊|谷梁/u.test(lesson.text)));
+  assert.equal(chunqiu.filter(l => l.contentKind === 'classic').length, 517);
+  assert.equal(chunqiu.filter(l => l.contentKind === 'commentary').length, 747);
+  assert.equal(new Set(chunqiu.map(l => `${l.chapter}:${l.section}`)).size, 242);
 });
 
 test("收藏与笔记可添加、读取并移除", () => {

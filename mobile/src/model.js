@@ -3,6 +3,8 @@ const editionOverrides = require("./data/edition-overrides.json");
 const pinyinCorrections = require("./data/pinyin-corrections.json");
 const suppliedEdition = require("./data/supplied-edition.json");
 const fourBooks = require("./data/four-books.json");
+const guliang = require("./data/guliang.json");
+const { applyGuliangEdition } = require("./guliang-edition");
 const { applySuppliedEdition } = require("./supplied-edition");
 
 function formatPinyin(text, units) {
@@ -195,9 +197,11 @@ if (appliedCorrectionKeys.size !== correctionKeys.size) {
   const missing = [...correctionKeys].filter((key) => !appliedCorrectionKeys.has(key));
   throw new Error(`拼音校正表引用了不存在的篇目或位置：${missing.join(", ")}`);
 }
-const demoLessons = applySuppliedEdition(applySuppliedEdition(correctedLessons, suppliedEdition, formatPinyin), fourBooks, formatPinyin);
+const demoLessons = applyGuliangEdition(applySuppliedEdition(applySuppliedEdition(correctedLessons, suppliedEdition, formatPinyin), fourBooks, formatPinyin), guliang, formatPinyin);
 const demoBooks = corpus.books.map((book) => {
   const bookLessons = demoLessons.filter((lesson) => lesson.bookId === book.id);
+  if (book.id === 'chunqiu') return { ...book, title: guliang.title, lessonCount: bookLessons.length, chapterCount: 12,
+    editionNote: '经文保留原阅读分段；新增姚政、邓启铜注释本《榖梁传》两册传文，按经传标记区分。扫描本经 OCR 辅助核对，拼音为程序自动注音。' };
   const pdfBook = fourBooks.books.find(item => item.id === book.id);
   if (pdfBook) return { ...book, lessonCount: bookLessons.length, chapterCount: new Set(bookLessons.map(l => l.chapter)).size, editionNote: `依据用户提供的邓启铜注释本扫描 PDF 整理（${pdfBook.edition.publisher}，${pdfBook.edition.published}）；OCR 辅助差异校对，拼音为程序自动注音。` };
   if (suppliedEdition.books.some(item => item.id === book.id)) return {
@@ -325,6 +329,8 @@ function getLessonText(lesson, script = "simplified") {
 }
 
 function getLessonSourceNote(lesson) {
+  if (lesson?.contentKind === 'classic') return '《春秋》经文，沿用原语料及阅读分段；拼音为程序自动注音。';
+  if (lesson?.contentKind === 'commentary') return `${lesson.sourceNote} 来源：姚政、邓启铜注释本第${lesson.sourcePdfVolume}册，PDF 第${lesson.sourcePdfPages.join('、')}页；OCR 辅助整理，拼音为程序自动注音。`;
   if (lesson?.editionSource) {
     if (lesson.editionSource.scope === "book") {
       return `${lesson.sourceNote ? `${lesson.sourceNote} ` : ""}正文依据${lesson.editionSource.annotator}注释本整理（PDF 第${lesson.editionSource.sourcePdfPages.join("、")}页）；拼音为程序自动注音。`;
@@ -412,7 +418,7 @@ function searchLessons(query, lessons = demoLessons) {
 module.exports = {
   corpus,
   legacyLessons: correctedLessons,
-  contentRevision: `${suppliedEdition.contentRevision}:${fourBooks.contentRevision}`,
+  contentRevision: `${suppliedEdition.contentRevision}:${fourBooks.contentRevision}:${guliang.contentRevision}`,
   demoBooks,
   demoLessons,
   projectPinyinCorrectionCount: correctionKeys.size,

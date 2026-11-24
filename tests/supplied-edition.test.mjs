@@ -10,7 +10,7 @@ const { applySuppliedEdition } = require('../mobile/src/supplied-edition.js');
 const { corpus, demoLessons, getChapterOutline, getPositionIndex, getLessonSourceNote, searchLessons } = require('../mobile/src/model.js');
 const byId = new Map(demoLessons.map(l => [l.id,l]));
 
-test('三本书的所有旧 ID 都保留，版本覆盖全文且其余两书不变', () => {
+test('三本书的所有旧 ID 都保留，版本覆盖全文且礼记不变', () => {
   for (const [id, expected] of [['lunyu',513],['daxue',17],['zhongyong',131]]) {
     const items = demoLessons.filter(l => l.bookId === id);
     assert.equal(items.length, expected);
@@ -20,7 +20,7 @@ test('三本书的所有旧 ID 都保留，版本覆盖全文且其余两书不�
       assert.equal(demoLessons[getPositionIndex(id, { [id]: old.id })].id, old.id);
     }
   }
-  for (const l of corpus.lessons.filter(l => ['liji','chunqiu'].includes(l.bookId))) assert.deepEqual(byId.get(l.id), l);
+  for (const l of corpus.lessons.filter(l => l.bookId === 'liji')) assert.deepEqual(byId.get(l.id), l);
 });
 
 test('大学按扫描本顺序重排，移入知本句并独立标明朱熹补文', () => {
