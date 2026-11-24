@@ -1,3 +1,5 @@
+import AccountPanel from "./src/AccountPanel";
+const { dateKey: beijingDateKey, recordRead } = require("./src/account-model");
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -188,8 +190,7 @@ function normalizeStoredPinyinCorrections(value) {
 }
 
 function localDateKey() {
-  const date = new Date();
-  return [date.getFullYear(), String(date.getMonth() + 1).padStart(2, "0"), String(date.getDate()).padStart(2, "0")].join("-");
+  return beijingDateKey();
 }
 
 function ActionChip({ symbol, label, active, onPress }) {
@@ -366,6 +367,8 @@ function VerticalReadingBlocks({ lesson, blocks, pinyinUnits, showPinyin, fontSi
 }
 
 export default function App() {
+  const [history, setHistory] = useState({});
+  const [accountActive, setAccountActive] = useState(false);
   const [screen, setScreen] = useState("today");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [favorites, setFavorites] = useState([]);
@@ -424,6 +427,7 @@ export default function App() {
         if (!mounted || !raw) return;
         const saved = migrateReaderSnapshot(JSON.parse(raw), legacyLessons, demoLessons, contentRevision);
         const index = Math.max(0, Math.min(Number(saved.currentIndex) || 0, demoLessons.length - 1));
+        setHistory(saved.history || (saved.dateKey && saved.todayReadIds?.length ? { [saved.dateKey]: saved.todayReadIds } : {}));
         setCurrentIndex(index);
         setScreen(["today", "library", "saved"].includes(saved.screen) ? saved.screen : "today");
         setFavorites(Array.isArray(saved.favorites) ? saved.favorites : []);
@@ -483,8 +487,9 @@ export default function App() {
   }, [readingFontStyle]);
 
   useEffect(() => {
-    if (!storageReady) return;
+    if (!storageReady || accountActive) return;
     const payload = {
+      history,
       currentIndex,
       currentLessonId: currentLesson.id,
       contentRevision,
@@ -501,7 +506,7 @@ export default function App() {
       dateKey: todayKey.current
     };
     AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(payload)).catch(() => {});
-  }, [storageReady, currentIndex, screen, favorites, notes, positions, readLessonIds, pinyinCorrections, settings, savedTab, todayReadIds]);
+  }, [storageReady, accountActive, history, currentIndex, screen, favorites, notes, positions, readLessonIds, pinyinCorrections, settings, savedTab, todayReadIds]);
 
   function notify(message) {
     setToast(message);
@@ -763,6 +768,10 @@ export default function App() {
   }
 
   function markCurrentRead() {
+    const day = localDateKey();
+    setHistory(previous => recordRead(previous, currentLesson.id));
+    if (todayKey.current !== day) { todayKey.current = day; setTodayReadIds([currentLesson.id]); }
+    else
     setTodayReadIds((previous) => previous.includes(currentLesson.id) ? previous : [...previous, currentLesson.id]);
     setReadLessonIds((previous) => previous.includes(currentLesson.id) ? previous : [...previous, currentLesson.id]);
   }
@@ -799,7 +808,6 @@ export default function App() {
   }
 
   function stopReading() {
-    markCurrentRead();
     setPositions((previous) => savePosition(previous, currentLesson.bookId, currentLesson.id));
     notify("阅读位置已保存，下次从这里继续。");
   }
@@ -1205,6 +1213,17 @@ export default function App() {
     );
   }
 
+  const accountSnapshot = useMemo(() => ({ currentIndex, currentLessonId: currentLesson.id, contentRevision, zhouyiOrderVersion: 1, favorites, notes, positions, readLessonIds, pinyinCorrections, settings, history }), [currentIndex, favorites, notes, positions, readLessonIds, pinyinCorrections, settings, history]);
+  function applyAccountSnapshot(value) {
+    const saved = migrateReaderSnapshot(value, legacyLessons, demoLessons, contentRevision);
+    setCurrentIndex(saved.currentIndex); setFavorites(saved.favorites || []); setNotes(saved.notes || {});
+    setPositions(saved.positions || {}); setReadLessonIds(saved.readLessonIds || []);
+    setPinyinCorrections(normalizeStoredPinyinCorrections(saved.pinyinCorrections));
+    setSettings({ ...defaultSettings, ...saved.settings }); setHistory(saved.history || {});
+    todayKey.current = localDateKey(); setTodayReadIds(saved.history?.[todayKey.current] || []);
+    setNoteOpen(false); setNoteDraft("");
+  }
+
   let screenContent;
   if (screen === "library") screenContent = renderLibrary();
   else if (screen === "saved") screenContent = renderSaved();
@@ -1243,14 +1262,16 @@ export default function App() {
         </View>
 
         <View style={styles.body}>
-          {screenContent}
+          {screen !== "account" ? screenContent : null}
+          {storageReady ? <AccountPanel visible={screen === "account"} snapshot={accountSnapshot} applySnapshot={applyAccountSnapshot} onActiveChange={setAccountActive} /> : null}
         </View>
 
         <View style={styles.tabBar}>
           {[
             { id: "today", symbol: "◉", label: "今日" },
             { id: "library", symbol: "▤", label: "经书" },
-            { id: "saved", symbol: "☆", label: "书架" }
+            { id: "saved", symbol: "☆", label: "书架" },
+            { id: "account", symbol: "▥", label: "我的" }
           ].map((tab) => (
             <Pressable key={tab.id} onPress={() => { setScreen(tab.id); scrollRef.current?.scrollTo({ y: 0, animated: false }); }} style={styles.tabItem}>
               <Text style={[styles.tabSymbol, screen === tab.id && styles.tabSymbolActive]}>{tab.symbol}</Text>

@@ -1,0 +1,5 @@
+
+# Server builds use only the server source
+*
+!server/
+!server/index.mjs

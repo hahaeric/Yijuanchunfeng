@@ -10,3 +10,10 @@ dist/
 public/releases/
 .verify-outline/
 deploy.tar.gz
+
+# Account server local databases and configuration
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+.env
+.env.local

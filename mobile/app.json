@@ -4,7 +4,7 @@
     "slug": "jingri-classics",
     "owner": "a114324s-team",
     "scheme": "yijuanchunfeng",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -14,7 +14,7 @@
     },
     "android": {
       "package": "com.jingri.classics",
-      "versionCode": 3,
+      "versionCode": 4,
       "permissions": [
         "android.permission.REQUEST_INSTALL_PACKAGES"
       ],
@@ -30,7 +30,8 @@
     },
     "plugins": [
       "expo-font",
-      "expo-updates"
+      "expo-updates",
+      "expo-secure-store"
     ],
     "updates": {
       "url": "https://u.expo.dev/62ed5659-ae18-4945-b961-af4ee9c2780f",

@@ -15,8 +15,8 @@ test("EAS preview profile creates an internally distributable Android APK", () =
 });
 
 test("release APK is configured for prompted Expo updates and Android package updates", () => {
-  assert.equal(appConfig.expo.version, "0.1.1");
-  assert.equal(appConfig.expo.android.versionCode, 3);
+  assert.equal(appConfig.expo.version, "0.1.2");
+  assert.equal(appConfig.expo.android.versionCode, 4);
   assert.equal(appConfig.expo.runtimeVersion.policy, "appVersion");
   assert.equal(appConfig.expo.updates.url, `https://u.expo.dev/${appConfig.expo.extra.eas.projectId}`);
   assert.equal(appConfig.expo.updates.checkAutomatically, "NEVER");
@@ -84,4 +84,9 @@ test("Expo uses the supplied logo for web, app, and Android adaptive icons", () 
   const favicon = readFileSync(new URL("../mobile/assets/favicon.png", import.meta.url));
   assert.equal(favicon.readUInt32BE(16), 64, "favicon should be 64 pixels wide");
   assert.equal(favicon.readUInt32BE(20), 64, "favicon should be 64 pixels tall");
+});
+
+test("account sessions use secure native storage and its config plugin", () => {
+  assert.ok(mobilePackage.dependencies["expo-secure-store"]);
+  assert.ok(appConfig.expo.plugins.includes("expo-secure-store"));
 });
