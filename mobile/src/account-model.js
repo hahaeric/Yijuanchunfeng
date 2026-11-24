@@ -26,7 +26,7 @@ function mergeSnapshots(remote = {}, local = {}, base = {}) {
   for (const [day, ids] of Object.entries(local.history || {})) result.history[day] = [...new Set([...(result.history[day] || []), ...ids])];
   return result;
 }
-function statistics(history, mode, anchor = dateKey()) {
+function statistics(history, mode, anchor = dateKey(), dailyCounts = {}) {
   const date = new Date(anchor + 'T00:00:00Z');
   let start, count;
   if (mode === 'year') { start = new Date(Date.UTC(date.getUTCFullYear(), 0, 1)); count = 12; }
@@ -35,8 +35,9 @@ function statistics(history, mode, anchor = dateKey()) {
   return Array.from({ length: count }, (_, i) => {
     const d = new Date(start); if (mode === 'year') d.setUTCMonth(i); else d.setUTCDate(start.getUTCDate() + i);
     const key = d.toISOString().slice(0, mode === 'year' ? 7 : 10);
-    const days = Object.keys(history || {}).filter(day => mode === 'year' ? day.startsWith(key + '-') : day === key);
-    return { key, count: days.reduce((n, day) => n + new Set(history[day]).size, 0), days: days.filter(day => history[day].length).length };
+    const days = [...new Set([...Object.keys(history || {}), ...Object.keys(dailyCounts || {})])].filter(day => mode === 'year' ? day.startsWith(key + '-') : day === key);
+    const countForDay = day => Math.max(Number(dailyCounts?.[day]) || 0, new Set(history?.[day] || []).size);
+    return { key, count: days.reduce((n, day) => n + countForDay(day), 0), days: days.filter(day => countForDay(day) > 0).length };
   });
 }
 module.exports = { dateKey, recordRead, mergeSnapshots, statistics };

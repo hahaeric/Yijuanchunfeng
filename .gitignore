@@ -5,3 +5,7 @@
 *.sqlite-wal
 .env
 .env.local
+/node_modules/
+
+.env.*
+!.env.example

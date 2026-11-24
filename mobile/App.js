@@ -368,6 +368,7 @@ function VerticalReadingBlocks({ lesson, blocks, pinyinUnits, showPinyin, fontSi
 
 export default function App() {
   const [history, setHistory] = useState({});
+  const [dailyCounts, setDailyCounts] = useState({});
   const [accountActive, setAccountActive] = useState(false);
   const [screen, setScreen] = useState("today");
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -408,7 +409,7 @@ export default function App() {
   const currentLesson = demoLessons[currentIndex];
   const transition = getTransition(currentIndex);
   const nextLesson = transition.nextLesson;
-  const todayCount = todayReadIds.length;
+  const todayCount = Math.max(dailyCounts[localDateKey()] || 0, todayKey.current === localDateKey() ? todayReadIds.length : 0);
   const readingFontSize = normalizeReadingFontSize(settings.fontSize);
   const readingFontStyle = normalizeReadingFontStyle(settings.fontStyle);
   const readingFontFamily = loadedFontStyles.has(readingFontStyle) ? READING_FONT_FAMILIES[readingFontStyle] : undefined;
@@ -427,6 +428,7 @@ export default function App() {
         if (!mounted || !raw) return;
         const saved = migrateReaderSnapshot(JSON.parse(raw), legacyLessons, demoLessons, contentRevision);
         const index = Math.max(0, Math.min(Number(saved.currentIndex) || 0, demoLessons.length - 1));
+        setDailyCounts(saved.dailyCounts || {});
         setHistory(saved.history || (saved.dateKey && saved.todayReadIds?.length ? { [saved.dateKey]: saved.todayReadIds } : {}));
         setCurrentIndex(index);
         setScreen(["today", "library", "saved"].includes(saved.screen) ? saved.screen : "today");
@@ -490,6 +492,7 @@ export default function App() {
     if (!storageReady || accountActive) return;
     const payload = {
       history,
+      dailyCounts,
       currentIndex,
       currentLessonId: currentLesson.id,
       contentRevision,
@@ -506,7 +509,7 @@ export default function App() {
       dateKey: todayKey.current
     };
     AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(payload)).catch(() => {});
-  }, [storageReady, accountActive, history, currentIndex, screen, favorites, notes, positions, readLessonIds, pinyinCorrections, settings, savedTab, todayReadIds]);
+  }, [storageReady, accountActive, history, dailyCounts, currentIndex, screen, favorites, notes, positions, readLessonIds, pinyinCorrections, settings, savedTab, todayReadIds]);
 
   function notify(message) {
     setToast(message);
@@ -1213,13 +1216,13 @@ export default function App() {
     );
   }
 
-  const accountSnapshot = useMemo(() => ({ currentIndex, currentLessonId: currentLesson.id, contentRevision, zhouyiOrderVersion: 1, favorites, notes, positions, readLessonIds, pinyinCorrections, settings, history }), [currentIndex, favorites, notes, positions, readLessonIds, pinyinCorrections, settings, history]);
+  const accountSnapshot = useMemo(() => ({ currentIndex, currentLessonId: currentLesson.id, contentRevision, zhouyiOrderVersion: 1, favorites, notes, positions, readLessonIds, pinyinCorrections, settings, history, dailyCounts }), [currentIndex, favorites, notes, positions, readLessonIds, pinyinCorrections, settings, history, dailyCounts]);
   function applyAccountSnapshot(value) {
     const saved = migrateReaderSnapshot(value, legacyLessons, demoLessons, contentRevision);
     setCurrentIndex(saved.currentIndex); setFavorites(saved.favorites || []); setNotes(saved.notes || {});
     setPositions(saved.positions || {}); setReadLessonIds(saved.readLessonIds || []);
     setPinyinCorrections(normalizeStoredPinyinCorrections(saved.pinyinCorrections));
-    setSettings({ ...defaultSettings, ...saved.settings }); setHistory(saved.history || {});
+    setSettings({ ...defaultSettings, ...saved.settings }); setHistory(saved.history || {}); setDailyCounts(saved.dailyCounts || {});
     todayKey.current = localDateKey(); setTodayReadIds(saved.history?.[todayKey.current] || []);
     setNoteOpen(false); setNoteDraft("");
   }
