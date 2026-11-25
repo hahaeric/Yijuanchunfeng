@@ -7,6 +7,7 @@ const {
   createSupabaseAccount, mergeReading, adoptGuestReading, acknowledge,
   encodePinyinUpserts, encodePinyinDeletes, acknowledgePinyin
 } = require('./supabase-account');
+const publicProject = require('./supabase-public.json');
 const SESSION_KEY = 'yijuan-supabase-session-v1';
 async function saveSession(value) {
   if (Platform.OS === 'web') return;
@@ -21,8 +22,8 @@ export default function AccountPanel({ snapshot, applySnapshot, onActiveChange, 
   const cacheQueue = useRef(Promise.resolve()), clientRef = useRef(null);
   latest.current = snapshot;
   if (!clientRef.current) clientRef.current = createSupabaseAccount({
-    url: process.env.EXPO_PUBLIC_SUPABASE_URL,
-    key: process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
+    url: process.env.EXPO_PUBLIC_SUPABASE_URL || publicProject.url,
+    key: process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || publicProject.key,
     onSession: async next => { await saveSession(next); active.current = next; setSession(next); }
   });
   const client = clientRef.current;
@@ -47,7 +48,7 @@ export default function AccountPanel({ snapshot, applySnapshot, onActiveChange, 
       const cache = JSON.parse(await AsyncStorage.getItem(client.cacheKey(auth)) || 'null');
       let restored, base;
       if (cache) { restored = cache.snapshot; base = cache.base || {}; }
-      else { const cloud = await client.getBackup(); restored = emptyAccount(cloud.snapshot); base = cloud.snapshot; }
+      else { restored = emptyAccount({}); base = {}; }
       if (!mounted) return;
       activate(auth, restored, base); setStatus('正在恢复同步');
     })().catch(error => { if (mounted) setStatus('请重新登录 · ' + error.message); })

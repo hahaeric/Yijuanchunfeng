@@ -54,3 +54,5 @@ where email = 'your_username@YOUR_PROJECT_REF.supabase.co';
 在没有真实项目配置时，界面可运行、阅读与本机统计可用，但注册登录和云同步尚未联通。PGlite 测试不替代真实 Supabase Auth / PostgREST 和手机双设备验收。
 
 旧 `server/` 是此前独立 SQLite 实现的留档与测试对象，当前客户端不再调用它，也不用部署其容器。
+
+Android APK 与 OTA 均随代码携带同一份 Supabase 公共项目配置（不含管理密钥），环境变量可覆盖；发布 OTA 不再依赖 APK 构建配置注入。手机恢复已保存的登录时先恢复本机身份，再由自动同步获取云端数据；无进度缓存时也不因临时断网而退出登录。

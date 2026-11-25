@@ -114,3 +114,17 @@ test("published account APK upgrades version 3 and does not prompt the same vers
   assert.match(offer.releaseNotes, /账号登录/u);
   assert.equal(updateClient.getAndroidUpdateOffer(androidUpdateFeed, 4), null);
 });
+
+
+test("OTA bundles retain the public Supabase project without build-profile environment", () => {
+  const project = JSON.parse(readFileSync(new URL("../mobile/src/supabase-public.json", import.meta.url), "utf8"));
+  assert.equal(project.url, easConfig.build.preview.env.EXPO_PUBLIC_SUPABASE_URL);
+  assert.equal(project.key, easConfig.build.preview.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY);
+  assert.deepEqual(Object.keys(project).sort(), ["key", "url"]);
+  const panel = readFileSync(new URL("../mobile/src/AccountPanel.js", import.meta.url), "utf8");
+  assert.ok(panel.includes("process.env.EXPO_PUBLIC_SUPABASE_URL || publicProject.url"));
+  assert.ok(panel.includes("process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || publicProject.key"));
+  const restore = panel.slice(panel.indexOf("const raw = await SecureStore.getItemAsync"), panel.indexOf("function emptyAccount"));
+  assert.ok(!restore.includes("await client.getBackup()"), "restoring saved identity must work offline even without a progress cache");
+  assert.ok(restore.includes("activate(auth, restored, base)"));
+});
