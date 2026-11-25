@@ -1,5 +1,7 @@
 import AccountPanel from "./src/AccountPanel";
+import HexagramIcon from "./src/HexagramIcon";
 const { dateKey: beijingDateKey, recordRead } = require("./src/account-model");
+const { isHexagramChapter } = require("./src/hexagrams");
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -926,6 +928,9 @@ export default function App() {
         >
           <View style={styles.readerTop}>
             <View style={styles.bookPill}><Text style={styles.bookPillText}>《{currentLesson.book}》</Text></View>
+            {isHexagramChapter(currentLesson.chapter) ? (
+              <HexagramIcon chapter={currentLesson.chapter} size={34} style={styles.hexagramIcon} />
+            ) : null}
             <Text style={styles.readerLocation}>{location}</Text>
             <Pressable onPress={toggleCurrentFavorite} style={({ pressed }) => [styles.favoriteButton, favorite && styles.favoriteButtonActive, pressed && styles.pressed]} accessibilityLabel={favorite ? "取消收藏" : "收藏章句"}>
               <Text style={[styles.favoriteSymbol, favorite && styles.favoriteSymbolActive]}>{favorite ? "★" : "☆"}</Text>
@@ -1543,6 +1548,7 @@ const styles = StyleSheet.create({
   readerTop: { flexDirection: "row", alignItems: "center" },
   bookPill: { paddingHorizontal: 9, paddingVertical: 5, borderRadius: 7, backgroundColor: COLORS.greenSoft },
   bookPillText: { color: "#526D58", fontSize: 10, fontWeight: "600" },
+  hexagramIcon: { marginLeft: 8 },
   readerLocation: { flex: 1, marginLeft: 8, color: COLORS.muted, fontSize: 9 },
   favoriteButton: { width: 31, height: 31, borderRadius: 16, borderWidth: 1, borderColor: "#EBE7DE", alignItems: "center", justifyContent: "center", backgroundColor: "#FFFEFA" },
   favoriteButtonActive: { borderColor: "#E7D9BF", backgroundColor: COLORS.goldSoft },
