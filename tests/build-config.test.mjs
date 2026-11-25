@@ -97,3 +97,12 @@ test("preview APK includes the configured Supabase public project without privil
   assert.match(env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY, /^sb_publishable_[A-Za-z0-9_-]+$/);
   assert.ok(!Object.keys(env).some(key => /SERVICE_ROLE|SECRET|PASSWORD/i.test(key)));
 });
+
+test("EAS upload excludes source downloads, old bundles, credentials and repository internals", () => {
+  const ignore = readFileSync(new URL("../.easignore", import.meta.url), "utf8");
+  for (const pattern of [".git/", "node_modules/", "mobile/.data-source/", "mobile/dist/", "mobile/.verify-*/", "mobile/public/releases/", "**/.env.*"]) {
+    assert.ok(ignore.split(/\r?\n/u).includes(pattern), pattern);
+  }
+  assert.ok(!ignore.split(/\r?\n/u).includes("mobile/assets/"));
+  assert.ok(!ignore.split(/\r?\n/u).includes("mobile/src/"));
+});
