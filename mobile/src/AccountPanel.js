@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, TextInput, Pressable, ScrollView, Share, AppState, Platform } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-const { dateKey, statistics } = require('./account-model');
+import ReadingStatistics from './ReadingStatistics';
 const { createSupabaseAccount, mergeReading, acknowledge } = require('./supabase-account');
 const SESSION_KEY = 'yijuan-supabase-session-v1';
 async function saveSession(value) {
@@ -10,10 +10,9 @@ async function saveSession(value) {
   if (value) await SecureStore.setItemAsync(SESSION_KEY, JSON.stringify(value));
   else await SecureStore.deleteItemAsync(SESSION_KEY);
 }
-export default function AccountPanel({ snapshot, applySnapshot, onActiveChange, visible }) {
+export default function AccountPanel({ snapshot, applySnapshot, onActiveChange, visible, books, bookByLesson }) {
   const [session, setSession] = useState(null), [username, setUsername] = useState(''), [password, setPassword] = useState('');
   const [status, setStatus] = useState('未登录'), [busy, setBusy] = useState(true);
-  const [mode, setMode] = useState('week'), [anchor, setAnchor] = useState(dateKey());
   const [adminRows, setAdminRows] = useState(null), [filter, setFilter] = useState(''), [from, setFrom] = useState(''), [to, setTo] = useState('');
   const latest = useRef(snapshot), baseline = useRef({}), locked = useRef(false), active = useRef(null), guest = useRef(null), generation = useRef(0);
   const cacheQueue = useRef(Promise.resolve()), clientRef = useRef(null);
@@ -132,24 +131,12 @@ export default function AccountPanel({ snapshot, applySnapshot, onActiveChange, 
     } catch (error) { setStatus(error.message); } finally { setBusy(false); }
   }
   if (!visible) return null;
-  const rows = statistics(snapshot.history || {}, mode, anchor, snapshot.dailyCounts), max = Math.max(1, ...rows.map(row => row.count));
   const button = (label, handler) => <Pressable disabled={busy} onPress={handler} style={{padding:12,backgroundColor:'#EAF0E9',borderRadius:8,marginVertical:4,opacity:busy?0.5:1}}><Text>{label}</Text></Pressable>;
   const input = (value, set, placeholder, secure=false) => <TextInput value={value} onChangeText={set} placeholder={placeholder} secureTextEntry={secure} autoCapitalize="none" autoCorrect={false} style={{padding:12,borderWidth:1,borderColor:'#ddd',borderRadius:8,marginVertical:4}}/>;
-  function move(direction) {
-    const d = new Date(anchor+'T00:00:00Z');
-    if (mode === 'year') d.setUTCFullYear(d.getUTCFullYear()+direction);
-    else if (mode === 'month') { d.setUTCDate(1); d.setUTCMonth(d.getUTCMonth()+direction); }
-    else d.setUTCDate(d.getUTCDate()+7*direction);
-    setAnchor(d.toISOString().slice(0,10));
-  }
   return <ScrollView contentContainerStyle={{padding:20,paddingBottom:50}} keyboardShouldPersistTaps="handled">
     <Text style={{fontSize:24,marginBottom:12}}>账户与阅读统计</Text><Text accessibilityLiveRegion="polite">{status}</Text>
     {!session ? <View>{input(username,setUsername,'用户名（字母、数字、下划线）')}{input(password,setPassword,'密码（至少8位）',true)}{button('登录',()=>login(false))}{button('注册并登录',()=>login(true))}<Text>登录后自动恢复阅读进度和统计。笔记、收藏和设置仅保存在本机；游客数据不会自动归入其他账号。手机端会安全保存登录状态；网页刷新后需重新登录。</Text></View> : <View><Text>当前账户：{session.username}</Text>{button('立即同步',sync)}{button('同步并退出',logout)}{status.includes('请重新登录') ? button('重新登录（保留待同步数据）',resetExpiredSession) : null}</View>}
-    <Text style={{fontSize:20,marginTop:24}}>我的阅读记录</Text><Text>北京时间 · 当天同一条只计一次</Text>
-    <View style={{flexDirection:'row',gap:8}}>{[['week','周'],['month','月'],['year','年']].map(([key,label])=><Pressable key={key} onPress={()=>setMode(key)} style={{padding:12,backgroundColor:mode===key?'#dbe8dc':'#eee'}}><Text>{label}</Text></Pressable>)}</View>
-    <View style={{flexDirection:'row',justifyContent:'space-between'}}>{button('上一期',()=>move(-1))}{button('当前',()=>setAnchor(dateKey()))}{button('下一期',()=>move(1))}</View>
-    <Text>{rows[0].key} — {rows.at(-1).key}</Text><Text>合计 {rows.reduce((n,row)=>n+row.count,0)} 条 · 阅读 {rows.reduce((n,row)=>n+row.days,0)} 天</Text>
-    {rows.map(row=><View key={row.key} style={{marginVertical:4}}><Text>{row.key}　{row.count} 条</Text><View style={{height:8,width:`${row.count/max*100}%`,backgroundColor:'#315440',borderRadius:4}}/></View>)}
+    <ReadingStatistics snapshot={snapshot} session={session} client={client} books={books} bookByLesson={bookByLesson} />
     {session?.admin ? <View><Text style={{fontSize:20,marginTop:24}}>所有账户每日统计</Text>{input(filter,setFilter,'筛选账户')}{input(from,setFrom,'开始日期 YYYY-MM-DD')}{input(to,setTo,'结束日期 YYYY-MM-DD')}{button('查询统计',()=>loadAdmin())}{button('导出筛选结果 CSV',()=>loadAdmin(true))}{(adminRows || []).map(row=><Text key={row.username+row.date}>{row.username}　{row.date}　{row.count} 条</Text>)}</View> : null}
   </ScrollView>;
 }

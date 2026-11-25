@@ -13,6 +13,23 @@ const url='https://reader.supabase.co';
 const response=(data,status=200)=>({ok:status>=200&&status<300,status,json:async()=>data});
 const authData=(overrides={})=>({access_token:'access',refresh_token:'refresh',expires_in:3600,user:{id:'user-id',email:'reader@reader.supabase.co',app_metadata:{}},...overrides});
 
+test('按账户和时段读取云端位图并解码为稳定章句编号', async () => {
+ const client=createSupabaseAccount({url,key:'public',fetchImpl:async (address, options)=>{
+   const request = new URL(address);
+   if (request.pathname === '/auth/v1/token') return response(authData());
+   assert.equal(request.pathname,'/rest/v1/reading_daily');
+   assert.equal(request.searchParams.get('select'),'day,read_bits');
+   assert.equal(request.searchParams.get('user_id'),'eq.user-id');
+   assert.equal(request.searchParams.get('and'),'(day.gte.2024-02-01,day.lte.2024-02-29)');
+   assert.equal(options.method,'GET');
+   assert.equal(options.body,undefined);
+   assert.equal(options.headers.Authorization,'Bearer access');
+   return response([{day:'2024-02-02',read_bits:'101'}]);
+ }});
+ await client.authenticate('reader','password123',false);
+ assert.deepEqual(await client.getReadingHistory('2024-02-01','2024-02-29'),{'2024-02-02':[ids[0],ids[2]]});
+});
+
 test('稳定索引完整覆盖发布正文，云端仅上传进度和阅读标记',()=>{
  assert.equal(createHash('sha256').update(JSON.stringify(ids.slice(0,6185))).digest('hex'),'9e4a8c5e008cdfcdf7483c131740c4c9cc899184e9cc05ef37510b03e6e6e90b','旧阅读编号不可重排');
  assert.equal(new Set(ids).size,ids.length); assert.ok(ids.length<=16384);

@@ -51,11 +51,11 @@ function createSupabaseAccount({ url, key, fetchImpl = fetch, onSession = async 
       catch (error) { if (error.message.includes('service_role')) throw error; }
     }
   }
-  async function raw(path, body, token) {
+  async function raw(path, body, token, method = 'POST') {
     configuration();
     const controller = new AbortController(), timer = setTimeout(() => controller.abort(), 15000);
     try {
-      const response = await fetchImpl(url + path, { method:'POST', headers:{ apikey:key, 'Content-Type':'application/json', ...(token ? {Authorization:`Bearer ${token}`} : {}) }, body:JSON.stringify(body), signal:controller.signal });
+      const response = await fetchImpl(url + path, { method, headers:{ apikey:key, 'Content-Type':'application/json', ...(token ? {Authorization:`Bearer ${token}`} : {}) }, body:JSON.stringify(body), signal:controller.signal });
       const data = response.status === 204 ? {} : await response.json();
       if (!response.ok) { const messages = { invalid_credentials:'账号或密码错误', user_already_exists:'用户名已存在', email_exists:'用户名已存在', email_not_confirmed:'账号尚未确认，请联系管理员检查邮箱确认配置', signup_disabled:'当前项目未开放注册', email_provider_disabled:'当前项目未启用密码登录' };
         const message = response.status === 429 ? '操作过于频繁，请稍后再试' : messages[data.error_code || data.code] || data.msg || data.message || data.error_description || data.error || '云服务请求失败';
@@ -76,12 +76,18 @@ function createSupabaseAccount({ url, key, fetchImpl = fetch, onSession = async 
     })().finally(() => {refreshPromise=null;});
     return refreshPromise;
   }
-  async function rpc(name, body = {}) {
+  async function authenticated(path, body, method) {
     if (!session) throw new Error('请重新登录');
+    const userId = session.userId;
+    function request() {
+      if (session?.userId !== userId) throw new Error('账户已切换');
+      return raw(path, body, session.access_token, method);
+    }
     if (session.expires_at * 1000 <= Date.now() + 60000) await refresh();
-    try { return await raw('/rest/v1/rpc/' + name, body, session.access_token); }
-    catch(error) { if (error.status !== 401) throw error; await refresh(); return raw('/rest/v1/rpc/' + name, body, session.access_token); }
+    try { return await request(); }
+    catch(error) { if (error.status !== 401 || session?.userId !== userId) throw error; await refresh(); return request(); }
   }
+  function rpc(name, body = {}) { return authenticated('/rest/v1/rpc/' + name, body); }
   return {
     restore(value) { if (value.project !== url || !value.userId || !value.refresh_token || !value.access_token) throw new Error('登录配置已变化，请重新登录'); session=value; },
     cacheKey(value = session) { return 'supabase-reader:' + url + ':' + value.userId; },
@@ -94,6 +100,16 @@ function createSupabaseAccount({ url, key, fetchImpl = fetch, onSession = async 
       const next=compact(data); session=next; return next;
     },
     async getBackup() { return decodeBackup(await rpc('reading_get_backup')); },
+    async getReadingHistory(from, to) {
+      const query = new URLSearchParams({
+        select: 'day,read_bits', user_id: 'eq.' + session?.userId,
+        and: `(day.gte.${from},day.lte.${to})`
+      });
+      const rows = await authenticated('/rest/v1/reading_daily?' + query, undefined, 'GET');
+      return Object.fromEntries(rows.map(({ day, read_bits }) => [
+        day, Array.from(read_bits).flatMap((bit, index) => bit === '1' && readingIds[index] ? [readingIds[index]] : [])
+      ]));
+    },
     async saveBackup(revision, snapshot, base) {
       return decodeBackup(await rpc('reading_save_backup', {p_revision:revision,p_progress:encodeProgress(snapshot),p_days:encodeDays(snapshot.history,base.history)}));
     },

@@ -48,6 +48,7 @@ const {
   toggleFavorite,
   updateNote
 } = require("./src/model");
+const bookByLesson = new Map(demoLessons.map(({ id, bookId }) => [id, bookId]));
 const {
   DEFAULT_READING_FONT_SIZE,
   DEFAULT_READING_FONT_STYLE,
@@ -1266,7 +1267,7 @@ export default function App() {
 
         <View style={styles.body}>
           {screen !== "account" ? screenContent : null}
-          {storageReady ? <AccountPanel visible={screen === "account"} snapshot={accountSnapshot} applySnapshot={applyAccountSnapshot} onActiveChange={setAccountActive} /> : null}
+          {storageReady ? <AccountPanel visible={screen === "account"} snapshot={accountSnapshot} applySnapshot={applyAccountSnapshot} onActiveChange={setAccountActive} books={demoBooks} bookByLesson={bookByLesson} /> : null}
         </View>
 
         <View style={styles.tabBar}>

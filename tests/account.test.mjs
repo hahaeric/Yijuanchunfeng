@@ -3,7 +3,34 @@ import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import { createAccountServer } from '../server/index.mjs';
 const require=createRequire(import.meta.url);
-const {dateKey,recordRead,statistics,mergeSnapshots}=require('../mobile/src/account-model.js');
+const {dateKey,recordRead,statistics,mergeSnapshots,readingBreakdown,readingPeriod,moveReadingPeriod}=require('../mobile/src/account-model.js');
+test('日月年书目统计合并云端与本地，保留旧总数和未归类条数', () => {
+ const local = {'2024-02-28':['a','a','c'], '2024-02-29':['a']};
+ const cloud = {'2024-02-28':['a','b'], '2024-03-01':['b']};
+ const totals = {'2024-02-28':4, '2024-01-31':2};
+ const books = new Map([['a','论语'],['b','孟子']]);
+ const report = (mode) => readingBreakdown(local, cloud, totals, mode, '2024-02-28', books);
+ assert.deepEqual(report('day'), [
+   {key:'2024-02-28', count:4, days:1, books:new Map([['论语',1],['孟子',1],[null,2]])}
+ ]);
+ const month = report('month');
+ assert.equal(month.length,29);
+ assert.equal(month[28].books.get('论语'),1);
+ const year = report('year');
+ assert.equal(year[0].books.get(null),2);
+ assert.equal(year[1].books.get('论语'),2);
+ assert.equal(year[1].days,2);
+ assert.equal(year[2].books.get('孟子'),1);
+ for (const row of year) assert.equal([...row.books.values()].reduce((sum,n)=>sum+n,0),row.count);
+});
+test('按自然日、月、年切换时段，正确跨月和跨年', () => {
+ assert.deepEqual(readingPeriod('month','2024-02-29'),['2024-02-01','2024-02-29']);
+ assert.deepEqual(readingPeriod('year','2024-02-29'),['2024-01-01','2024-12-31']);
+ assert.deepEqual(readingPeriod('day','2024-02-29'),['2024-02-29','2024-02-29']);
+ assert.equal(moveReadingPeriod('day','2024-02-29',1),'2024-03-01');
+ assert.equal(moveReadingPeriod('month','2024-03-31',-1),'2024-02-01');
+ assert.equal(moveReadingPeriod('year','2024-02-29',1),'2025-01-01');
+});
 test('北京时间跨日、每日去重及周月年统计',()=>{
  assert.equal(dateKey('2026-11-24T16:00:00Z'),'2026-11-25');
  let h=recordRead({},'a','2026-11-24T00:00:00Z'); h=recordRead(h,'a','2026-11-24T01:00:00Z');h=recordRead(h,'a','2026-11-25T01:00:00Z');
