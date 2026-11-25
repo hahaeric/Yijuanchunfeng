@@ -3,7 +3,10 @@ import { View, Text, TextInput, Pressable, ScrollView, Share, AppState, Platform
 import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ReadingStatistics from './ReadingStatistics';
-const { createSupabaseAccount, mergeReading, adoptGuestReading, acknowledge } = require('./supabase-account');
+const {
+  createSupabaseAccount, mergeReading, adoptGuestReading, acknowledge,
+  encodePinyinUpserts, encodePinyinDeletes, acknowledgePinyin
+} = require('./supabase-account');
 const SESSION_KEY = 'yijuan-supabase-session-v1';
 async function saveSession(value) {
   if (Platform.OS === 'web') return;
@@ -14,7 +17,7 @@ export default function AccountPanel({ snapshot, applySnapshot, onActiveChange, 
   const [session, setSession] = useState(null), [username, setUsername] = useState(''), [password, setPassword] = useState('');
   const [status, setStatus] = useState('未登录'), [busy, setBusy] = useState(true);
   const [adminRows, setAdminRows] = useState(null), [filter, setFilter] = useState(''), [from, setFrom] = useState(''), [to, setTo] = useState('');
-  const latest = useRef(snapshot), baseline = useRef({}), locked = useRef(false), active = useRef(null), guest = useRef(null), generation = useRef(0);
+  const latest = useRef(snapshot), baseline = useRef({}), pinyinBaseline = useRef({}), locked = useRef(false), pinyinLocked = useRef(false), active = useRef(null), guest = useRef(null), generation = useRef(0);
   const cacheQueue = useRef(Promise.resolve()), clientRef = useRef(null);
   latest.current = snapshot;
   if (!clientRef.current) clientRef.current = createSupabaseAccount({
@@ -24,6 +27,7 @@ export default function AccountPanel({ snapshot, applySnapshot, onActiveChange, 
   });
   const client = clientRef.current;
   function persistCache(value, base, auth = active.current) {
+    if (!auth) return Promise.resolve();
     const encoded = JSON.stringify({ snapshot:value, base });
     cacheQueue.current = cacheQueue.current.catch(() => {}).then(() => AsyncStorage.setItem(client.cacheKey(auth), encoded));
     return cacheQueue.current;
@@ -53,7 +57,32 @@ export default function AccountPanel({ snapshot, applySnapshot, onActiveChange, 
   function emptyAccount(cloud = {}) {
     return { currentIndex:0, favorites:[], notes:{}, positions:{}, readLessonIds:[], pinyinCorrections:{}, settings:latest.current.settings, history:{}, dailyCounts:{}, ...cloud };
   }
-  async function sync() {
+  async function syncPinyin() {
+    if (pinyinLocked.current) return false;
+    pinyinLocked.current = true;
+    try {
+      const sent = latest.current.pinyinCorrections || {};
+      const upserts = encodePinyinUpserts(sent, pinyinBaseline.current);
+      const deletes = encodePinyinDeletes(sent, pinyinBaseline.current);
+      const remote = (upserts.length || deletes.length)
+        ? await client.applyPinyinCorrections(upserts, deletes)
+        : await client.getPinyinCorrections();
+      const nextMap = acknowledgePinyin(remote, latest.current.pinyinCorrections || {}, sent);
+      pinyinBaseline.current = remote;
+      if (JSON.stringify(nextMap) === JSON.stringify(latest.current.pinyinCorrections || {})) return true;
+      const next = { ...latest.current, pinyinCorrections: nextMap };
+      latest.current = next;
+      applySnapshot(next);
+      await persistCache(next, baseline.current);
+      return true;
+    } catch (error) {
+      if (!active.current) setStatus('拼音待同步 · ' + error.message);
+      return false;
+    } finally {
+      pinyinLocked.current = false;
+    }
+  }
+  async function syncReading() {
     if (!active.current || locked.current) return false;
     locked.current = true; const epoch = generation.current; setStatus('同步中');
     try {
@@ -76,17 +105,42 @@ export default function AccountPanel({ snapshot, applySnapshot, onActiveChange, 
     } catch (error) { if (epoch === generation.current) setStatus('待同步 · ' + error.message); return false; }
     finally { locked.current = false; }
   }
+  async function sync() {
+    const readingOk = active.current ? await syncReading() : true;
+    const pinyinOk = await syncPinyin();
+    if (pinyinOk && (!active.current || readingOk)) {
+      setStatus((active.current ? '已同步 · ' : '拼音已同步 · ') + new Date().toLocaleString('zh-CN', {timeZone:'Asia/Shanghai'}));
+    }
+    return readingOk && pinyinOk;
+  }
   useEffect(() => {
     if (!session) return;
     persistCache(snapshot, baseline.current).catch(() => setStatus('本机缓存保存失败，请勿退出'));
-    const timer = setTimeout(() => sync(), 1000); return () => clearTimeout(timer);
-  }, [JSON.stringify(snapshot), session]);
+    const timer = setTimeout(() => syncReading(), 1000); return () => clearTimeout(timer);
+  }, [JSON.stringify({
+    currentLessonId: snapshot.currentLessonId,
+    contentRevision: snapshot.contentRevision,
+    zhouyiOrderVersion: snapshot.zhouyiOrderVersion,
+    positions: snapshot.positions,
+    readLessonIds: snapshot.readLessonIds,
+    history: snapshot.history
+  }), session]);
   useEffect(() => {
-    if (!session) return;
-    const timer = setInterval(() => sync(), 5 * 60000);
-    const subscription = AppState.addEventListener('change', state => { if (state === 'active') sync(); });
+    const timer = setTimeout(() => { syncPinyin().then((ok) => {
+      if (ok && !active.current) setStatus('拼音已同步 · ' + new Date().toLocaleString('zh-CN', {timeZone:'Asia/Shanghai'}));
+    }); }, 1000);
+    return () => clearTimeout(timer);
+  }, [JSON.stringify(snapshot.pinyinCorrections)]);
+  useEffect(() => {
+    const timer = setInterval(() => { if (session) syncReading(); syncPinyin(); }, 5 * 60000);
+    const subscription = AppState.addEventListener('change', state => {
+      if (state === 'active') { if (session) syncReading(); syncPinyin(); }
+    });
     return () => { clearInterval(timer); subscription.remove(); };
   }, [session]);
+  useEffect(() => {
+    syncPinyin().catch(() => {});
+  }, []);
   async function login(register) {
     if (busy) return; setBusy(true);
     try {
@@ -98,6 +152,7 @@ export default function AccountPanel({ snapshot, applySnapshot, onActiveChange, 
       const restored = adoptGuestReading(account, guestSnapshot);
       await persistCache(restored, cloud.snapshot, auth); await saveSession(auth);
       activate(auth, restored, cloud.snapshot); setPassword(''); setStatus('已登录，正在同步');
+      await sync();
     } catch (error) { setStatus(error.message); } finally { setBusy(false); }
   }
   async function deactivate() {
@@ -137,7 +192,7 @@ export default function AccountPanel({ snapshot, applySnapshot, onActiveChange, 
   const input = (value, set, placeholder, secure=false) => <TextInput value={value} onChangeText={set} placeholder={placeholder} secureTextEntry={secure} autoCapitalize="none" autoCorrect={false} style={{padding:12,borderWidth:1,borderColor:'#ddd',borderRadius:8,marginVertical:4}}/>;
   return <ScrollView contentContainerStyle={{padding:20,paddingBottom:50}} keyboardShouldPersistTaps="handled">
     <Text style={{fontSize:24,marginBottom:12}}>账户与阅读统计</Text><Text accessibilityLiveRegion="polite">{status}</Text>
-    {!session ? <View>{input(username,setUsername,'用户名（字母、数字、下划线）')}{input(password,setPassword,'密码（至少8位）',true)}{button('登录',()=>login(false))}{button('注册并登录',()=>login(true))}<Text>登录后自动恢复阅读进度和统计，并把本机游客阅读进度合并进账号后同步。笔记、收藏和设置仍仅保存在本机。手机端会安全保存登录状态；网页刷新后需重新登录。</Text></View> : <View><Text>当前账户：{session.username}</Text>{button('立即同步',sync)}{button('同步并退出',logout)}{status.includes('请重新登录') ? button('重新登录（保留待同步数据）',resetExpiredSession) : null}</View>}
+    {!session ? <View>{input(username,setUsername,'用户名（字母、数字、下划线）')}{input(password,setPassword,'密码（至少8位）',true)}{button('登录',()=>login(false))}{button('注册并登录',()=>login(true))}{button('立即同步拼音',sync)}<Text>拼音改正会自动同步到公共校正表，未登录也可上传和下载，后写覆盖先写。登录后额外自动恢复阅读进度和统计，并把本机游客阅读进度合并进账号后同步。笔记、收藏和设置仍仅保存在本机。手机端会安全保存登录状态；网页刷新后需重新登录。</Text></View> : <View><Text>当前账户：{session.username}</Text>{button('立即同步',sync)}{button('同步并退出',logout)}{status.includes('请重新登录') ? button('重新登录（保留待同步数据）',resetExpiredSession) : null}</View>}
     <ReadingStatistics snapshot={snapshot} session={session} client={client} books={books} bookByLesson={bookByLesson} />
     {session?.admin ? <View><Text style={{fontSize:20,marginTop:24}}>所有账户每日统计</Text>{input(filter,setFilter,'筛选账户')}{input(from,setFrom,'开始日期 YYYY-MM-DD')}{input(to,setTo,'结束日期 YYYY-MM-DD')}{button('查询统计',()=>loadAdmin())}{button('导出筛选结果 CSV',()=>loadAdmin(true))}{(adminRows || []).map(row=><Text key={row.username+row.date}>{row.username}　{row.date}　{row.count} 条</Text>)}</View> : null}
   </ScrollView>;

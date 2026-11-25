@@ -724,7 +724,7 @@ export default function App() {
       return next;
     });
     closePinyinEditor();
-    notify(correctedPinyin === originalPinyin ? "已恢复默认拼音。" : "拼音已修改并保存在本机。");
+    notify(correctedPinyin === originalPinyin ? "已恢复默认拼音，将自动同步。" : "拼音已修改，将自动同步。");
   }
 
   function resetPinyinCorrection() {
@@ -736,7 +736,7 @@ export default function App() {
       return next;
     });
     closePinyinEditor();
-    notify("已恢复默认拼音。");
+    notify("已恢复默认拼音，将自动同步。");
   }
 
   async function exportPinyinCorrections() {
@@ -1341,7 +1341,7 @@ export default function App() {
                 </View>
               </View>
               <View style={styles.settingRow}>
-                <View><Text style={styles.settingTitle}>拼音校正表</Text><Text style={styles.settingHint}>项目已校正 {projectPinyinCorrectionCount} 处；本机另改 {Object.keys(pinyinCorrections).length} 处</Text></View>
+                <View><Text style={styles.settingTitle}>拼音校正表</Text><Text style={styles.settingHint}>项目已校正 {projectPinyinCorrectionCount} 处；当前同步 {Object.keys(pinyinCorrections).length} 处（公共直接覆盖，自动同步）</Text></View>
                 <Pressable onPress={exportPinyinCorrections} style={({ pressed }) => [styles.correctionExportButton, pressed && styles.pressed]}>
                   <Text style={styles.correctionExportText}>导出</Text>
                 </Pressable>

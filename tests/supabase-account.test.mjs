@@ -5,7 +5,10 @@ import { readFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { PGlite } from '@electric-sql/pglite';
 const require=createRequire(import.meta.url);
-const { createSupabaseAccount, encodeProgress, encodeDays, decodeBackup, mergeReading, adoptGuestReading, acknowledge } = require('../mobile/src/supabase-account.js');
+const {
+  createSupabaseAccount, encodeProgress, encodeDays, decodeBackup, mergeReading, adoptGuestReading, acknowledge,
+  decodePinyinList, encodePinyinUpserts, encodePinyinDeletes, mergePinyinMaps, acknowledgePinyin
+} = require('../mobile/src/supabase-account.js');
 const { statistics, dateKey } = require('../mobile/src/account-model.js');
 const ids=require('../mobile/src/data/reading-ids.json');
 const {demoLessons}=require('../mobile/src/model.js');
@@ -53,8 +56,8 @@ test('日汇总支持多年趋势，成功确认压缩历史并保留请求期�
 });
 test('登录时合并游客阅读进度，保留账号侧笔记收藏设置',()=>{
  const today=dateKey();
- const account={currentIndex:0,currentLessonId:ids[0],positions:{a:ids[0]},readLessonIds:[ids[0]],history:{[today]:[ids[0]]},dailyCounts:{[today]:1},notes:{cloud:'keep'},favorites:[ids[2]],settings:{fontSize:18},pinyinCorrections:{a:'account'}};
- const guest={currentIndex:42,currentLessonId:ids[3],positions:{a:ids[1],b:ids[3]},readLessonIds:[ids[1],ids[3]],history:{[today]:[ids[1]],'2026-01-01':[ids[3]]},notes:{guest:'ignore'},favorites:[ids[1]],settings:{fontSize:28},pinyinCorrections:{g:'guest'}};
+ const account={currentIndex:0,currentLessonId:ids[0],positions:{a:ids[0]},readLessonIds:[ids[0]],history:{[today]:[ids[0]]},dailyCounts:{[today]:1},notes:{cloud:'keep'},favorites:[ids[2]],settings:{fontSize:18},pinyinCorrections:{'a:0':{lessonId:'a',index:0,correctedPinyin:'zhī',updatedAt:'2026-01-01T00:00:00.000Z'}}};
+ const guest={currentIndex:42,currentLessonId:ids[3],positions:{a:ids[1],b:ids[3]},readLessonIds:[ids[1],ids[3]],history:{[today]:[ids[1]],'2026-01-01':[ids[3]]},notes:{guest:'ignore'},favorites:[ids[1]],settings:{fontSize:28},pinyinCorrections:{'a:0':{lessonId:'a',index:0,correctedPinyin:'zhī2',updatedAt:'2026-02-01T00:00:00.000Z'},'g:1':{lessonId:'g',index:1,correctedPinyin:'yě',updatedAt:'2026-02-01T00:00:00.000Z'}}};
  const adopted=adoptGuestReading(account,guest);
  assert.equal(adopted.currentIndex,42);
  assert.equal(adopted.currentLessonId,ids[3]);
@@ -66,8 +69,48 @@ test('登录时合并游客阅读进度，保留账号侧笔记收藏设置',()=
  assert.deepEqual(adopted.notes,{cloud:'keep'});
  assert.deepEqual(adopted.favorites,[ids[2]]);
  assert.deepEqual(adopted.settings,{fontSize:18});
- assert.deepEqual(adopted.pinyinCorrections,{a:'account'});
+ assert.equal(adopted.pinyinCorrections['a:0'].correctedPinyin,'zhī2');
+ assert.equal(adopted.pinyinCorrections['g:1'].correctedPinyin,'yě');
  assert.deepEqual(adoptGuestReading(account,null),account);
+});
+
+test('公共拼音校正编码、合并与飞行中确认', () => {
+  const base = decodePinyinList([{ lessonId:'lunyu-1', index:2, character:'乐', originalPinyin:'lè', correctedPinyin:'yuè', updatedAt:'2026-01-01T00:00:00.000Z' }]);
+  const local = {
+    ...base,
+    'lunyu-1:2': { ...base['lunyu-1:2'], correctedPinyin:'yào', updatedAt:'2026-01-02T00:00:00.000Z' },
+    'daxue-1:0': { lessonId:'daxue-1', index:0, character:'大', originalPinyin:'dà', correctedPinyin:'dài', updatedAt:'2026-01-02T00:00:00.000Z' }
+  };
+  assert.deepEqual(encodePinyinUpserts(local, base).map((item) => item.correctedPinyin).sort(), ['dài', 'yào']);
+  assert.deepEqual(encodePinyinDeletes({ 'daxue-1:0': local['daxue-1:0'] }, local), [{ lessonId:'lunyu-1', index:2 }]);
+  const remote = decodePinyinList([
+    { lessonId:'lunyu-1', index:2, character:'乐', originalPinyin:'lè', correctedPinyin:'yào', updatedAt:'2026-01-03T00:00:00.000Z' },
+    { lessonId:'zhongyong-1', index:1, character:'中', originalPinyin:'zhōng', correctedPinyin:'zhòng', updatedAt:'2026-01-03T00:00:00.000Z' }
+  ]);
+  const sent = { ...local };
+  const latest = { ...local, 'zhongyong-1:1': remote['zhongyong-1:1'] };
+  delete latest['daxue-1:0'];
+  const next = acknowledgePinyin(remote, latest, sent);
+  assert.equal(next['lunyu-1:2'].correctedPinyin, 'yào');
+  assert.equal(next['zhongyong-1:1'].correctedPinyin, 'zhòng');
+  assert.equal(next['daxue-1:0'], undefined);
+  assert.equal(mergePinyinMaps(base, remote)['lunyu-1:2'].correctedPinyin, 'yào');
+});
+
+test('未登录也可调用公共拼音校正 RPC', async () => {
+  const calls = [];
+  const client = createSupabaseAccount({ url, key:'public', fetchImpl:async (path, options) => {
+    calls.push({ path, ...options });
+    if (path.includes('pinyin_get_corrections')) return response([{ lessonId:ids[0], index:0, character:'春', originalPinyin:'chūn', correctedPinyin:'chún', updatedAt:'2026-01-01T00:00:00.000Z' }]);
+    if (path.includes('pinyin_apply_corrections')) return response([{ lessonId:ids[0], index:0, character:'春', originalPinyin:'chūn', correctedPinyin:'chún', updatedAt:'2026-01-02T00:00:00.000Z' }]);
+    return response({});
+  }});
+  const got = await client.getPinyinCorrections();
+  assert.equal(got[`${ids[0]}:0`].correctedPinyin, 'chún');
+  assert.equal(calls[0].headers.Authorization, undefined);
+  const applied = await client.applyPinyinCorrections([{ lessonId:ids[0], index:0, character:'春', originalPinyin:'chūn', correctedPinyin:'chún' }], []);
+  assert.equal(applied[`${ids[0]}:0`].correctedPinyin, 'chún');
+  assert.deepEqual(JSON.parse(calls[1].body).p_upserts[0].correctedPinyin, 'chún');
 });
 test('Supabase 用户名登录、配置校验、注册确认提示及刷新令牌持久化',async()=>{
  let requests=[],saved=[];
@@ -110,6 +153,7 @@ test('真实 PostgreSQL 执行迁移：账户隔离、CAS、历史去重、权�
    grant usage on schema auth to authenticated,anon;
    insert into auth.users values('00000000-0000-0000-0000-000000000001','alice@reader.supabase.co'),('00000000-0000-0000-0000-000000000002','bob@reader.supabase.co');`);
   await db.exec(await readFile(new URL('../supabase/migrations/202611240001_reading.sql',import.meta.url),'utf8'));
+  await db.exec(await readFile(new URL('../supabase/migrations/202611260001_pinyin_corrections.sql',import.meta.url),'utf8'));
   await db.exec(`set role authenticated; select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000001',false);`);
   const rpc=async(revision,progress,days)=>(await db.query('select public.reading_save_backup($1,$2::jsonb,$3::jsonb) as value',[revision,JSON.stringify(progress),JSON.stringify(days)])).rows[0].value;
   let result=await rpc(0,{currentLessonId:ids[0]}, {'2020-01-01':[0,1,1]});
@@ -128,6 +172,19 @@ test('真实 PostgreSQL 执行迁移：账户隔离、CAS、历史去重、权�
   assert.equal((await db.query('select public.reading_admin_stats() as value')).rows[0].value[0].count,3);
   await db.exec(`reset role;set role anon;`);
   await assert.rejects(()=>db.query('select public.reading_get_backup()'),/permission denied/);
+  const applied=(await db.query(
+    `select public.pinyin_apply_corrections($1::jsonb,$2::jsonb) as value`,
+    [JSON.stringify([{ lessonId:ids[0], index:3, character:'乐', originalPinyin:'lè', correctedPinyin:'yuè', citation:'《论语》', sourceText:'乐', source:'manual-in-app' }]), JSON.stringify([])]
+  )).rows[0].value;
+  assert.equal(applied[0].correctedPinyin,'yuè');
+  assert.equal((await db.query('select public.pinyin_get_corrections() as value')).rows[0].value[0].lessonId, ids[0]);
+  await db.query(
+    `select public.pinyin_apply_corrections($1::jsonb,$2::jsonb) as value`,
+    [JSON.stringify([]), JSON.stringify([{ lessonId:ids[0], index:3 }])]
+  );
+  assert.deepEqual((await db.query('select public.pinyin_get_corrections() as value')).rows[0].value, []);
+  await assert.rejects(()=>db.query(`select public.pinyin_apply_corrections('[{"lessonId":""}]'::jsonb,'[]'::jsonb)`), /Invalid pinyin/);
+  await assert.rejects(()=>db.query('update public.pinyin_corrections set corrected_pinyin=\'x\''), /permission denied/);
  }finally{await db.close();}
 });
 

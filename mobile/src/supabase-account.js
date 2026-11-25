@@ -28,6 +28,82 @@ function mergeReading(remote, local, base = {}) {
   const pick = value => ({ currentLessonId:value.currentLessonId, contentRevision:value.contentRevision, zhouyiOrderVersion:value.zhouyiOrderVersion || 1, positions:value.positions || {}, readLessonIds:value.readLessonIds || [], history:value.history || {} });
   return { ...local, ...mergeSnapshots(pick(remote), pick(local), pick(base)), dailyCounts: remote.dailyCounts || {} };
 }
+function pinyinCorrectionKey(lessonId, characterIndex) {
+  return `${lessonId}:${characterIndex}`;
+}
+
+function decodePinyinList(list = []) {
+  const map = {};
+  if (!Array.isArray(list)) return map;
+  for (const item of list) {
+    if (!item || typeof item !== 'object') continue;
+    const lessonId = item.lessonId;
+    const index = Number(item.index);
+    if (typeof lessonId !== 'string' || !Number.isInteger(index) || index < 0) continue;
+    map[pinyinCorrectionKey(lessonId, index)] = {
+      lessonId,
+      index,
+      character: item.character || '',
+      originalPinyin: item.originalPinyin || '',
+      correctedPinyin: item.correctedPinyin || '',
+      citation: item.citation || '',
+      sourceText: item.sourceText || '',
+      source: item.source || 'manual-in-app',
+      updatedAt: typeof item.updatedAt === 'string' ? item.updatedAt : new Date(item.updatedAt || Date.now()).toISOString()
+    };
+  }
+  return map;
+}
+
+function encodePinyinUpserts(local = {}, base = {}) {
+  return Object.values(local).filter((item) => {
+    if (!item || typeof item !== 'object') return false;
+    const key = pinyinCorrectionKey(item.lessonId, item.index);
+    const prior = base[key];
+    return !prior || prior.correctedPinyin !== item.correctedPinyin
+      || prior.character !== item.character
+      || prior.originalPinyin !== item.originalPinyin;
+  }).map((item) => ({
+    lessonId: item.lessonId,
+    index: item.index,
+    character: item.character,
+    originalPinyin: item.originalPinyin || '',
+    correctedPinyin: item.correctedPinyin,
+    citation: item.citation || '',
+    sourceText: item.sourceText || '',
+    source: item.source || 'manual-in-app'
+  }));
+}
+
+function encodePinyinDeletes(local = {}, base = {}) {
+  return Object.keys(base).filter((key) => !(key in local)).map((key) => {
+    const at = key.lastIndexOf(':');
+    return { lessonId: key.slice(0, at), index: Number(key.slice(at + 1)) };
+  }).filter((item) => item.lessonId && Number.isInteger(item.index) && item.index >= 0);
+}
+
+function mergePinyinMaps(...maps) {
+  const result = {};
+  for (const map of maps) {
+    for (const [key, value] of Object.entries(map || {})) {
+      const existing = result[key];
+      if (!existing || (value.updatedAt || '') >= (existing.updatedAt || '')) result[key] = value;
+    }
+  }
+  return result;
+}
+
+function acknowledgePinyin(remote = {}, latest = {}, sent = {}) {
+  const next = { ...remote };
+  for (const [key, value] of Object.entries(latest)) {
+    if (JSON.stringify(sent[key]) !== JSON.stringify(value)) next[key] = value;
+  }
+  for (const key of Object.keys(sent)) {
+    if (!(key in latest)) delete next[key];
+  }
+  return next;
+}
+
 function adoptGuestReading(account = {}, guest) {
   if (!guest) return account;
   const merged = mergeReading(account, guest, {});
@@ -40,7 +116,8 @@ function adoptGuestReading(account = {}, guest) {
     positions: merged.positions,
     readLessonIds: merged.readLessonIds,
     history: merged.history,
-    dailyCounts: merged.dailyCounts
+    dailyCounts: merged.dailyCounts,
+    pinyinCorrections: mergePinyinMaps(account.pinyinCorrections, guest.pinyinCorrections)
   };
 }
 function acknowledge(remote, latest, sent) {
@@ -103,6 +180,10 @@ function createSupabaseAccount({ url, key, fetchImpl = fetch, onSession = async 
     catch(error) { if (error.status !== 401 || session?.userId !== userId) throw error; await refresh(); return request(); }
   }
   function rpc(name, body = {}) { return authenticated('/rest/v1/rpc/' + name, body); }
+  async function publicOrAuthRpc(name, body = {}) {
+    if (session) return rpc(name, body);
+    return raw('/rest/v1/rpc/' + name, body);
+  }
   return {
     restore(value) { if (value.project !== url || !value.userId || !value.refresh_token || !value.access_token) throw new Error('登录配置已变化，请重新登录'); session=value; },
     cacheKey(value = session) { return 'supabase-reader:' + url + ':' + value.userId; },
@@ -128,9 +209,18 @@ function createSupabaseAccount({ url, key, fetchImpl = fetch, onSession = async 
     async saveBackup(revision, snapshot, base) {
       return decodeBackup(await rpc('reading_save_backup', {p_revision:revision,p_progress:encodeProgress(snapshot),p_days:encodeDays(snapshot.history,base.history)}));
     },
+    async getPinyinCorrections() {
+      return decodePinyinList(await publicOrAuthRpc('pinyin_get_corrections'));
+    },
+    async applyPinyinCorrections(upserts = [], deletes = []) {
+      return decodePinyinList(await publicOrAuthRpc('pinyin_apply_corrections', { p_upserts: upserts, p_deletes: deletes }));
+    },
     async adminStatistics({from='',to='',username='',offset=0}={}) { return rpc('reading_admin_stats',{p_from:from || null,p_to:to || null,p_username:username,p_offset:offset,p_limit:500}); },
     async logout() { if (session) { if (session.expires_at*1000 <= Date.now()) await refresh(); await raw('/auth/v1/logout?scope=local',{},session.access_token); } session=null; },
     clear() { session=null; }
   };
 }
-module.exports = { createSupabaseAccount, encodeProgress, encodeDays, decodeBackup, mergeReading, adoptGuestReading, acknowledge };
+module.exports = {
+  createSupabaseAccount, encodeProgress, encodeDays, decodeBackup, mergeReading, adoptGuestReading, acknowledge,
+  pinyinCorrectionKey, decodePinyinList, encodePinyinUpserts, encodePinyinDeletes, mergePinyinMaps, acknowledgePinyin
+};
