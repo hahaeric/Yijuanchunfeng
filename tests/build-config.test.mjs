@@ -90,3 +90,10 @@ test("account sessions use secure native storage and its config plugin", () => {
   assert.ok(mobilePackage.dependencies["expo-secure-store"]);
   assert.ok(appConfig.expo.plugins.includes("expo-secure-store"));
 });
+
+test("preview APK includes the configured Supabase public project without privileged secrets", () => {
+  const env = easConfig.build.preview.env;
+  assert.equal(env.EXPO_PUBLIC_SUPABASE_URL, "https://tzjuggunuelhprcxdrwv.supabase.co");
+  assert.match(env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY, /^sb_publishable_[A-Za-z0-9_-]+$/);
+  assert.ok(!Object.keys(env).some(key => /SERVICE_ROLE|SECRET|PASSWORD/i.test(key)));
+});
