@@ -28,6 +28,21 @@ function mergeReading(remote, local, base = {}) {
   const pick = value => ({ currentLessonId:value.currentLessonId, contentRevision:value.contentRevision, zhouyiOrderVersion:value.zhouyiOrderVersion || 1, positions:value.positions || {}, readLessonIds:value.readLessonIds || [], history:value.history || {} });
   return { ...local, ...mergeSnapshots(pick(remote), pick(local), pick(base)), dailyCounts: remote.dailyCounts || {} };
 }
+function adoptGuestReading(account = {}, guest) {
+  if (!guest) return account;
+  const merged = mergeReading(account, guest, {});
+  return {
+    ...account,
+    currentIndex: guest.currentIndex ?? account.currentIndex,
+    currentLessonId: merged.currentLessonId,
+    contentRevision: merged.contentRevision,
+    zhouyiOrderVersion: merged.zhouyiOrderVersion,
+    positions: merged.positions,
+    readLessonIds: merged.readLessonIds,
+    history: merged.history,
+    dailyCounts: merged.dailyCounts
+  };
+}
 function acknowledge(remote, latest, sent) {
   const result = mergeReading(remote, latest, sent);
   const today = dateKey();
@@ -118,4 +133,4 @@ function createSupabaseAccount({ url, key, fetchImpl = fetch, onSession = async 
     clear() { session=null; }
   };
 }
-module.exports = { createSupabaseAccount, encodeProgress, encodeDays, decodeBackup, mergeReading, acknowledge };
+module.exports = { createSupabaseAccount, encodeProgress, encodeDays, decodeBackup, mergeReading, adoptGuestReading, acknowledge };

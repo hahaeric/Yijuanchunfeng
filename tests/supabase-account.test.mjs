@@ -5,7 +5,7 @@ import { readFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { PGlite } from '@electric-sql/pglite';
 const require=createRequire(import.meta.url);
-const { createSupabaseAccount, encodeProgress, encodeDays, decodeBackup, mergeReading, acknowledge } = require('../mobile/src/supabase-account.js');
+const { createSupabaseAccount, encodeProgress, encodeDays, decodeBackup, mergeReading, adoptGuestReading, acknowledge } = require('../mobile/src/supabase-account.js');
 const { statistics, dateKey } = require('../mobile/src/account-model.js');
 const ids=require('../mobile/src/data/reading-ids.json');
 const {demoLessons}=require('../mobile/src/model.js');
@@ -50,6 +50,24 @@ test('日汇总支持多年趋势，成功确认压缩历史并保留请求期�
  assert.equal(statistics({},'year','2020-01-01',next.dailyCounts)[0].count,10);
  const merged=mergeReading({...remote,positions:{a:ids[3]}},{...sent,positions:{a:ids[0],b:ids[2]}},{positions:{a:ids[0]}});
  assert.equal(merged.positions.a,ids[3]);assert.equal(merged.positions.b,ids[2]);
+});
+test('登录时合并游客阅读进度，保留账号侧笔记收藏设置',()=>{
+ const today=dateKey();
+ const account={currentIndex:0,currentLessonId:ids[0],positions:{a:ids[0]},readLessonIds:[ids[0]],history:{[today]:[ids[0]]},dailyCounts:{[today]:1},notes:{cloud:'keep'},favorites:[ids[2]],settings:{fontSize:18},pinyinCorrections:{a:'account'}};
+ const guest={currentIndex:42,currentLessonId:ids[3],positions:{a:ids[1],b:ids[3]},readLessonIds:[ids[1],ids[3]],history:{[today]:[ids[1]],'2026-01-01':[ids[3]]},notes:{guest:'ignore'},favorites:[ids[1]],settings:{fontSize:28},pinyinCorrections:{g:'guest'}};
+ const adopted=adoptGuestReading(account,guest);
+ assert.equal(adopted.currentIndex,42);
+ assert.equal(adopted.currentLessonId,ids[3]);
+ assert.deepEqual(adopted.positions,{a:ids[1],b:ids[3]});
+ assert.deepEqual(new Set(adopted.readLessonIds),new Set([ids[0],ids[1],ids[3]]));
+ assert.deepEqual(new Set(adopted.history[today]),new Set([ids[0],ids[1]]));
+ assert.deepEqual(adopted.history['2026-01-01'],[ids[3]]);
+ assert.equal(adopted.dailyCounts[today],1);
+ assert.deepEqual(adopted.notes,{cloud:'keep'});
+ assert.deepEqual(adopted.favorites,[ids[2]]);
+ assert.deepEqual(adopted.settings,{fontSize:18});
+ assert.deepEqual(adopted.pinyinCorrections,{a:'account'});
+ assert.deepEqual(adoptGuestReading(account,null),account);
 });
 test('Supabase 用户名登录、配置校验、注册确认提示及刷新令牌持久化',async()=>{
  let requests=[],saved=[];

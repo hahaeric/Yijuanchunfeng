@@ -3,7 +3,7 @@ import { View, Text, TextInput, Pressable, ScrollView, Share, AppState, Platform
 import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ReadingStatistics from './ReadingStatistics';
-const { createSupabaseAccount, mergeReading, acknowledge } = require('./supabase-account');
+const { createSupabaseAccount, mergeReading, adoptGuestReading, acknowledge } = require('./supabase-account');
 const SESSION_KEY = 'yijuan-supabase-session-v1';
 async function saveSession(value) {
   if (Platform.OS === 'web') return;
@@ -90,10 +90,12 @@ export default function AccountPanel({ snapshot, applySnapshot, onActiveChange, 
   async function login(register) {
     if (busy) return; setBusy(true);
     try {
+      const guestSnapshot = latest.current;
       const auth = await client.authenticate(username, password, register);
       const cloud = await client.getBackup();
       const cached = JSON.parse(await AsyncStorage.getItem(client.cacheKey(auth)) || 'null');
-      const restored = cached ? mergeReading(cloud.snapshot, cached.snapshot, cached.base) : emptyAccount(cloud.snapshot);
+      const account = cached ? mergeReading(cloud.snapshot, cached.snapshot, cached.base) : emptyAccount(cloud.snapshot);
+      const restored = adoptGuestReading(account, guestSnapshot);
       await persistCache(restored, cloud.snapshot, auth); await saveSession(auth);
       activate(auth, restored, cloud.snapshot); setPassword(''); setStatus('已登录，正在同步');
     } catch (error) { setStatus(error.message); } finally { setBusy(false); }
@@ -135,7 +137,7 @@ export default function AccountPanel({ snapshot, applySnapshot, onActiveChange, 
   const input = (value, set, placeholder, secure=false) => <TextInput value={value} onChangeText={set} placeholder={placeholder} secureTextEntry={secure} autoCapitalize="none" autoCorrect={false} style={{padding:12,borderWidth:1,borderColor:'#ddd',borderRadius:8,marginVertical:4}}/>;
   return <ScrollView contentContainerStyle={{padding:20,paddingBottom:50}} keyboardShouldPersistTaps="handled">
     <Text style={{fontSize:24,marginBottom:12}}>账户与阅读统计</Text><Text accessibilityLiveRegion="polite">{status}</Text>
-    {!session ? <View>{input(username,setUsername,'用户名（字母、数字、下划线）')}{input(password,setPassword,'密码（至少8位）',true)}{button('登录',()=>login(false))}{button('注册并登录',()=>login(true))}<Text>登录后自动恢复阅读进度和统计。笔记、收藏和设置仅保存在本机；游客数据不会自动归入其他账号。手机端会安全保存登录状态；网页刷新后需重新登录。</Text></View> : <View><Text>当前账户：{session.username}</Text>{button('立即同步',sync)}{button('同步并退出',logout)}{status.includes('请重新登录') ? button('重新登录（保留待同步数据）',resetExpiredSession) : null}</View>}
+    {!session ? <View>{input(username,setUsername,'用户名（字母、数字、下划线）')}{input(password,setPassword,'密码（至少8位）',true)}{button('登录',()=>login(false))}{button('注册并登录',()=>login(true))}<Text>登录后自动恢复阅读进度和统计，并把本机游客阅读进度合并进账号后同步。笔记、收藏和设置仍仅保存在本机。手机端会安全保存登录状态；网页刷新后需重新登录。</Text></View> : <View><Text>当前账户：{session.username}</Text>{button('立即同步',sync)}{button('同步并退出',logout)}{status.includes('请重新登录') ? button('重新登录（保留待同步数据）',resetExpiredSession) : null}</View>}
     <ReadingStatistics snapshot={snapshot} session={session} client={client} books={books} bookByLesson={bookByLesson} />
     {session?.admin ? <View><Text style={{fontSize:20,marginTop:24}}>所有账户每日统计</Text>{input(filter,setFilter,'筛选账户')}{input(from,setFrom,'开始日期 YYYY-MM-DD')}{input(to,setTo,'结束日期 YYYY-MM-DD')}{button('查询统计',()=>loadAdmin())}{button('导出筛选结果 CSV',()=>loadAdmin(true))}{(adminRows || []).map(row=><Text key={row.username+row.date}>{row.username}　{row.date}　{row.count} 条</Text>)}</View> : null}
   </ScrollView>;
