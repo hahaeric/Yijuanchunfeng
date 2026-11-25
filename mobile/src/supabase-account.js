@@ -98,7 +98,7 @@ function createSupabaseAccount({ url, key, fetchImpl = fetch, onSession = async 
       return decodeBackup(await rpc('reading_save_backup', {p_revision:revision,p_progress:encodeProgress(snapshot),p_days:encodeDays(snapshot.history,base.history)}));
     },
     async adminStatistics({from='',to='',username='',offset=0}={}) { return rpc('reading_admin_stats',{p_from:from || null,p_to:to || null,p_username:username,p_offset:offset,p_limit:500}); },
-    async logout() { if (session) { if (session.expires_at*1000 <= Date.now()) await refresh(); await raw('/auth/v1/logout',{},session.access_token); } session=null; },
+    async logout() { if (session) { if (session.expires_at*1000 <= Date.now()) await refresh(); await raw('/auth/v1/logout?scope=local',{},session.access_token); } session=null; },
     clear() { session=null; }
   };
 }

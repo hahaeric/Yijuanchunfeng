@@ -97,7 +97,7 @@ test('真实 PostgreSQL 执行迁移：账户隔离、CAS、历史去重、权�
 });
 
 test('Supabase 退出成功的204空响应不会误报失败',async()=>{
- const client=createSupabaseAccount({url,key:'public',fetchImpl:async path=>path.endsWith('/logout')?{ok:true,status:204,json:async()=>{throw new Error('empty response');}}:response(authData())});
+ const client=createSupabaseAccount({url,key:'public',fetchImpl:async path=>path.endsWith('/logout?scope=local')?{ok:true,status:204,json:async()=>{throw new Error('empty response');}}:response(authData())});
  await client.authenticate('reader','password123',false);await client.logout();
  await assert.rejects(()=>client.getBackup(),/请重新登录/);
 });
