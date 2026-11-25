@@ -106,3 +106,11 @@ test("EAS upload excludes source downloads, old bundles, credentials and reposit
   assert.ok(!ignore.split(/\r?\n/u).includes("mobile/assets/"));
   assert.ok(!ignore.split(/\r?\n/u).includes("mobile/src/"));
 });
+
+test("published account APK upgrades version 3 and does not prompt the same version again", () => {
+  const offer = updateClient.getAndroidUpdateOffer(androidUpdateFeed, 3);
+  assert.equal(offer?.version, "0.1.2");
+  assert.equal(offer?.versionCode, 4);
+  assert.match(offer.releaseNotes, /账号登录/u);
+  assert.equal(updateClient.getAndroidUpdateOffer(androidUpdateFeed, 4), null);
+});

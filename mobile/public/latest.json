@@ -1,22 +1,22 @@
 {
   "platform": "android",
-  "version": "0.1.1",
-  "androidVersionCode": 3,
+  "version": "0.1.2",
+  "androidVersionCode": 4,
   "apkParts": [
-    "https://yijuanchunfeng-updates--update-feed.expo.app/releases/v0.1.1-3-1794899887562/part-000.bin",
-    "https://yijuanchunfeng-updates--update-feed.expo.app/releases/v0.1.1-3-1794899887562/part-001.bin",
-    "https://yijuanchunfeng-updates--update-feed.expo.app/releases/v0.1.1-3-1794899887562/part-002.bin",
-    "https://yijuanchunfeng-updates--update-feed.expo.app/releases/v0.1.1-3-1794899887562/part-003.bin",
-    "https://yijuanchunfeng-updates--update-feed.expo.app/releases/v0.1.1-3-1794899887562/part-004.bin"
+    "https://yijuanchunfeng-updates--update-feed.expo.app/releases/v0.1.2-4-1795575389744/part-000.bin",
+    "https://yijuanchunfeng-updates--update-feed.expo.app/releases/v0.1.2-4-1795575389744/part-001.bin",
+    "https://yijuanchunfeng-updates--update-feed.expo.app/releases/v0.1.2-4-1795575389744/part-002.bin",
+    "https://yijuanchunfeng-updates--update-feed.expo.app/releases/v0.1.2-4-1795575389744/part-003.bin",
+    "https://yijuanchunfeng-updates--update-feed.expo.app/releases/v0.1.2-4-1795575389744/part-004.bin"
   ],
   "apkPartSizes": [
     20971520,
     20971520,
     20971520,
     20971520,
-    13310352
+    14404492
   ],
-  "apkSizeBytes": 97196432,
-  "apkMd5": "74a8cf78992939cf6adb5b068040345c",
-  "releaseNotes": "新增应用内统一更新；《学而篇》文字和标点按邓启铜版核校，拼音使用程序自动注音。"
+  "apkSizeBytes": 98290572,
+  "apkMd5": "44a35d1883db5ffdcf69dbad0a558e42",
+  "releaseNotes": "新增账号登录与阅读进度自动同步；支持每日阅读统计及周、月、年趋势；云端阅读记录去重，笔记与收藏保留本机。"
 }
