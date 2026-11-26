@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 const { dateKey, moveReadingPeriod, readingBreakdown, readingPeriod } = require('./account-model');
+const { currentRoundReads, getRound } = require('./reading-rounds');
 const modes = [['day', '日'], ['month', '月'], ['year', '年']];
 const colors = ['#36715D', '#AC633E', '#52759B', '#85668D', '#A78135', '#557D83', '#9D6172', '#61688F', '#627E44'];
 
@@ -51,6 +52,11 @@ export default function ReadingStatistics({ snapshot, session, client, books, bo
   const shownTotal = selected?.count ?? total;
   const shownBooks = listed.filter(book => breakdown.has(book.id))
     .sort((a, b) => breakdown.get(b.id) - breakdown.get(a.id));
+  const readCounts = new Map();
+  for (const id of currentRoundReads(snapshot.positions, snapshot.readLessonIds || [], bookByLesson)) {
+    const bookId = bookByLesson.get(id);
+    readCounts.set(bookId, (readCounts.get(bookId) || 0) + 1);
+  }
   const changePeriod = next => { select(null); setAnchor(next); };
 
   return <View style={styles.card}>
@@ -109,6 +115,21 @@ export default function ReadingStatistics({ snapshot, session, client, books, bo
       </View>;
     })}
     <Text style={styles.note}>当天同一章句只计一次</Text>
+    <Text style={styles.subtitle}>各书当前进度</Text>
+    {series.filter(book => book.id !== null).map(book => {
+      const round = getRound(snapshot.positions, book.id);
+      const count = readCounts.get(book.id) || 0;
+      const percent = book.lessonCount ? Math.round(count / book.lessonCount * 100) : 0;
+      return <View key={book.id}>
+        <View style={styles.bookRow}>
+          <Text style={styles.bookName}>{book.title}</Text>
+          <Text style={styles.muted}>{round === 1 && !count ? '未开始' : '第 ' + round + ' 遍 · ' + percent + '%'}</Text>
+        </View>
+        <View style={styles.bookProgressTrack}>
+          <View style={{ height: '100%', width: percent + '%', backgroundColor: book.color }} />
+        </View>
+      </View>;
+    })}
   </View>;
 }
 
@@ -130,6 +151,7 @@ const styles = StyleSheet.create({
   track: { height: 114, width: '100%', maxWidth: 24, paddingHorizontal: 0.7, justifyContent: 'flex-end', borderBottomWidth: 1, borderBottomColor: '#BFC9BE' },
   dimmed: { opacity: 0.35 },
   tick: { color: '#53675C', position: 'absolute', top: 119, fontSize: 9, width: 28, textAlign: 'center' },
+  bookProgressTrack: { height: 5, backgroundColor: '#E2E8DF', borderRadius: 3, overflow: 'hidden', marginTop: 4 },
   bookRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   swatch: { width: 9, height: 9, borderRadius: 3 },
   bookName: { flex: 1, color: '#263F33' },

@@ -1,3 +1,5 @@
+const { mergeRoundPositions } = require('./reading-rounds');
+
 function dateKey(value = new Date()) {
   return new Date(new Date(value).getTime() + 8 * 3600000).toISOString().slice(0, 10);
 }
@@ -21,6 +23,9 @@ function mergeSnapshots(remote = {}, local = {}, base = {}) {
       const removed = new Set((base[key] || []).filter(id => !(local[key] || []).includes(id)));
       result[key] = [...new Set([...(remote[key] || []).filter(id => !removed.has(id)), ...(local[key] || []).filter(id => !(base[key] || []).includes(id))])];
     } else result[key] = local[key];
+  }
+  if (remote.positions || local.positions) {
+    mergeRoundPositions(result, remote, local);
   }
   result.history = { ...(remote.history || {}) };
   for (const [day, ids] of Object.entries(local.history || {})) result.history[day] = [...new Set([...(result.history[day] || []), ...ids])];

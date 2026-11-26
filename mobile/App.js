@@ -1,6 +1,7 @@
 import AccountPanel from "./src/AccountPanel";
 import HexagramIcon from "./src/HexagramIcon";
 const { dateKey: beijingDateKey, recordRead } = require("./src/account-model");
+const { getRound, restartBook, recordRoundRead, currentRoundReads } = require("./src/reading-rounds");
 const { isHexagramChapter } = require("./src/hexagrams");
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -36,6 +37,7 @@ const {
   projectPinyinCorrectionCount,
   getBookPosition,
   getBookProgress,
+  getBookStartIndex,
   getChapterOutline,
   getChapterProgress,
   getFirstUnreadLessonId,
@@ -412,6 +414,9 @@ export default function App() {
   const currentLesson = demoLessons[currentIndex];
   const transition = getTransition(currentIndex);
   const nextLesson = transition.nextLesson;
+  const [roundPrompt, setRoundPrompt] = useState(false);
+  const roundReads = useMemo(() => currentRoundReads(positions, readLessonIds, bookByLesson), [positions, readLessonIds]);
+  const readingRound = getRound(positions, currentLesson.bookId);
   const todayCount = Math.max(dailyCounts[localDateKey()] || 0, todayKey.current === localDateKey() ? todayReadIds.length : 0);
   const readingFontSize = normalizeReadingFontSize(settings.fontSize);
   const readingFontStyle = normalizeReadingFontStyle(settings.fontStyle);
@@ -779,6 +784,10 @@ export default function App() {
     if (todayKey.current !== day) { todayKey.current = day; setTodayReadIds([currentLesson.id]); }
     else
     setTodayReadIds((previous) => previous.includes(currentLesson.id) ? previous : [...previous, currentLesson.id]);
+    if (readingRound > 1) {
+      setPositions(previous => recordRoundRead(previous, currentLesson.bookId, currentLesson.id));
+      return;
+    }
     setReadLessonIds((previous) => previous.includes(currentLesson.id) ? previous : [...previous, currentLesson.id]);
   }
 
@@ -786,9 +795,18 @@ export default function App() {
     if (toastTimer.current) clearTimeout(toastTimer.current);
     setToast("");
     markCurrentRead();
+    if (!nextLesson || nextLesson.bookId !== currentLesson.bookId) {
+      setPositions(previous => savePosition(previous, currentLesson.bookId, currentLesson.id));
+      setRoundPrompt(true);
+      return;
+    }
+    advanceReading();
+  }
+
+  function advanceReading() {
+    setRoundPrompt(false);
     if (!nextLesson) {
-      setPositions((previous) => savePosition(previous, currentLesson.bookId, currentLesson.id));
-      notify("已读完当前收录的全部经典。");
+      setScreen("library");
       return;
     }
     const nextIndex = transition.nextIndex;
@@ -798,6 +816,17 @@ export default function App() {
     );
     pendingReaderScroll.current = true;
     setCurrentIndex(nextIndex);
+    setNoteOpen(false);
+    setNoteDraft("");
+  }
+
+  function startNextRound() {
+    const bookId = currentLesson.bookId;
+    const firstIndex = getBookStartIndex(bookId);
+    setPositions(previous => restartBook(previous, bookId, demoLessons[firstIndex].id));
+    setRoundPrompt(false);
+    pendingReaderScroll.current = true;
+    setCurrentIndex(firstIndex);
     setNoteOpen(false);
     setNoteDraft("");
   }
@@ -887,7 +916,7 @@ export default function App() {
   }
 
   function renderToday() {
-    const bookProgress = getBookProgress(readLessonIds, currentLesson.bookId);
+    const bookProgress = getBookProgress(roundReads, currentLesson.bookId);
     const bookPosition = getBookPosition(currentLesson.id);
     const book = demoBooks.find((item) => item.id === currentLesson.bookId);
     const location = [currentLesson.chapter, currentLesson.section, currentLesson.unitLabel]
@@ -986,7 +1015,7 @@ export default function App() {
             <Text style={styles.pathPercent}>{bookProgress}%</Text>
           </View>
           <View style={styles.progressTrack}><View style={[styles.progressFill, { width: bookProgress + "%" }]} /></View>
-          <Text style={styles.pathBookSubtitle}>已读进度 {bookProgress}% · 随时可以继续</Text>
+          <Text style={styles.pathBookSubtitle}>第 {readingRound} 遍 · 已读 {bookProgress}%</Text>
         </View>
       </ScrollView>
       <View style={styles.navigationDock}>
@@ -1002,14 +1031,12 @@ export default function App() {
         </Pressable>
         <Pressable
           onPress={continueReading}
-          disabled={!nextLesson}
           accessibilityRole="button"
           accessibilityLabel="下一句"
-          accessibilityState={{ disabled: !nextLesson }}
-          style={({ pressed }) => [styles.nextButton, !nextLesson && styles.navigationButtonDisabled, pressed && nextLesson && styles.pressed]}
+          style={({ pressed }) => [styles.nextButton, pressed && styles.pressed]}
         >
-          <Text style={styles.nextButtonText}>{nextLesson ? "下一句" : "已读完"}</Text>
-          <Text style={styles.nextButtonArrow}>{nextLesson ? "→" : "✓"}</Text>
+          <Text style={styles.nextButtonText}>下一句</Text>
+          <Text style={styles.nextButtonArrow}>→</Text>
         </Pressable>
       </View>
       </View>
@@ -1036,7 +1063,7 @@ export default function App() {
               <View style={styles.catalogHeading}><Text style={styles.catalogTitle}>{group}</Text><Text style={styles.catalogCount}>{books.length} 部</Text></View>
               <View style={styles.bookGrid}>
                 {books.map((book) => {
-                  const progress = getBookProgress(readLessonIds, book.id);
+                  const progress = getBookProgress(roundReads, book.id);
                   const selected = currentLesson.bookId === book.id;
                   const savedId = positions[book.id];
                   const savedLesson = demoLessons.find((lesson) => lesson.id === savedId);
@@ -1139,7 +1166,7 @@ export default function App() {
         {outline.map((chapter) => {
           const key = chapter.chapter;
           const open = openChapterKey === key;
-          const progress = getChapterProgress(chapter.lessons, readLessonIds);
+          const progress = getChapterProgress(chapter.lessons, roundReads);
           return (
             <View key={key} style={styles.chapterCard}>
               <Pressable onPress={() => setOpenChapterKey(open ? null : key)} style={({ pressed }) => [styles.chapterHeader, pressed && styles.pressed]}>
@@ -1151,11 +1178,11 @@ export default function App() {
               </Pressable>
               {open ? (
                 <View style={styles.chapterBody}>
-                  <Pressable onPress={() => openLesson(getFirstUnreadLessonId(chapter.lessons, readLessonIds))} style={({ pressed }) => [styles.chapterJump, pressed && styles.pressed]}>
+                  <Pressable onPress={() => openLesson(getFirstUnreadLessonId(chapter.lessons, roundReads))} style={({ pressed }) => [styles.chapterJump, pressed && styles.pressed]}>
                     <Text style={styles.chapterJumpText}>从未读处继续阅读　→</Text>
                   </Pressable>
                   {chapter.lessons.map((lesson) => {
-                    const read = readLessonIds.includes(lesson.id);
+                    const read = roundReads.includes(lesson.id);
                     const preview = getLessonText(lesson, settings.script).replace(/\s+/g, " ").trim();
                     return (
                       <Pressable key={lesson.id} onPress={() => openLesson(lesson.id)} style={({ pressed }) => [styles.lessonRow, pressed && styles.pressed]}>
@@ -1291,6 +1318,23 @@ export default function App() {
         </View>
 
         {toast ? <View pointerEvents="none" style={styles.toast}><Text style={styles.toastText}>{toast}</Text></View> : null}
+
+        <Modal visible={roundPrompt} transparent animationType="fade" onRequestClose={() => setRoundPrompt(false)}>
+          <View style={styles.updateModalRoot}>
+            <View style={styles.roundPromptCard}>
+              <Text style={styles.pathBookTitle}>《{currentLesson.book}》读到末句了</Text>
+              <Pressable accessibilityRole="button" style={styles.pauseButton} onPress={startNextRound}>
+                <Text style={styles.pauseButtonText}>从头读第 {readingRound + 1} 遍</Text>
+              </Pressable>
+              <Pressable accessibilityRole="button" style={styles.pauseButton} onPress={advanceReading}>
+                <Text style={styles.pauseButtonText}>{nextLesson ? "继续读《" + nextLesson.book + "》" : "返回目录"}</Text>
+              </Pressable>
+              <Pressable accessibilityRole="button" style={styles.pauseButton} onPress={() => setRoundPrompt(false)}>
+                <Text style={styles.pauseButtonText}>取消</Text>
+              </Pressable>
+            </View>
+          </View>
+        </Modal>
 
         <Modal visible={settingsOpen} transparent animationType="slide" onRequestClose={() => setSettingsOpen(false)}>
           <View style={styles.modalRoot}>
@@ -1726,6 +1770,7 @@ const styles = StyleSheet.create({
   modalRoot: { flex: 1, justifyContent: "flex-end" },
   modalScrim: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(35,46,37,0.31)" },
   settingsSheet: { paddingHorizontal: 20, paddingTop: 9, paddingBottom: Platform.OS === "ios" ? 31 : 22, borderTopLeftRadius: 22, borderTopRightRadius: 22, borderWidth: 1, borderColor: "#E6E3D9", backgroundColor: COLORS.paper },
+  roundPromptCard: { backgroundColor: "#F7F8F2", padding: 20, borderRadius: 16, gap: 12, elevation: 8 },
   updateModalRoot: { flex: 1, justifyContent: "center", paddingHorizontal: 24 },
   updateSheet: { paddingHorizontal: 21, paddingTop: 23, paddingBottom: 18, borderWidth: 1, borderColor: "#E6E3D9", borderRadius: 18, backgroundColor: COLORS.paper },
   updateTitle: { color: "#35493B", fontFamily: "serif", fontSize: 19, fontWeight: "600", textAlign: "center" },

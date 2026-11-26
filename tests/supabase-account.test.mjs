@@ -159,7 +159,10 @@ test('真实 PostgreSQL 执行迁移：账户隔离、CAS、历史去重、权�
   let result=await rpc(0,{currentLessonId:ids[0]}, {'2020-01-01':[0,1,1]});
   assert.equal(result.revision,1);assert.equal(result.snapshot.dailyCounts['2020-01-01'],2);assert.equal(result.snapshot.history['2020-01-01'],undefined);
   await assert.rejects(()=>rpc(0,{},{}),/Revision conflict/);
-  result=await rpc(1,{currentLessonId:ids[1]},{'2020-01-01':[1,2]});assert.equal(result.snapshot.dailyCounts['2020-01-01'],3);
+  const positions = { daxue: ids[1], '@round:daxue': { number: 2, indices: [0] } };
+  result=await rpc(1,{currentLessonId:ids[1],positions},{'2020-01-01':[1,2]});
+  assert.equal(result.snapshot.dailyCounts['2020-01-01'],3);
+  assert.deepEqual(result.snapshot.positions, positions);
   await assert.rejects(()=>rpc(2,{notes:{secret:1}},{}),/Only reading progress/);
   await assert.rejects(()=>rpc(2,{}, {'2020-01-02':[0],'2020-01-03':[-1]}),/Invalid reading ID/);
   assert.equal((await db.query('select public.reading_get_backup() as value')).rows[0].value.revision,2);
