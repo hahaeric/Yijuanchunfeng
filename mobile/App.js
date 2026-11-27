@@ -410,6 +410,7 @@ export default function App() {
   const [openChapterKey, setOpenChapterKey] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchReturnScreen, setSearchReturnScreen] = useState("library");
+  const pinyinInputRef = useRef(null);
   const toastTimer = useRef(null);
   const scrollRef = useRef(null);
   const readerCardOffset = useRef(0);
@@ -1527,7 +1528,7 @@ export default function App() {
           </View>
         </Modal>
 
-        <Modal visible={Boolean(pinyinEditorTarget)} transparent animationType="slide" onRequestClose={closePinyinEditor}>
+        <Modal visible={Boolean(pinyinEditorTarget)} transparent animationType="slide" onShow={() => pinyinInputRef.current?.focus()} onRequestClose={closePinyinEditor}>
           <View style={styles.modalRoot}>
             <Pressable style={styles.modalScrim} onPress={closePinyinEditor} />
             <View style={styles.pinyinEditorSheet}>
@@ -1543,6 +1544,8 @@ export default function App() {
                 {pinyinEditorTarget?.displayedCharacter}　当前：{pinyinEditorTarget?.currentPinyin}　默认：{pinyinEditorTarget?.originalPinyin}
               </Text>
               <TextInput
+                ref={pinyinInputRef}
+                selectTextOnFocus
                 value={pinyinEditorDraft}
                 onChangeText={(value) => {
                   const parsed = splitPinyinTone(value);
