@@ -1,3 +1,4 @@
+const { pendingTextCorrections, mergeTextState } = require('./text-corrections');
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, TextInput, Pressable, ScrollView, Share, AppState, Platform, Switch } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
@@ -22,6 +23,7 @@ export default function AccountPanel({ snapshot, applySnapshot, onActiveChange, 
   const [status, setStatus] = useState('未登录'), [busy, setBusy] = useState(true);
   const [adminRows, setAdminRows] = useState(null), [filter, setFilter] = useState(''), [from, setFrom] = useState(''), [to, setTo] = useState('');
   const latest = useRef(snapshot), baseline = useRef({}), pinyinBaseline = useRef({}), locked = useRef(false), pinyinLocked = useRef(false), active = useRef(null), guest = useRef(null), generation = useRef(0);
+  const textBaseline = useRef({}), textLocked = useRef(false);
   const cacheQueue = useRef(Promise.resolve()), clientRef = useRef(null);
   latest.current = snapshot;
   if (!clientRef.current) clientRef.current = createSupabaseAccount({
@@ -37,6 +39,7 @@ export default function AccountPanel({ snapshot, applySnapshot, onActiveChange, 
     return cacheQueue.current;
   }
   function activate(auth, restored, base) {
+    restored = { ...restored, textCorrections: mergeTextState(restored.textCorrections, latest.current.textCorrections) };
     guest.current = latest.current; baseline.current = base; generation.current++;
     active.current = auth; latest.current = restored;
     onActiveChange(true); applySnapshot(restored); setSession(auth);
@@ -62,6 +65,25 @@ export default function AccountPanel({ snapshot, applySnapshot, onActiveChange, 
   }, []);
   function emptyAccount(cloud = {}) {
     return { currentIndex:0, favorites:[], notes:{}, positions:{}, readLessonIds:[], pinyinCorrections:{}, settings:latest.current.settings, history:{}, dailyCounts:{}, ...cloud };
+  }
+  async function syncText() {
+    if (textLocked.current) return false;
+    textLocked.current = true;
+    try {
+      const sent = latest.current.textCorrections || {};
+      const changes = pendingTextCorrections(sent, textBaseline.current);
+      let remote;
+      if (!changes.length) remote = await client.getTextCorrections();
+      else for (let i = 0; i < changes.length; i += 50) remote = await client.applyTextCorrections(changes.slice(i, i + 50));
+      const nextMap = acknowledgePinyin(remote, latest.current.textCorrections || {}, sent);
+      textBaseline.current = remote;
+      if (JSON.stringify(nextMap) !== JSON.stringify(latest.current.textCorrections || {})) {
+        const next = { ...latest.current, textCorrections: nextMap };
+        latest.current = next; applySnapshot(next); await persistCache(next, baseline.current);
+      }
+      return true;
+    } catch (error) { setStatus('原文待同步 · ' + error.message); return false; }
+    finally { textLocked.current = false; }
   }
   async function syncPinyin() {
     if (pinyinLocked.current) return false;
@@ -114,10 +136,11 @@ export default function AccountPanel({ snapshot, applySnapshot, onActiveChange, 
   async function sync() {
     const readingOk = active.current ? await syncReading() : true;
     const pinyinOk = await syncPinyin();
-    if (pinyinOk && (!active.current || readingOk)) {
-      setStatus((active.current ? '已同步 · ' : '拼音已同步 · ') + new Date().toLocaleString('zh-CN', {timeZone:'Asia/Shanghai'}));
+    const textOk = await syncText();
+    if (textOk && pinyinOk && (!active.current || readingOk)) {
+      setStatus((active.current ? '已同步 · ' : '原文和拼音已同步 · ') + new Date().toLocaleString('zh-CN', {timeZone:'Asia/Shanghai'}));
     }
-    return readingOk && pinyinOk;
+    return readingOk && pinyinOk && textOk;
   }
   useEffect(() => {
     if (!session) return;
@@ -130,21 +153,18 @@ export default function AccountPanel({ snapshot, applySnapshot, onActiveChange, 
     positions: snapshot.positions,
     readLessonIds: snapshot.readLessonIds,
     history: snapshot.history,
+    textCorrections: snapshot.textCorrections,
     pinyinCorrections: snapshot.pinyinCorrections
   }), session]);
   useEffect(() => {
     if (!initialized) return;
-    const timer = setTimeout(() => { syncPinyin().then((ok) => {
-      if (ok && !active.current) setStatus('拼音已同步 · ' + new Date().toLocaleString('zh-CN', {timeZone:'Asia/Shanghai'}));
-    }); }, 1000);
+    const timer = setTimeout(() => sync(), 1000);
     return () => clearTimeout(timer);
-  }, [JSON.stringify(snapshot.pinyinCorrections), initialized]);
+  }, [JSON.stringify(snapshot.pinyinCorrections), JSON.stringify(snapshot.textCorrections), initialized]);
   useEffect(() => {
     if (!initialized) return;
-    const timer = setInterval(() => { if (session) syncReading(); syncPinyin(); }, 5 * 60000);
-    const subscription = AppState.addEventListener('change', state => {
-      if (state === 'active') { if (session) syncReading(); syncPinyin(); }
-    });
+    const timer = setInterval(() => sync(), 5 * 60000);
+    const subscription = AppState.addEventListener('change', state => { if (state === 'active') sync(); });
     return () => { clearInterval(timer); subscription.remove(); };
   }, [session, initialized]);
   async function login(register) {
@@ -204,7 +224,7 @@ export default function AccountPanel({ snapshot, applySnapshot, onActiveChange, 
   const input = (value, set, placeholder, secure=false) => <TextInput value={value} onChangeText={set} placeholder={placeholder} secureTextEntry={secure} autoCapitalize="none" autoCorrect={false} style={{padding:12,borderWidth:1,borderColor:'#ddd',borderRadius:8,marginVertical:4}}/>;
   return <ScrollView contentContainerStyle={{padding:20,paddingBottom:50}} keyboardShouldPersistTaps="handled">
     <Text style={{fontSize:24,marginBottom:12}}>账户与阅读统计</Text><Text accessibilityLiveRegion="polite">{status}</Text>
-    {!session ? <View>{input(username,setUsername,'用户名（字母、数字、下划线）')}{input(password,setPassword,'密码（至少8位）',true)}{Platform.OS !== 'web' ? <View style={{flexDirection:'row',alignItems:'center'}}><Switch accessibilityLabel="记住密码" value={rememberPassword} onValueChange={async value => { if (!value) await clearRememberedLogin(); else setRememberPassword(true); }}/><Text>记住密码（保存在系统安全存储中）</Text></View> : null}{button('登录',()=>login(false))}{button('注册并登录',()=>login(true))}{button('立即同步拼音',sync)}<Text>拼音改正会自动同步到公共校正表，未登录也可上传和下载，后写覆盖先写。登录后额外自动恢复阅读进度和统计，并把本机游客阅读进度合并进账号后同步。笔记、收藏和设置仍仅保存在本机。手机端会安全保存登录状态；网页刷新后需重新登录。</Text></View> : <View><Text>当前账户：{session.username}</Text>{button('立即同步',sync)}{button('同步并退出',logout)}{status.includes('请重新登录') ? button('重新登录（保留待同步数据）',resetExpiredSession) : null}</View>}
+    {!session ? <View>{input(username,setUsername,'用户名（字母、数字、下划线）')}{input(password,setPassword,'密码（至少8位）',true)}{Platform.OS !== 'web' ? <View style={{flexDirection:'row',alignItems:'center'}}><Switch accessibilityLabel="记住密码" value={rememberPassword} onValueChange={async value => { if (!value) await clearRememberedLogin(); else setRememberPassword(true); }}/><Text>记住密码（保存在系统安全存储中）</Text></View> : null}{button('登录',()=>login(false))}{button('注册并登录',()=>login(true))}{button('立即同步原文和拼音',sync)}<Text>原文和拼音改正会自动同步到公共校正表，未登录也可上传和下载，后写覆盖先写。登录后额外自动恢复阅读进度和统计，并把本机游客阅读进度合并进账号后同步。笔记、收藏和设置仍仅保存在本机。手机端会安全保存登录状态；网页刷新后需重新登录。</Text></View> : <View><Text>当前账户：{session.username}</Text>{button('立即同步',sync)}{button('同步并退出',logout)}{status.includes('请重新登录') ? button('重新登录（保留待同步数据）',resetExpiredSession) : null}</View>}
     {Platform.OS !== 'web' && rememberPassword ? button('清除保存的密码',clearRememberedLogin) : null}
     <ReadingStatistics snapshot={snapshot} session={session} client={client} books={books} bookByLesson={bookByLesson} />
     {session?.admin ? <View><Text style={{fontSize:20,marginTop:24}}>所有账户每日统计</Text>{input(filter,setFilter,'筛选账户')}{input(from,setFrom,'开始日期 YYYY-MM-DD')}{input(to,setTo,'结束日期 YYYY-MM-DD')}{button('查询统计',()=>loadAdmin())}{button('导出筛选结果 CSV',()=>loadAdmin(true))}{(adminRows || []).map(row=><Text key={row.username+row.date}>{row.username}　{row.date}　{row.count} 条</Text>)}</View> : null}

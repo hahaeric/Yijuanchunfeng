@@ -1,6 +1,6 @@
 const CREDENTIALS_KEY = 'yijuan-remembered-login-v1';
 function guestAfterLogout(guest, current) {
-  return { ...guest, pinyinCorrections: current.pinyinCorrections || {} };
+  return { ...guest, textCorrections: current.textCorrections || {}, pinyinCorrections: current.pinyinCorrections || {} };
 }
 function createRememberedLogin(store, native) {
   return {

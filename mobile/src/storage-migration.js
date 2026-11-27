@@ -51,7 +51,9 @@ function migrateReaderSnapshot(saved, oldLessons, lessons, contentRevision) {
   const maps = new Map();
   for (const correction of Object.values(value.pinyinCorrections || {})) {
     if (!correction || !Number.isInteger(correction.index) || correction.index < 0) continue;
-    const lesson = byId.get(correction.lessonId)?.l;
+    const baseLesson = byId.get(correction.lessonId)?.l;
+    const edit = value.textCorrections?.[correction.lessonId];
+    const lesson = baseLesson && edit ? { ...baseLesson, text: edit.text } : baseLesson;
     if (!lesson) continue;
     const sourceText = correction.sourceText || (!value.contentRevision ? oldById.get(lesson.id)?.text : lesson.text);
     if (!sourceText || [...sourceText][correction.index] !== correction.character) continue;
@@ -67,4 +69,4 @@ function migrateReaderSnapshot(saved, oldLessons, lessons, contentRevision) {
   return { ...value, currentIndex, currentLessonId: lessons[currentIndex]?.id, contentRevision, pinyinCorrections, readLessonIds: [...readLessonIds], zhouyiOrderVersion: 1 };
 }
 
-module.exports = { getStoredValueWithMigration, migrateReaderSnapshot };
+module.exports = { getStoredValueWithMigration, migrateReaderSnapshot, characterIndexMap };

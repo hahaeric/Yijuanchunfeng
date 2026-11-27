@@ -1,3 +1,4 @@
+const { validateText, normalizeTextCorrections, applyTextCorrection, alignedCorrections, rebasePinyinCorrections } = require("./src/text-corrections");
 import AccountPanel from "./src/AccountPanel";
 import HexagramIcon from "./src/HexagramIcon";
 const { dateKey: beijingDateKey, recordRead } = require("./src/account-model");
@@ -175,7 +176,7 @@ function pinyinCorrectionKey(lessonId, characterIndex) {
   return `${lessonId}:${characterIndex}`;
 }
 
-function normalizeStoredPinyinCorrections(value) {
+function normalizeStoredPinyinCorrections(value, textEdits = {}) {
   if (!value || typeof value !== "object" || Array.isArray(value)) return {};
   const lessonsById = new Map(demoLessons.map((lesson) => [lesson.id, lesson]));
   const normalized = {};
@@ -183,7 +184,7 @@ function normalizeStoredPinyinCorrections(value) {
     if (!correction || typeof correction !== "object") continue;
     const lesson = lessonsById.get(correction.lessonId);
     const characterIndex = correction.index;
-    const character = [...(lesson?.text || "")][characterIndex];
+    const character = [...(correction.sourceText || textEdits[correction.lessonId]?.text || lesson?.text || "")][characterIndex];
     const correctedPinyin = normalizePinyinSyllable(correction.correctedPinyin);
     if (!lesson || !Number.isInteger(characterIndex) || characterIndex < 0 || character !== correction.character || !isValidPinyinSyllable(correctedPinyin)) continue;
     normalized[pinyinCorrectionKey(correction.lessonId, characterIndex)] = {
@@ -384,6 +385,11 @@ export default function App() {
   const [todayReadIds, setTodayReadIds] = useState([]);
   const [settings, setSettings] = useState(defaultSettings);
   const [pinyinCorrections, setPinyinCorrections] = useState({});
+  const [textCorrections, setTextCorrections] = useState({});
+  const [textEditor, setTextEditor] = useState(null);
+  const [textDraft, setTextDraft] = useState('');
+  const [textReview, setTextReview] = useState(false);
+  const [textError, setTextError] = useState('');
   const [pinyinEditorTarget, setPinyinEditorTarget] = useState(null);
   const [pinyinEditorDraft, setPinyinEditorDraft] = useState("");
   const [pinyinEditorTone, setPinyinEditorTone] = useState(0);
@@ -411,7 +417,7 @@ export default function App() {
   const todayKey = useRef(localDateKey());
   const checkingUpdatesRef = useRef(false);
   const startupUpdateCheckDone = useRef(false);
-  const currentLesson = demoLessons[currentIndex];
+  const currentLesson = useMemo(() => applyTextCorrection(demoLessons[currentIndex], textCorrections[demoLessons[currentIndex].id]), [currentIndex, textCorrections]);
   const transition = getTransition(currentIndex);
   const nextLesson = transition.nextLesson;
   const [roundPrompt, setRoundPrompt] = useState(false);
@@ -444,7 +450,8 @@ export default function App() {
         setNotes(saved.notes && typeof saved.notes === "object" ? saved.notes : {});
         setPositions(saved.positions && typeof saved.positions === "object" ? saved.positions : {});
         setReadLessonIds(Array.isArray(saved.readLessonIds) ? saved.readLessonIds : []);
-        setPinyinCorrections(normalizeStoredPinyinCorrections(saved.pinyinCorrections));
+        setTextCorrections(normalizeTextCorrections(saved.textCorrections));
+    setPinyinCorrections(normalizeStoredPinyinCorrections(saved.pinyinCorrections, saved.textCorrections));
         const savedSettings = saved.settings || {};
         setSettings({
           ...defaultSettings,
@@ -511,13 +518,14 @@ export default function App() {
       positions,
       readLessonIds,
       pinyinCorrections,
+      textCorrections,
       settings,
       savedTab,
       todayReadIds,
       dateKey: todayKey.current
     };
     AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(payload)).catch(() => {});
-  }, [storageReady, accountActive, history, dailyCounts, currentIndex, screen, favorites, notes, positions, readLessonIds, pinyinCorrections, settings, savedTab, todayReadIds]);
+  }, [storageReady, accountActive, history, dailyCounts, currentIndex, screen, favorites, notes, positions, readLessonIds, pinyinCorrections, textCorrections, settings, savedTab, todayReadIds]);
 
   function notify(message) {
     setToast(message);
@@ -673,14 +681,31 @@ export default function App() {
     }
   }
 
+  function openTextEditor() {
+    setTextEditor({ lessonId: currentLesson.id, before: currentLesson.text, citation: currentLesson.citation });
+    setTextDraft(currentLesson.text); setTextReview(false); setTextError('');
+  }
+  function saveTextEdit() {
+    try {
+      const text = validateText(textDraft);
+      const latestText = applyTextCorrection(demoLessons.find(l => l.id === textEditor.lessonId), textCorrections[textEditor.lessonId]).text;
+      if (latestText !== textEditor.before) throw new Error('这段原文刚收到公共更新，请关闭后重新编辑。');
+      if (!textReview) { setTextDraft(text); setTextReview(true); return; }
+      setTextCorrections(previous => ({ ...previous, [textEditor.lessonId]: {
+        lessonId: textEditor.lessonId, text, pending: true, updatedAt: new Date().toISOString()
+      } }));
+      setTextEditor(null); notify('原文已保存，将自动公共同步。');
+    } catch (error) { setTextError(error.message); }
+  }
+
   function openPinyinEditor(characterIndex, displayedCharacter, currentPinyin) {
     const originalCharacter = [...currentLesson.text][characterIndex];
-    const key = pinyinCorrectionKey(currentLesson.id, characterIndex);
-    const savedCorrection = pinyinCorrections[key];
+    const savedCorrection = alignedCorrections(currentLesson, pinyinCorrections)[characterIndex];
     const currentReading = savedCorrection?.correctedPinyin || currentPinyin || "";
     const parsedReading = splitPinyinTone(currentReading);
     setPinyinEditorTarget({
       lessonId: currentLesson.id,
+      sourceText: currentLesson.text,
       citation: currentLesson.citation,
       characterIndex,
       character: originalCharacter || displayedCharacter,
@@ -703,6 +728,9 @@ export default function App() {
 
   function savePinyinCorrection() {
     if (!pinyinEditorTarget) return;
+    if (currentLesson.id !== pinyinEditorTarget.lessonId || currentLesson.text !== pinyinEditorTarget.sourceText) {
+      setPinyinEditorError('原文已更新，请关闭后重新选择要修改的拼音。'); return;
+    }
     const correctedPinyin = applyPinyinTone(pinyinEditorDraft, pinyinEditorTone);
     if (!isValidPinyinSyllable(correctedPinyin)) {
       setPinyinEditorError("请输入一个拼音音节，例如 wéi 或 wei2。");
@@ -712,7 +740,7 @@ export default function App() {
     const { lessonId, characterIndex, character, originalPinyin } = pinyinEditorTarget;
     const key = pinyinCorrectionKey(lessonId, characterIndex);
     setPinyinCorrections((previous) => {
-      const next = { ...previous };
+      const next = rebasePinyinCorrections(currentLesson, previous);
       if (correctedPinyin === originalPinyin) {
         delete next[key];
       } else {
@@ -736,10 +764,12 @@ export default function App() {
 
   function resetPinyinCorrection() {
     if (!pinyinEditorTarget?.hasOverride) return;
-    const key = pinyinCorrectionKey(pinyinEditorTarget.lessonId, pinyinEditorTarget.characterIndex);
+    if (currentLesson.id !== pinyinEditorTarget.lessonId || currentLesson.text !== pinyinEditorTarget.sourceText) {
+      setPinyinEditorError('原文已更新，请关闭后重新选择要修改的拼音。'); return;
+    }
     setPinyinCorrections((previous) => {
-      const next = { ...previous };
-      delete next[key];
+      const next = rebasePinyinCorrections(currentLesson, previous);
+      delete next[pinyinCorrectionKey(pinyinEditorTarget.lessonId, pinyinEditorTarget.characterIndex)];
       return next;
     });
     closePinyinEditor();
@@ -903,8 +933,9 @@ export default function App() {
     const size = normalizeReadingFontSize(settings.fontSize);
     const textStyle = [styles.sentenceText, { fontSize: size }, readingFontFamily ? { fontFamily: readingFontFamily } : null];
     const blocks = getLessonBlocks(currentLesson, settings.script);
+    const aligned = alignedCorrections(currentLesson, pinyinCorrections);
     const pinyinUnits = (currentLesson.pinyinUnits || []).map((pinyin, characterIndex) => (
-      pinyinCorrections[pinyinCorrectionKey(currentLesson.id, characterIndex)]?.correctedPinyin || pinyin
+      aligned[characterIndex]?.correctedPinyin || pinyin
     ));
     const onEditPinyin = (characterIndex, character, pinyin) => openPinyinEditor(characterIndex, character, pinyin);
     if (settings.layout === "vertical") {
@@ -955,6 +986,7 @@ export default function App() {
           style={styles.readerCard}
           onLayout={(event) => { readerCardOffset.current = event.nativeEvent.layout.y; }}
         >
+          <Pressable onPress={openTextEditor} accessibilityLabel="修改原文" style={styles.actionChip}><Text style={styles.actionChipLabel}>修改原文</Text></Pressable>
           <View style={styles.readerTop}>
             <View style={styles.bookPill}><Text style={styles.bookPillText}>《{currentLesson.book}》</Text></View>
             {isHexagramChapter(currentLesson.chapter) ? (
@@ -1249,12 +1281,13 @@ export default function App() {
     );
   }
 
-  const accountSnapshot = useMemo(() => ({ currentIndex, currentLessonId: currentLesson.id, contentRevision, zhouyiOrderVersion: 1, favorites, notes, positions, readLessonIds, pinyinCorrections, settings, history, dailyCounts }), [currentIndex, favorites, notes, positions, readLessonIds, pinyinCorrections, settings, history, dailyCounts]);
+  const accountSnapshot = useMemo(() => ({ currentIndex, currentLessonId: currentLesson.id, contentRevision, zhouyiOrderVersion: 1, favorites, notes, positions, readLessonIds, pinyinCorrections, textCorrections, settings, history, dailyCounts }), [currentIndex, favorites, notes, positions, readLessonIds, pinyinCorrections, textCorrections, settings, history, dailyCounts]);
   function applyAccountSnapshot(value) {
     const saved = migrateReaderSnapshot(value, legacyLessons, demoLessons, contentRevision);
     setCurrentIndex(saved.currentIndex); setFavorites(saved.favorites || []); setNotes(saved.notes || {});
     setPositions(saved.positions || {}); setReadLessonIds(saved.readLessonIds || []);
-    setPinyinCorrections(normalizeStoredPinyinCorrections(saved.pinyinCorrections));
+    setTextCorrections(normalizeTextCorrections(saved.textCorrections));
+    setPinyinCorrections(normalizeStoredPinyinCorrections(saved.pinyinCorrections, saved.textCorrections));
     setSettings({ ...defaultSettings, ...saved.settings }); setHistory(saved.history || {}); setDailyCounts(saved.dailyCounts || {});
     todayKey.current = localDateKey(); setTodayReadIds(saved.history?.[todayKey.current] || []);
     setNoteOpen(false); setNoteDraft("");
@@ -1469,6 +1502,27 @@ export default function App() {
                   <Text style={styles.updateNowText}>{applyingUpdate ? "请稍候…" : "立即更新"}</Text>
                 </Pressable>
               </View>
+            </View>
+          </View>
+        </Modal>
+
+        <Modal visible={Boolean(textEditor)} transparent animationType="slide" onRequestClose={() => setTextEditor(null)}>
+          <View style={styles.modalRoot}>
+            <Pressable style={styles.modalScrim} onPress={() => setTextEditor(null)} />
+            <View style={[styles.pinyinEditorSheet, { maxHeight: '88%' }]}>
+              <ScrollView keyboardShouldPersistTaps="handled">
+                <Text style={styles.sheetTitle}>{textReview ? '确认原文修改' : '修改原文'}</Text>
+                <Text style={styles.sheetSubtitle}>{textEditor?.citation}</Text>
+                <Text style={styles.pinyinEditorHint}>可增删汉字、修改标点和换行。保存后公共同步，同一段后保存覆盖先保存。</Text>
+                {textReview ? <View><Text>修改前</Text><Text selectable>{textEditor?.before}</Text><Text>修改后</Text><Text selectable>{textDraft}</Text></View> :
+                  <TextInput accessibilityLabel="原文内容" multiline value={textDraft} onChangeText={setTextDraft} style={[styles.pinyinEditorInput, { minHeight: 160, textAlign: 'left', textAlignVertical: 'top' }]} />}
+                {textError ? <Text style={styles.pinyinEditorError}>{textError}</Text> : null}
+                <View style={styles.pinyinEditorActions}>
+                  <Pressable onPress={() => setTextEditor(null)}><Text>取消</Text></Pressable>
+                  {textReview ? <Pressable onPress={() => setTextReview(false)}><Text>继续修改</Text></Pressable> : <Pressable onPress={() => { setTextDraft(demoLessons.find(l => l.id === textEditor.lessonId).text); setTextError('已填入项目底稿，请对照后保存；恢复也会公共同步。'); }}><Text>恢复项目底稿</Text></Pressable>}
+                  <Pressable onPress={saveTextEdit} style={styles.noteSave}><Text style={styles.noteSaveText}>{textReview ? '确认保存并同步' : '查看修改对照'}</Text></Pressable>
+                </View>
+              </ScrollView>
             </View>
           </View>
         </Modal>

@@ -329,6 +329,7 @@ function getLessonText(lesson, script = "simplified") {
 }
 
 function getLessonSourceNote(lesson) {
+  if (lesson?.publiclyCorrected) return "本段已应用公共原文校正；可在修改原文中恢复项目底稿。拼音含自动注音，可继续校正。";
   if (lesson?.contentKind === 'classic') return '《春秋》经文，沿用原语料及阅读分段；拼音为程序自动注音。';
   if (lesson?.contentKind === 'commentary') return `${lesson.sourceNote} 来源：姚政、邓启铜注释本第${lesson.sourcePdfVolume}册，PDF 第${lesson.sourcePdfPages.join('、')}页；OCR 辅助整理，拼音为程序自动注音。`;
   if (lesson?.editionSource) {

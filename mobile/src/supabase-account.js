@@ -117,6 +117,7 @@ function adoptGuestReading(account = {}, guest) {
     readLessonIds: merged.readLessonIds,
     history: merged.history,
     dailyCounts: merged.dailyCounts,
+    textCorrections: require('./text-corrections').mergeTextState(account.textCorrections, guest.textCorrections),
     pinyinCorrections: mergePinyinMaps(account.pinyinCorrections, guest.pinyinCorrections)
   };
 }
@@ -208,6 +209,14 @@ function createSupabaseAccount({ url, key, fetchImpl = fetch, onSession = async 
     },
     async saveBackup(revision, snapshot, base) {
       return decodeBackup(await rpc('reading_save_backup', {p_revision:revision,p_progress:encodeProgress(snapshot),p_days:encodeDays(snapshot.history,base.history)}));
+    },
+    async getTextCorrections() {
+      const rows = await publicOrAuthRpc('text_get_corrections');
+      return require('./text-corrections').normalizeTextCorrections(rows);
+    },
+    async applyTextCorrections(upserts) {
+      const rows = await publicOrAuthRpc('text_apply_corrections', { p_upserts: upserts });
+      return require('./text-corrections').normalizeTextCorrections(rows);
     },
     async getPinyinCorrections() {
       return decodePinyinList(await publicOrAuthRpc('pinyin_get_corrections'));

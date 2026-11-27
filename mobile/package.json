@@ -13,6 +13,8 @@
     "expo-secure-store": "~57.0.4",
     "expo-status-bar": "~57.0.1",
     "expo-updates": "~57.0.28",
+    "opencc-js": "^1.4.2",
+    "pinyin-pro": "^3.29.5",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-native": "0.86.3",
@@ -29,9 +31,5 @@
     "deploy:update-feed": "expo export --platform web && npx eas-cli@latest deploy --dev-domain yijuanchunfeng-updates --alias update-feed --non-interactive",
     "build:data": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/download-classics-data.ps1 && node scripts/build-classics-data.mjs"
   },
-  "private": true,
-  "devDependencies": {
-    "opencc-js": "^1.4.2",
-    "pinyin-pro": "^3.29.5"
-  }
+  "private": true
 }
