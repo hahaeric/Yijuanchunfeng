@@ -7,6 +7,7 @@ const { isHexagramChapter } = require("./src/hexagrams");
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  KeyboardAvoidingView,
   Modal,
   Platform,
   Pressable,
@@ -1512,7 +1513,7 @@ export default function App() {
         </Modal>
 
         <Modal visible={Boolean(textEditor)} transparent animationType="slide" onRequestClose={() => setTextEditor(null)}>
-          <View style={styles.modalRoot}>
+          <KeyboardAvoidingView style={styles.modalRoot} behavior={Platform.OS === "ios" ? "padding" : "height"}>
             <Pressable style={styles.modalScrim} onPress={() => setTextEditor(null)} />
             <View style={[styles.pinyinEditorSheet, { maxHeight: '88%' }]}>
               <ScrollView keyboardShouldPersistTaps="handled">
@@ -1529,13 +1530,13 @@ export default function App() {
                 </View>
               </ScrollView>
             </View>
-          </View>
+          </KeyboardAvoidingView>
         </Modal>
 
         <Modal visible={Boolean(pinyinEditorTarget)} transparent animationType="slide" onShow={() => pinyinInputRef.current?.focus()} onRequestClose={closePinyinEditor}>
-          <View style={styles.modalRoot}>
+          <KeyboardAvoidingView style={styles.modalRoot} behavior={Platform.OS === "ios" ? "padding" : "height"}>
             <Pressable style={styles.modalScrim} onPress={closePinyinEditor} />
-            <View style={styles.pinyinEditorSheet}>
+            <ScrollView style={styles.keyboardEditorSheet} contentContainerStyle={styles.pinyinEditorSheet} keyboardShouldPersistTaps="handled">
               <View style={styles.sheetHandle} />
               <View style={styles.sheetHeader}>
                 <View>
@@ -1590,8 +1591,8 @@ export default function App() {
                 <Pressable onPress={resetPinyinCorrection} disabled={!pinyinEditorTarget?.hasOverride} style={[styles.noteCancel, !pinyinEditorTarget?.hasOverride && styles.noteActionDisabled]}><Text style={styles.noteCancelText}>恢复默认</Text></Pressable>
                 <Pressable onPress={savePinyinCorrection} style={styles.noteSave}><Text style={styles.noteSaveText}>保存</Text></Pressable>
               </View>
-            </View>
-          </View>
+            </ScrollView>
+          </KeyboardAvoidingView>
         </Modal>
       </SafeAreaView>
     </View>
@@ -1856,6 +1857,7 @@ const styles = StyleSheet.create({
   sheetSubtitle: { marginTop: 4, color: "#9BA197", fontSize: 9 },
   sheetClose: { width: 29, height: 29, borderRadius: 15, borderWidth: 1, borderColor: "#EEECE4", alignItems: "center", justifyContent: "center" },
   sheetCloseText: { color: "#7F897F", fontSize: 19, lineHeight: 22 },
+  keyboardEditorSheet: { flexGrow: 0, maxHeight: "88%" },
   pinyinEditorSheet: { paddingHorizontal: 20, paddingTop: 9, paddingBottom: Platform.OS === "ios" ? 31 : 22, borderTopLeftRadius: 22, borderTopRightRadius: 22, borderWidth: 1, borderColor: "#E6E3D9", backgroundColor: COLORS.paper },
   pinyinEditorContext: { marginBottom: 9, color: "#657367", fontFamily: "serif", fontSize: 13, textAlign: "center" },
   pinyinEditorInput: { minHeight: 48, paddingHorizontal: 12, borderWidth: 1, borderColor: "#DDE3DA", borderRadius: 10, color: COLORS.ink, backgroundColor: "#FFFEFB", fontSize: 18, textAlign: "center" },
