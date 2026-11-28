@@ -239,6 +239,8 @@ function SegmentedChoice({ options, value, onChange, containerStyle, optionStyle
   );
 }
 
+const { getPinyinTouchLayout } = require("./src/pinyin-touch-layout");
+
 function PinyinAnnotatedLine({ text, pinyinUnits, fontSize, textStyle, characterOffset = 0, onEditPinyin }) {
   const characters = [...text];
   if (!Array.isArray(pinyinUnits) || pinyinUnits.length !== characters.length) {
@@ -246,6 +248,7 @@ function PinyinAnnotatedLine({ text, pinyinUnits, fontSize, textStyle, character
   }
   const pinyinSize = Math.max(8, Math.round(fontSize * 0.36));
   const pinyinHeight = Math.max(12, Math.round(fontSize * 0.48));
+  const pinyinTouchLayout = getPinyinTouchLayout(Platform.OS, fontSize, pinyinHeight);
   const openingPunctuation = new Set(["“", "‘", "「", "『", "（", "【", "《", "〈", "〔", "〖", "〘", "〚"]);
   const closingPunctuation = new Set(["，", "。", "；", "：", "？", "！", "、", ",", ".", ";", ":", "?", "!", "”", "’", "」", "』", "）", "】", "》", "〉", "〕", "〗", "〙", "〛", "…"]);
   const groups = [];
@@ -282,14 +285,14 @@ function PinyinAnnotatedLine({ text, pinyinUnits, fontSize, textStyle, character
         const hasPinyin = Boolean(group.character);
         return (
           <View key={`${index}-${group.character || group.text}`} style={styles.rubyCell}>
-            <View style={[styles.rubyPinyinSlot, { height: pinyinHeight }]}>
+            <View style={[styles.rubyPinyinSlot, { height: pinyinTouchLayout.height, minWidth: pinyinTouchLayout.minWidth }]}>
               {hasPinyin ? (
                 <Pressable
                   onPress={() => onEditPinyin?.(group.characterIndex, group.character, group.pinyin)}
                   hitSlop={5}
                   accessibilityRole="button"
                   accessibilityLabel={`修改${group.character}的拼音，当前${group.pinyin}`}
-                  style={styles.pinyinTouchTarget}
+                  style={[styles.pinyinTouchTarget, pinyinTouchLayout]}
                 >
                   <Text style={[styles.rubyPinyin, { fontSize: pinyinSize, lineHeight: pinyinHeight }]}>{group.pinyin}</Text>
                 </Pressable>
@@ -328,8 +331,9 @@ function VerticalReadingBlocks({ lesson, blocks, pinyinUnits, showPinyin, fontSi
   const scrollRef = useRef(null);
   const pinyinSize = Math.max(8, Math.round(fontSize * 0.36));
   const pinyinHeight = Math.max(12, Math.round(fontSize * 0.48));
+  const pinyinTouchLayout = getPinyinTouchLayout(Platform.OS, fontSize, pinyinHeight);
   const characterLineHeight = Math.round(fontSize * 1.4);
-  const columnHeight = characterLineHeight + (showPinyin ? pinyinHeight : 0);
+  const columnHeight = characterLineHeight + (showPinyin ? pinyinTouchLayout.height : 0);
   const rowsPerColumn = Math.max(1, Math.floor(height / columnHeight));
   const columnWidth = Math.max(fontSize + 12, Math.round(pinyinSize * 3.5));
   const columnsByBlock = makeVerticalColumns(blocks, pinyinUnits, rowsPerColumn);
@@ -356,7 +360,7 @@ function VerticalReadingBlocks({ lesson, blocks, pinyinUnits, showPinyin, fontSi
                       hitSlop={5}
                       accessibilityRole="button"
                       accessibilityLabel={`修改${character}的拼音，当前${pinyin}`}
-                      style={styles.pinyinTouchTarget}
+                      style={[styles.pinyinTouchTarget, pinyinTouchLayout]}
                     >
                       <Text style={[styles.verticalPinyin, { height: pinyinHeight, fontSize: pinyinSize, lineHeight: pinyinHeight }]}>{pinyin}</Text>
                     </Pressable>
