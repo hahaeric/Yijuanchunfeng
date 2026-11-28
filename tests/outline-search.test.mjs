@@ -20,10 +20,11 @@ const expectedBooks = [
   ["shangshu", "尚书", 79, 439],
   ["liji", "礼记", 49, 815],
   ["zhouyi", "周易", 69, 991],
-  ["chunqiu", "春秋榖梁传", 12, 1264]
+  ["chunqiu", "春秋榖梁传", 12, 1264],
+  ["laozi", "老子", 81, 81]
 ];
 
-test("九部书都能按阅读顺序展开篇目，且章句不重不漏", () => {
+test("十部书都能按阅读顺序展开篇目，且章句不重不漏", () => {
   for (const [id, title, chapterCount, lessonCount] of expectedBooks) {
     const outline = getChapterOutline(id);
     assert.equal(outline.length, chapterCount, `${title} 篇目数`);

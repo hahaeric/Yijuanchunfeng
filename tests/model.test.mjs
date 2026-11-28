@@ -31,7 +31,8 @@ const expectedBooks = [
   ["shangshu", "尚书", 79, 439],
   ["liji", "礼记", 49, 815],
   ["zhouyi", "周易", 69, 991],
-  ["chunqiu", "春秋榖梁传", 12, 1264]
+  ["chunqiu", "春秋榖梁传", 12, 1264],
+  ["laozi", "老子", 81, 81]
 ];
 
 function assertPhrasePinyin(lesson, phrase, expected, fromIndex = 0) {
@@ -75,12 +76,12 @@ function assertEveryCharacterInPhrasePinyin(phrase, character, expected) {
   assert.ok(occurrences > 0, `语料中应包含 ${phrase}`);
 }
 
-test("九部书按阅读路线收录完整篇章结构和全部导入章句", () => {
+test("十部书按阅读路线收录完整篇章结构和全部导入章句", () => {
   assert.deepEqual(
     demoBooks.map((book) => [book.id, book.title, book.chapterCount, book.lessonCount]),
     expectedBooks
   );
-  assert.equal(demoLessons.length, 6185);
+  assert.equal(demoLessons.length, 6266);
   assert.equal(new Set(demoLessons.map((lesson) => lesson.id)).size, demoLessons.length);
 });
 

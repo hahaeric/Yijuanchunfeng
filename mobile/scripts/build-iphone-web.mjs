@@ -25,7 +25,7 @@ export function compileModel(source, model) {
   // Keep exactly the existing runtime helpers; evaluate edition transforms only at build time.
   const helpers = source.slice(source.indexOf('const lessonsByBook ='))
     .replace('legacyLessons: correctedLessons', 'legacyLessons')
-    .replace('contentRevision: `${suppliedEdition.contentRevision}:${fourBooks.contentRevision}:${guliang.contentRevision}`', 'contentRevision')
+    .replace(/contentRevision: `[^`]+`/, 'contentRevision')
     .replace('projectPinyinCorrectionCount: correctionKeys.size', 'projectPinyinCorrectionCount');
   return `const { demoBooks, demoLessons, legacyLessons, contentRevision, projectPinyinCorrectionCount } = globalThis.__iphoneData;
 const corpus = { books: demoBooks, lessons: demoLessons };

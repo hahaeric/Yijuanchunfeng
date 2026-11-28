@@ -1081,7 +1081,7 @@ export default function App() {
   }
 
   function renderLibrary() {
-    const groups = ["四书", "五经"];
+    const groups = [...new Set(demoBooks.map(book => book.group))];
     return (
       <ScrollView ref={scrollRef} style={styles.scroll} contentContainerStyle={styles.screenContent} showsVerticalScrollIndicator={false}>
         <View style={styles.screenHeading}>
@@ -1090,8 +1090,8 @@ export default function App() {
           <Text style={styles.screenSubtitle}>按书与篇章顺序推进，读到哪里就从哪里继续。</Text>
         </View>
         <View style={styles.routeNotice}>
-          <Text style={styles.routeNoticeTitle}>九部经典全文已收录</Text>
-          <Text style={styles.routeNoticeText}>按大学 → 中庸 → 论语 → 孟子 → 诗经 → 尚书 → 礼记 → 周易 → 春秋排列。下一句先留在当前篇章；篇章或书目切换时会在按钮上说明。</Text>
+          <Text style={styles.routeNoticeTitle}>{demoBooks.length} 部经典全文已收录</Text>
+          <Text style={styles.routeNoticeText}>按{demoBooks.map(book => book.title).join(' → ')}排列。下一句先留在当前篇章；篇章或书目切换时会在按钮上说明。</Text>
         </View>
         {groups.map((group) => {
           const books = demoBooks.filter((book) => book.group === group);
@@ -1261,7 +1261,7 @@ export default function App() {
         <ScrollView ref={scrollRef} style={styles.scroll} contentContainerStyle={styles.screenContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
           {!query ? (
             <View style={styles.searchHint}>
-              <Text style={styles.searchHintTitle}>检索九部经典</Text>
+              <Text style={styles.searchHintTitle}>检索 {demoBooks.length} 部经典</Text>
               <Text style={styles.searchHintText}>按原文、篇名或章节名查找，点击结果可直接跳到该则。</Text>
             </View>
           ) : visibleResults.length === 0 ? (

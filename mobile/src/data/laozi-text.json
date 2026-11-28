@@ -1,0 +1,4241 @@
+{
+  "edition": {
+    "title": "中华传统文化经典注音全本 第2辑 老子·大学·中庸",
+    "annotator": "邓启铜",
+    "sourceSha256": "7d93462fa0f937a081bf193050d31bf4ff3f4b2e1afcdfb33cb3ef471b8596e8",
+    "note": "仅收《老子》正文；小黑底通假字说明、注释序号、页下注释不混入正文。"
+  },
+  "chapters": [
+    {
+      "chapter": "第一章",
+      "page": 15,
+      "rows": [
+        {
+          "text": "道可道，非常道。",
+          "page": 15,
+          "pinyinOcr": "dao ké  dao fei chang dao"
+        },
+        {
+          "text": "名可名，非常名。",
+          "page": 15,
+          "pinyinOcr": "ming ke ming fei   chang ming"
+        },
+        {
+          "text": "无名，天地之始；",
+          "page": 15,
+          "pinyinOcr": "wu ming tian di zhi shi"
+        },
+        {
+          "text": "有名，万物之母。",
+          "page": 15,
+          "pinyinOcr": "you ming nwI4z nM upM"
+        },
+        {
+          "text": "故常无，欲以观其妙；",
+          "page": 15,
+          "pinyinOcr": "gu  chang  wu yuyiguan qi  miao"
+        },
+        {
+          "text": "常有，欲以观其徼。",
+          "page": 15,
+          "pinyinOcr": "chang you yu yi guanqi jido"
+        },
+        {
+          "text": "此两者，同出而异名，同谓",
+          "page": 15,
+          "pinyinOcr": "ci liang   zhe tongchuéryiming tong  wei"
+        },
+        {
+          "text": "之玄。玄之又玄，众妙之门。",
+          "page": 15,
+          "pinyinOcr": "zhi   xuan xuánzhiyou xuán zhong miao zhi men"
+        }
+      ]
+    },
+    {
+      "chapter": "第二章",
+      "page": 16,
+      "rows": [
+        {
+          "text": "天下皆知美之为美，斯恶已。",
+          "page": 16,
+          "pinyinOcr": "tian xia jie zhi mei zhi wéi mei siéyi"
+        },
+        {
+          "text": "皆知善之为善，斯不善已。",
+          "page": 16,
+          "pinyinOcr": "jiezhi shan zhi  wei shan sibu shan yi"
+        },
+        {
+          "text": "故有无相生，难易相成，",
+          "page": 16,
+          "pinyinOcr": "xiang sheng nan   yi  xiang chéng"
+        },
+        {
+          "text": "长短相形，高下相盈，",
+          "page": 16,
+          "pinyinOcr": "chang duan xiang xing gaoxid xiang ying"
+        },
+        {
+          "text": "音声相和，前後相随。恒也。",
+          "page": 16,
+          "pinyinOcr": "yin sheng xiang he qian hou xiang sui heng"
+        },
+        {
+          "text": "是以圣人处无为之事，",
+          "page": 16,
+          "pinyinOcr": "shi yisheng rén chuwuwéi zhi  shi"
+        },
+        {
+          "text": "行不言之教；",
+          "page": 16,
+          "pinyinOcr": "xing bu yan  zhi  jiao"
+        },
+        {
+          "text": "万物作而弗始，生而弗有，",
+          "page": 17,
+          "pinyinOcr": "wanwu zuo ér fu shi shengér fuyou"
+        },
+        {
+          "text": "为而弗恃，功成而弗居。",
+          "page": 17,
+          "pinyinOcr": "wéiérfu shi gong chengérfu ju"
+        },
+        {
+          "text": "夫唯弗居，是以不去。",
+          "page": 17,
+          "pinyinOcr": "fu wéifuju shiyibuqu"
+        }
+      ]
+    },
+    {
+      "chapter": "第三章",
+      "page": 18,
+      "rows": [
+        {
+          "text": "不尚贤，使民不争；",
+          "page": 18,
+          "pinyinOcr": "bu shang xian shi min bu zheng"
+        },
+        {
+          "text": "不贵难得之货，使民不为盗；",
+          "page": 18,
+          "pinyinOcr": "bu gui nán dézhi huo shiminbu wéi dao"
+        },
+        {
+          "text": "不见可欲，使民心不乱。",
+          "page": 18,
+          "pinyinOcr": "bu xian ké  yu shiminxinbuluan"
+        },
+        {
+          "text": "是以圣人之治，虚其心，",
+          "page": 18,
+          "pinyinOcr": "shi z luz u uaus  nx qi xin"
+        },
+        {
+          "text": "实其腹，弱其志，强其骨。",
+          "page": 18,
+          "pinyinOcr": "shi b zbon qiang   qi  gu"
+        },
+        {
+          "text": "常使民无知无欲。",
+          "page": 18,
+          "pinyinOcr": "chang shi  min wu zhi  wu yu"
+        },
+        {
+          "text": "使夫知者不敢为也。",
+          "page": 18,
+          "pinyinOcr": "shifuzhi zhe bu gan  wéi yé"
+        },
+        {
+          "text": "为无为，则无不治。",
+          "page": 18,
+          "pinyinOcr": "wei wuwéi zé wubuzhi"
+        }
+      ]
+    },
+    {
+      "chapter": "第四章",
+      "page": 19,
+      "rows": [
+        {
+          "text": "道冲，而用之或不盈。",
+          "page": 19,
+          "pinyinOcr": "dao chong ér yong  zhi   huo bu ying"
+        },
+        {
+          "text": "渊兮，似万物之宗；",
+          "page": 19,
+          "pinyinOcr": "yuan xi buozIuznmupmIS"
+        },
+        {
+          "text": "挫其锐，解其纷；",
+          "page": 19,
+          "pinyinOcr": "cuo b ji qi fen"
+        },
+        {
+          "text": "和其光，同其尘；",
+          "page": 19,
+          "pinyinOcr": "hé tong qi chén"
+        },
+        {
+          "text": "湛兮，似或存。",
+          "page": 19,
+          "pinyinOcr": "zhan Xi sihuo cun"
+        },
+        {
+          "text": "吾不知谁之子，象帝之先。",
+          "page": 19,
+          "pinyinOcr": "zIuzinusluznqnm upIx Iyz Ip 6up!x"
+        }
+      ]
+    },
+    {
+      "chapter": "第五章",
+      "page": 20,
+      "rows": [
+        {
+          "text": "天地不仁，以万物为刍狗。",
+          "page": 20,
+          "pinyinOcr": "tian dibu rén yi wanwuwéichugou"
+        },
+        {
+          "text": "圣人不仁，以百姓为刍狗。",
+          "page": 20,
+          "pinyinOcr": "sheng rén bu rén yi bai xing  wéi chu gou"
+        },
+        {
+          "text": "天地之间，其犹橐龠乎？",
+          "page": 20,
+          "pinyinOcr": "qiyoutuo yue hu"
+        },
+        {
+          "text": "虚而不屈，动而愈出。",
+          "page": 20,
+          "pinyinOcr": "bngenx dongéryuchu"
+        },
+        {
+          "text": "多言数穷，不如守中。",
+          "page": 20,
+          "pinyinOcr": "duo  yán su qiong buru  shou chong"
+        }
+      ]
+    },
+    {
+      "chapter": "第六章",
+      "page": 21,
+      "rows": [
+        {
+          "text": "谷神不死，是谓玄牝。",
+          "page": 21,
+          "pinyinOcr": "gu  shén  bu si shiwei xuan pin"
+        },
+        {
+          "text": "玄牝之门，是谓天地根。",
+          "page": 21,
+          "pinyinOcr": "xuán pin zhi mén shi  wei tian di gen"
+        },
+        {
+          "text": "绵绵若存，用之不勤。",
+          "page": 21,
+          "pinyinOcr": "mian mian ruocun yong zhibuqin"
+        }
+      ]
+    },
+    {
+      "chapter": "第七章",
+      "page": 22,
+      "rows": [
+        {
+          "text": "天长，地久。",
+          "page": 22,
+          "pinyinOcr": "tian  chang"
+        },
+        {
+          "text": "天地所以能长且久者，",
+          "page": 22,
+          "pinyinOcr": "tian  di  suo  yi  néeng  chang  qie  jiu  zhe"
+        },
+        {
+          "text": "以其不自生，故能长生。",
+          "page": 22,
+          "pinyinOcr": "yiqibuzisheng gu  neng chang sheng"
+        },
+        {
+          "text": "是以圣人後其身而身先；",
+          "page": 22,
+          "pinyinOcr": "shi yi shengrénhou qi shen ér shen xian"
+        },
+        {
+          "text": "外其身而身存。",
+          "page": 22,
+          "pinyinOcr": "wai qishenérshencun"
+        },
+        {
+          "text": "非以其无私邪？",
+          "page": 22,
+          "pinyinOcr": "feiyiqiwusiyé"
+        },
+        {
+          "text": "故能成其私。",
+          "page": 22,
+          "pinyinOcr": "gu  neéng chéng  qi   si"
+        }
+      ]
+    },
+    {
+      "chapter": "第八章",
+      "page": 23,
+      "rows": [
+        {
+          "text": "上善若水。",
+          "page": 23,
+          "pinyinOcr": "shang shan ruo shui"
+        },
+        {
+          "text": "水善利万物而不争，",
+          "page": 23,
+          "pinyinOcr": "shui  shan  li buauznq Jθ nm upm"
+        },
+        {
+          "text": "处众人之所恶，故几于道。",
+          "page": 23,
+          "pinyinOcr": "chu zhongrénzhisuowu gu opp!"
+        },
+        {
+          "text": "居善地，心善渊，",
+          "page": 23,
+          "pinyinOcr": "ju   shan   di xin shan yuan"
+        },
+        {
+          "text": "与善仁，言善信，",
+          "page": 23,
+          "pinyinOcr": "yu  shan rén yan shan xin"
+        },
+        {
+          "text": "政善治，事善能，动善时。",
+          "page": 23,
+          "pinyinOcr": "zheng shan zhi shi shan néng dong shan shi"
+        },
+        {
+          "text": "夫唯不争，故无尤。",
+          "page": 23,
+          "pinyinOcr": "fu wéibu zheng gu wuyou"
+        }
+      ]
+    },
+    {
+      "chapter": "第九章",
+      "page": 24,
+      "rows": [
+        {
+          "text": "持而盈之，不如其已；",
+          "page": 24,
+          "pinyinOcr": "chiér yingzhi"
+        },
+        {
+          "text": "揣而梲之，不可长保。",
+          "page": 24,
+          "pinyinOcr": "zhui   éer   rui zhi bu kécháng báo",
+          "verifiedPinyin": [
+            {
+              "index": 0,
+              "character": "揣",
+              "pinyin": "zhuī"
+            },
+            {
+              "index": 2,
+              "character": "梲",
+              "pinyin": "ruì"
+            }
+          ]
+        },
+        {
+          "text": "金玉满堂，莫之能守；",
+          "page": 24,
+          "pinyinOcr": "jin yu män tang mozhi néng shou"
+        },
+        {
+          "text": "富贵而骄，自遗其咎。",
+          "page": 24,
+          "pinyinOcr": "fu gui érjiao zi yi"
+        },
+        {
+          "text": "功遂身退，天之道也。",
+          "page": 24,
+          "pinyinOcr": "gong  sui shentui tian zhi daoyé"
+        }
+      ]
+    },
+    {
+      "chapter": "第十章",
+      "page": 25,
+      "rows": [
+        {
+          "text": "载营魄抱一，能无离乎？",
+          "page": 25,
+          "pinyinOcr": "zai ying po bao yi néng wu lihu"
+        },
+        {
+          "text": "专气致柔，能如婴儿乎？",
+          "page": 25,
+          "pinyinOcr": "zhuan qi zhi   rou néngruyingérhu"
+        },
+        {
+          "text": "涤除玄鉴，能无疵乎？",
+          "page": 25,
+          "pinyinOcr": "Ip chu xuan jian néngwucihu"
+        },
+        {
+          "text": "爱民治国，能无知乎？",
+          "page": 25,
+          "pinyinOcr": "ai min zhi guo neng wu zhi hu"
+        },
+        {
+          "text": "天门开阖，能为雌乎？",
+          "page": 25,
+          "pinyinOcr": "tian men kaihé neng  wéi ci hu"
+        },
+        {
+          "text": "明白四达，能无为乎？",
+          "page": 25,
+          "pinyinOcr": "ming   bai  sidá neng wu wéi hu"
+        },
+        {
+          "text": "生之畜之，生而不有，",
+          "page": 25,
+          "pinyinOcr": "sheng zhixu zhi shengérbu you"
+        },
+        {
+          "text": "为而不恃，长而不宰，",
+          "page": 25,
+          "pinyinOcr": "wei érbu shi zhangér buzái"
+        },
+        {
+          "text": "是谓玄德。",
+          "page": 25,
+          "pinyinOcr": "shi wei xuandé"
+        }
+      ]
+    },
+    {
+      "chapter": "第十一章",
+      "page": 26,
+      "rows": [
+        {
+          "text": "三十辐，共一毂，",
+          "page": 26,
+          "pinyinOcr": "sanshifu gong  yi  gu"
+        },
+        {
+          "text": "当其无，有车之用。",
+          "page": 26,
+          "pinyinOcr": "dang   qi  wu you juzhiyong"
+        },
+        {
+          "text": "埏埴以为器，当其无，",
+          "page": 26,
+          "pinyinOcr": "shan zhi yi  wéi !b dangqi  wu"
+        },
+        {
+          "text": "有器之用。",
+          "page": 26,
+          "pinyinOcr": "you buouz"
+        },
+        {
+          "text": "凿户牖以为室，当其无，",
+          "page": 26,
+          "pinyinOcr": "zao hu you yi wéi shi dang   qi  wu"
+        },
+        {
+          "text": "有室之用。",
+          "page": 26,
+          "pinyinOcr": "youshi  zhi yong"
+        },
+        {
+          "text": "故有之以为利，无之以为用。",
+          "page": 26,
+          "pinyinOcr": "guyouzhiyi weéili wuzhiyi wéi yong"
+        }
+      ]
+    },
+    {
+      "chapter": "第十二章",
+      "page": 27,
+      "rows": [
+        {
+          "text": "五色令人目盲；",
+          "page": 27,
+          "pinyinOcr": "wu se ling rén mu mang"
+        },
+        {
+          "text": "五音令人耳聋；",
+          "page": 27,
+          "pinyinOcr": "wu yin lingrénér long"
+        },
+        {
+          "text": "五味令人口爽；",
+          "page": 27,
+          "pinyinOcr": "wu wei ling rén kou shuäng"
+        },
+        {
+          "text": "驰骋畋猎，令人心发狂；",
+          "page": 27,
+          "pinyinOcr": "chi  cheng tian  lie ling ren xin fa kuang"
+        },
+        {
+          "text": "难得之货，令人行妨。",
+          "page": 27,
+          "pinyinOcr": "nan ndézhihuo ling rén xing fang"
+        },
+        {
+          "text": "是以圣人为腹不为目，",
+          "page": 27,
+          "pinyinOcr": "shi iyi shengrénweifu bu wei mu"
+        },
+        {
+          "text": "故去彼取此。",
+          "page": 27,
+          "pinyinOcr": "guqubi b"
+        }
+      ]
+    },
+    {
+      "chapter": "第十三章",
+      "page": 28,
+      "rows": [
+        {
+          "text": "宠辱若惊，贵大患若身。",
+          "page": 28,
+          "pinyinOcr": "chongruruo jing gui da huan ruo shen"
+        },
+        {
+          "text": "何谓宠辱若惊？",
+          "page": 28,
+          "pinyinOcr": "héwei chong ru ruojing"
+        },
+        {
+          "text": "宠为下，得之若惊，失之若惊，",
+          "page": 28,
+          "pinyinOcr": "chong wéi xia dé zhiruo  jing shi zhiruo jing"
+        },
+        {
+          "text": "是谓宠辱若惊。何谓贵大患若身？",
+          "page": 28,
+          "pinyinOcr": "shi wei chong ru ruo jing héweiguida huan ruo shen"
+        },
+        {
+          "text": "吾所以有大患者，为吾有身，",
+          "page": 28,
+          "pinyinOcr": "wusuoyiyoudahuanzhe weiwuyoushen"
+        },
+        {
+          "text": "及吾无身，吾有何患？",
+          "page": 28,
+          "pinyinOcr": "ji wuwu shen wuyouhéhuan"
+        },
+        {
+          "text": "故贵以身为天下，若可寄天下；",
+          "page": 28,
+          "pinyinOcr": "gu gui  yi shen  wéi tian xia ruo keji tian  xia"
+        },
+        {
+          "text": "爱以身为天下，若可託天下。",
+          "page": 28,
+          "pinyinOcr": "ai yishenwéitianxia ruoketuo tian xia"
+        }
+      ]
+    },
+    {
+      "chapter": "第十四章",
+      "page": 29,
+      "rows": [
+        {
+          "text": "视之不见，名曰夷；",
+          "page": 29,
+          "pinyinOcr": "shi zhi bujian ming  yue  yi"
+        },
+        {
+          "text": "听之不闻，名曰希；",
+          "page": 29,
+          "pinyinOcr": "ting zhibu wén ming yue xi"
+        },
+        {
+          "text": "搏之不得，名曰微。",
+          "page": 29,
+          "pinyinOcr": "bo zhi budé ming yue wei"
+        },
+        {
+          "text": "此三者不可致诘，",
+          "page": 29,
+          "pinyinOcr": "e1uzaynqauzuoslo"
+        },
+        {
+          "text": "故混而为一。",
+          "page": 29,
+          "pinyinOcr": "gu hun ér wéi yi"
+        },
+        {
+          "text": "其上不皦，其下不昧。",
+          "page": 29,
+          "pinyinOcr": "qi shang bu jiao qixia. bu  mei"
+        },
+        {
+          "text": "绳绳兮不可名，",
+          "page": 29,
+          "pinyinOcr": "min min xibukéming"
+        },
+        {
+          "text": "复归于无物。",
+          "page": 29,
+          "pinyinOcr": "fu gui yuwuwu"
+        },
+        {
+          "text": "是谓无状之状，无物之象，",
+          "page": 30,
+          "pinyinOcr": "shiweiwuzhuangzhizhuang wuwuzhi xiang"
+        },
+        {
+          "text": "是谓惚恍。",
+          "page": 30,
+          "pinyinOcr": "shi wei hu huang"
+        },
+        {
+          "text": "迎之不见其首，随之不见其後。",
+          "page": 30,
+          "pinyinOcr": "ying  zhi  bu jian  C qi shou sui zhi bujianqi hou"
+        },
+        {
+          "text": "执古之道，以御今之有。",
+          "page": 30,
+          "pinyinOcr": "opp14zn64z yiyujinzhiyou"
+        },
+        {
+          "text": "能知古始，是谓道纪。",
+          "page": 30,
+          "pinyinOcr": "néng zhi gu shi shi   wei  dao ji"
+        }
+      ]
+    },
+    {
+      "chapter": "第十五章",
+      "page": 31,
+      "rows": [
+        {
+          "text": "古之善为道者，微妙玄通，",
+          "page": 31,
+          "pinyinOcr": "gu zhi shanwei dao zhe wei miao xuan tong"
+        },
+        {
+          "text": "深不可识。",
+          "page": 31,
+          "pinyinOcr": "shenbukéshi"
+        },
+        {
+          "text": "夫唯不可识，故强为之容：",
+          "page": 31,
+          "pinyinOcr": "fu wéibuke shi gu qiang wei zhi rong"
+        },
+        {
+          "text": "豫兮若冬涉川；",
+          "page": 31,
+          "pinyinOcr": "xi ruodongshechuan"
+        },
+        {
+          "text": "犹兮若畏四邻；",
+          "page": 31,
+          "pinyinOcr": "Xi ruowei `si lin"
+        },
+        {
+          "text": "俨兮其若客；",
+          "page": 31,
+          "pinyinOcr": "yan Xi qi ruo ke"
+        },
+        {
+          "text": "涣兮其若凌释；",
+          "page": 31,
+          "pinyinOcr": "huan Xi qi ruoling shi"
+        },
+        {
+          "text": "敦兮其若朴；",
+          "page": 31,
+          "pinyinOcr": "dun xi"
+        },
+        {
+          "text": "旷兮其若谷；混兮其若浊；",
+          "page": 32,
+          "pinyinOcr": "kuang xi qi ruo n6  hun xi qi ruozhuo"
+        },
+        {
+          "text": "澹兮其若海；飘兮若无止。",
+          "page": 32,
+          "pinyinOcr": "dan xi qi ruo hai piao xi  ruowuzhi"
+        },
+        {
+          "text": "孰能浊以静之徐清？",
+          "page": 32,
+          "pinyinOcr": "shu neng zhuo  yi  jing zhi  xu qing"
+        },
+        {
+          "text": "孰能安以动之徐生？",
+          "page": 32,
+          "pinyinOcr": "shu néng an yi dong zhi xu sheng"
+        },
+        {
+          "text": "保此道者，不欲盈。",
+          "page": 32,
+          "pinyinOcr": "bao  cidao zhé bu yu  ying"
+        },
+        {
+          "text": "夫唯不盈，故能蔽而新成。",
+          "page": 32,
+          "pinyinOcr": "fu wéi bu ying gu  néng  bi ér xin chéng"
+        }
+      ]
+    },
+    {
+      "chapter": "第十六章",
+      "page": 33,
+      "rows": [
+        {
+          "text": "致虚极，守静笃。",
+          "page": 33,
+          "pinyinOcr": "zhi xu ji shou jing  du"
+        },
+        {
+          "text": "万物并作，吾以观复。",
+          "page": 33,
+          "pinyinOcr": "wanwubing zuo wu yiguan fu"
+        },
+        {
+          "text": "夫物芸芸，各复归其根。",
+          "page": 33,
+          "pinyinOcr": "fu wu yun yun gefuguiqigen"
+        },
+        {
+          "text": "归根曰静，静曰复命。",
+          "page": 33,
+          "pinyinOcr": "gui  gen yue jing jing yuefu  ming"
+        },
+        {
+          "text": "复命曰常，知常曰明。",
+          "page": 33,
+          "pinyinOcr": "fu ming yue chang zhi chang yueming"
+        },
+        {
+          "text": "不知常，妄作凶。",
+          "page": 33,
+          "pinyinOcr": "nq zhichang wang zuo xiong"
+        },
+        {
+          "text": "知常容，容乃公，公乃全，",
+          "page": 33,
+          "pinyinOcr": "zhi chang rong rong nai gong gong nai quan"
+        },
+        {
+          "text": "全乃天，天乃道，道乃久，",
+          "page": 33,
+          "pinyinOcr": "quán   nai  tian tian nai dao dao  nai jiu"
+        },
+        {
+          "text": "没身不殆。",
+          "page": 33,
+          "pinyinOcr": "moshen budai"
+        }
+      ]
+    },
+    {
+      "chapter": "第十七章",
+      "page": 34,
+      "rows": [
+        {
+          "text": "太上，不知有之；",
+          "page": 34,
+          "pinyinOcr": "tai   shang yznouznq"
+        },
+        {
+          "text": "其次，亲而誉之；",
+          "page": 34,
+          "pinyinOcr": "ci qinér yuzhi"
+        },
+        {
+          "text": "其次，畏之；",
+          "page": 34,
+          "pinyinOcr": "ci wei  zhi"
+        },
+        {
+          "text": "其次，侮之。",
+          "page": 34,
+          "pinyinOcr": "ci wu zhi"
+        },
+        {
+          "text": "信不足焉，有不信焉。",
+          "page": 34,
+          "pinyinOcr": "xin buzu yan youbuxin yan"
+        },
+        {
+          "text": "悠兮其贵言。",
+          "page": 34,
+          "pinyinOcr": "you   xi qi gui yán"
+        },
+        {
+          "text": "功成事遂，",
+          "page": 34,
+          "pinyinOcr": "gongchengshisui"
+        },
+        {
+          "text": "百姓皆谓：“我自然。”",
+          "page": 34,
+          "pinyinOcr": "bai  xing  jie   wei wozirán"
+        }
+      ]
+    },
+    {
+      "chapter": "第十八章",
+      "page": 35,
+      "rows": [
+        {
+          "text": "大道废，有仁义；",
+          "page": 35,
+          "pinyinOcr": "dadao fei you  rén yi"
+        },
+        {
+          "text": "智慧出，有大伪；",
+          "page": 35,
+          "pinyinOcr": "zhi hui chu youdawei"
+        },
+        {
+          "text": "六亲不和，有孝慈；",
+          "page": 35,
+          "pinyinOcr": "N!I! bu  hé you  xiao ci"
+        },
+        {
+          "text": "国家昏乱，有忠臣。",
+          "page": 35,
+          "pinyinOcr": "guo  jia hun Luan you zhong chén"
+        }
+      ]
+    },
+    {
+      "chapter": "第十九章",
+      "page": 36,
+      "rows": [
+        {
+          "text": "绝圣弃智，民利百倍；",
+          "page": 36,
+          "pinyinOcr": "jué sheng qi zhi min li bai bei"
+        },
+        {
+          "text": "绝仁弃义，民复孝慈；",
+          "page": 36,
+          "pinyinOcr": "jué rén qi yi min   fu OP!X"
+        },
+        {
+          "text": "绝巧弃利，盗贼无有。",
+          "page": 36,
+          "pinyinOcr": "jué  qiao  qili daozéiwuyou"
+        },
+        {
+          "text": "此三者以为文不足。",
+          "page": 36,
+          "pinyinOcr": "cisan zhe yiwéi wen buzu"
+        },
+        {
+          "text": "故令有所属：见素抱朴，",
+          "page": 36,
+          "pinyinOcr": "guling you suoshu xian su bao pu"
+        },
+        {
+          "text": "少私寡欲，绝学无忧。",
+          "page": 36,
+          "pinyinOcr": "shäo si guä yu juéxué wu you"
+        }
+      ]
+    },
+    {
+      "chapter": "第二十章",
+      "page": 37,
+      "rows": [
+        {
+          "text": "唯之与阿，相去几何？",
+          "page": 37,
+          "pinyinOcr": "wéizhiyué xiangqujihé"
+        },
+        {
+          "text": "美之与恶，相去若何？",
+          "page": 37,
+          "pinyinOcr": "mei zhiyu xiang quruo hé"
+        },
+        {
+          "text": "人之所畏，不可不畏。",
+          "page": 37,
+          "pinyinOcr": "rénzhisuowei bukebuwei"
+        },
+        {
+          "text": "荒兮，其未央哉！",
+          "page": 37,
+          "pinyinOcr": "huang xi zai"
+        },
+        {
+          "text": "众人熙熙，如享太牢，",
+          "page": 37,
+          "pinyinOcr": "zhong rén XT ru xiang tailáo"
+        },
+        {
+          "text": "如春登台。",
+          "page": 37,
+          "pinyinOcr": "ru chun deng tai"
+        },
+        {
+          "text": "我独泊兮，其未兆；",
+          "page": 37,
+          "pinyinOcr": "wo dubo xi qi   wei  zhao"
+        },
+        {
+          "text": "沌沌兮，如婴儿之未孩；",
+          "page": 37,
+          "pinyinOcr": "dun dun xi ymzeu"
+        },
+        {
+          "text": "儽儽兮，若无所归。",
+          "page": 38,
+          "pinyinOcr": "lei lei xi ruowusuo gui"
+        },
+        {
+          "text": "众人皆有馀，而我独若遗。",
+          "page": 38,
+          "pinyinOcr": "zhong  rén jie you yu ér onnpom yi"
+        },
+        {
+          "text": "我愚人之心也哉，沌沌兮！",
+          "page": 38,
+          "pinyinOcr": "wo yurén zhi  xin  yé zai dundun xi"
+        },
+        {
+          "text": "俗人昭昭，我独昏昏。",
+          "page": 38,
+          "pinyinOcr": "su rénzhaozhao woduhunhun"
+        },
+        {
+          "text": "俗人察察，我独闷闷。",
+          "page": 38,
+          "pinyinOcr": "surénchá chá wodumenmen"
+        },
+        {
+          "text": "澹兮其若海，飂兮若无止，",
+          "page": 38,
+          "pinyinOcr": "dan  xi qi ruo hai liáo xi ruo wuzhi"
+        },
+        {
+          "text": "众人皆有以，而我独顽且鄙。",
+          "page": 38,
+          "pinyinOcr": "zhong   réen  jie   you  yi ér wo du wan qie bi"
+        },
+        {
+          "text": "我独异于人，而贵食母。",
+          "page": 38,
+          "pinyinOcr": "woduyiyurén érguisimu"
+        }
+      ]
+    },
+    {
+      "chapter": "第二十一章",
+      "page": 39,
+      "rows": [
+        {
+          "text": "孔德之容，惟道是从。",
+          "page": 39,
+          "pinyinOcr": "kong dé zhi rong wéi dao shi cong"
+        },
+        {
+          "text": "道之为物，惟恍惟惚。",
+          "page": 39,
+          "pinyinOcr": "daozhiwéiwu wei huang weihu"
+        },
+        {
+          "text": "惚兮恍兮，其中有象；",
+          "page": 39,
+          "pinyinOcr": "huxihuängxi qizhong you xiang"
+        },
+        {
+          "text": "恍兮惚兮，其中有物。",
+          "page": 39,
+          "pinyinOcr": "I×nyx6upny qi zhong you wu"
+        },
+        {
+          "text": "窈兮冥兮，其中有精；",
+          "page": 39,
+          "pinyinOcr": "yáo ximingxi qizhong you jing"
+        },
+        {
+          "text": "其精甚真，其中有信。",
+          "page": 39,
+          "pinyinOcr": "qijing shen zhen ux noK buouzjb"
+        },
+        {
+          "text": "自今及古，其名不去，以阅众甫。",
+          "page": 39,
+          "pinyinOcr": "zijinjigu qi ming bu qu yiyue zhongfu"
+        },
+        {
+          "text": "吾何以知众甫之状哉？以此。",
+          "page": 39,
+          "pinyinOcr": "wu hé yi zhi zhong fu zhi  zhuang zai yici"
+        }
+      ]
+    },
+    {
+      "chapter": "第二十二章",
+      "page": 40,
+      "rows": [
+        {
+          "text": "曲则全，枉则直，洼则盈，",
+          "page": 40,
+          "pinyinOcr": "upnbznb wangzézhi wa  zé  ying"
+        },
+        {
+          "text": "敝则新，少则得，多则惑。",
+          "page": 40,
+          "pinyinOcr": "!q  zé xin shaozédé duozéhuo"
+        },
+        {
+          "text": "是以圣人抱一为天下式。",
+          "page": 40,
+          "pinyinOcr": "shi yi sheng rén bao yi wéitianxia shi"
+        },
+        {
+          "text": "」不自见，故明；",
+          "page": 40,
+          "pinyinOcr": "bu zi xian gu  ming"
+        },
+        {
+          "text": "不自是，故彰；",
+          "page": 40,
+          "pinyinOcr": "bu zi shi n6 zhang"
+        },
+        {
+          "text": "不自伐，故有功；",
+          "page": 40,
+          "pinyinOcr": "bu gu you gong"
+        },
+        {
+          "text": "不自矜，故长。",
+          "page": 40,
+          "pinyinOcr": "bu zijin gu  chang"
+        },
+        {
+          "text": "夫唯不争，故天下莫能与之争。",
+          "page": 40,
+          "pinyinOcr": "fu weibuzheng gutian xiamonéngyu zhi zheng"
+        },
+        {
+          "text": "古之所谓“曲则全”者，",
+          "page": 41,
+          "pinyinOcr": ""
+        },
+        {
+          "text": "岂虚言哉！",
+          "page": 41,
+          "pinyinOcr": "!pzupΛnxb"
+        },
+        {
+          "text": "诚全而归之。",
+          "page": 41,
+          "pinyinOcr": "yz1nb 1θ upnb buayo"
+        }
+      ]
+    },
+    {
+      "chapter": "第二十三章",
+      "page": 42,
+      "rows": [
+        {
+          "text": "希言自然。",
+          "page": 42,
+          "pinyinOcr": "xi yán zi rán"
+        },
+        {
+          "text": "故飘风不终朝，骤雨不终日。",
+          "page": 42,
+          "pinyinOcr": "gu piao feng bu zhong zhao zhou yu buzhong ri"
+        },
+        {
+          "text": "孰为此者？天地。",
+          "page": 42,
+          "pinyinOcr": "shuwéi cizhe tian   di"
+        },
+        {
+          "text": "天地尚不能久，而况于人乎？",
+          "page": 42,
+          "pinyinOcr": "tian  di   shang  bu  néngjiu érkuang  yurén hu"
+        },
+        {
+          "text": "故从事于道者，同于道；",
+          "page": 42,
+          "pinyinOcr": "gu cong shi  yu daozhé tong yu dao"
+        },
+        {
+          "text": "德者，同于德；失者，同于失。",
+          "page": 42,
+          "pinyinOcr": "dézhé tongyu dé shizhe tong yushi"
+        },
+        {
+          "text": "同于道者，道亦乐得之；",
+          "page": 42,
+          "pinyinOcr": "tong yudao zhé dao yiledézhi"
+        },
+        {
+          "text": "同于德者，德亦乐得之；",
+          "page": 42,
+          "pinyinOcr": "tong yudézhé déyiledé zhi"
+        },
+        {
+          "text": "同于失者，失亦乐得之。",
+          "page": 43,
+          "pinyinOcr": "tongyushizhé shi  yi  ledé zhi"
+        },
+        {
+          "text": "信不足焉，有不信焉。",
+          "page": 43,
+          "pinyinOcr": "xin bu zu yan youbu xin yan"
+        }
+      ]
+    },
+    {
+      "chapter": "第二十四章",
+      "page": 44,
+      "rows": [
+        {
+          "text": "企者不立；跨者不行；",
+          "page": 44,
+          "pinyinOcr": "qi zhé bu fi kua zhébu xing"
+        },
+        {
+          "text": "自见者不明；自是者不彰；",
+          "page": 44,
+          "pinyinOcr": "zi xian zhe bu ming bupuz nq ayz lys z"
+        },
+        {
+          "text": "自伐者无功；自矜者不长。",
+          "page": 44,
+          "pinyinOcr": "uonmuz zijinzhebu chang"
+        },
+        {
+          "text": "其在道也，曰：馀食赘行，",
+          "page": 44,
+          "pinyinOcr": "opp!pzb yue buix (nuz jus n"
+        },
+        {
+          "text": "物或恶之，故有道者不处。",
+          "page": 44,
+          "pinyinOcr": "wuhuowuzhi guyoudaozhébuchu"
+        }
+      ]
+    },
+    {
+      "chapter": "第二十五章",
+      "page": 45,
+      "rows": [
+        {
+          "text": "有物混成，先天地生。",
+          "page": 45,
+          "pinyinOcr": "you wu hun chéng xian tian di sheng"
+        },
+        {
+          "text": "寂兮寥兮，独立而不改，",
+          "page": 45,
+          "pinyinOcr": "j xliáo Xi ér bu gai"
+        },
+        {
+          "text": "周行而不殆，可以为天地母。",
+          "page": 45,
+          "pinyinOcr": "zhou xing érbu dai ke yi wéitiandi mu"
+        },
+        {
+          "text": "吾不知其名，强字之曰道，",
+          "page": 45,
+          "pinyinOcr": "bujwjbluznqnM oppan1uzzbupi"
+        },
+        {
+          "text": "强为之名曰大。",
+          "page": 45,
+          "pinyinOcr": "qiang wei zhimingyueda"
+        },
+        {
+          "text": "大曰逝，逝曰远，远曰反。",
+          "page": 45,
+          "pinyinOcr": "da  yue shi shi yue yuan yuan yue fan"
+        },
+        {
+          "text": "故道大，天大，地大，人亦大。",
+          "page": 45,
+          "pinyinOcr": "oppnb da tianda rén yida"
+        },
+        {
+          "text": "域中有四大，而人居其一焉。",
+          "page": 45,
+          "pinyinOcr": "yu  zhong you  sida ér  ren ju qi  yi . yan"
+        },
+        {
+          "text": "人法地，地法天，",
+          "page": 46,
+          "pinyinOcr": "rénfo di !P tian"
+        },
+        {
+          "text": "天法道，道法自然。",
+          "page": 46,
+          "pinyinOcr": "tian foa dao daofo zi rán"
+        }
+      ]
+    },
+    {
+      "chapter": "第二十六章",
+      "page": 47,
+      "rows": [
+        {
+          "text": "重为轻根，静为躁君。",
+          "page": 47,
+          "pinyinOcr": "zhong wéi qing gen jing   wei  zao jun"
+        },
+        {
+          "text": "是以君子终日行不离辎重。",
+          "page": 47,
+          "pinyinOcr": "shi   yi  jun   i  zhong  ri  xing  bu  li  i zi zhong"
+        },
+        {
+          "text": "虽有荣观，燕处超然。",
+          "page": 47,
+          "pinyinOcr": "sui you rong guan yan  chu  chao rán"
+        },
+        {
+          "text": "奈何万乘之主，",
+          "page": 47,
+          "pinyinOcr": "nai hé wan sheng zhi zhu"
+        },
+        {
+          "text": "而以身轻天下？",
+          "page": 47,
+          "pinyinOcr": "éryi shen qing tian  xia"
+        },
+        {
+          "text": "轻则失根，躁则失君。",
+          "page": 47,
+          "pinyinOcr": "qingzéshigen zaozé shi  jun"
+        }
+      ]
+    },
+    {
+      "chapter": "第二十七章",
+      "page": 48,
+      "rows": [
+        {
+          "text": "善行无辙迹，善言无瑕謫；",
+          "page": 48,
+          "pinyinOcr": "shan  xing  wu zheé ji shan yan wuxiazhé"
+        },
+        {
+          "text": "善数不用筹策；",
+          "page": 48,
+          "pinyinOcr": "shan shubu yong chouce"
+        },
+        {
+          "text": "善闭无关楗而不可开，",
+          "page": 48,
+          "pinyinOcr": "shan biwu guan jian ér bukekai"
+        },
+        {
+          "text": "善结无绳约而不可解。",
+          "page": 48,
+          "pinyinOcr": "shanjié wu shéng yue érbukéjiè"
+        },
+        {
+          "text": "是以圣人常善救人，故无弃人；",
+          "page": 48,
+          "pinyinOcr": "shi yi sheng rén cháng shan jiu rén guwuqirén"
+        },
+        {
+          "text": "常善救物，故无弃物。",
+          "page": 48,
+          "pinyinOcr": "chang shan jiu wu guwuqiwu"
+        },
+        {
+          "text": "是谓袭明。",
+          "page": 48,
+          "pinyinOcr": "shi iweiximing"
+        },
+        {
+          "text": "故善人者，不善人之师；",
+          "page": 48,
+          "pinyinOcr": "gu shan rén zhé bushan rén zhi shi"
+        },
+        {
+          "text": "不善人者，善人之资。",
+          "page": 49,
+          "pinyinOcr": "bushanrénzhé shanrénzhizi"
+        },
+        {
+          "text": "不贵其师，不爱其资，",
+          "page": 49,
+          "pinyinOcr": "bu gui qishi"
+        },
+        {
+          "text": "虽智大迷，是谓要妙。",
+          "page": 49,
+          "pinyinOcr": "sui zhi dami shi wei yao miao"
+        }
+      ]
+    },
+    {
+      "chapter": "第二十八章",
+      "page": 50,
+      "rows": [
+        {
+          "text": "知其雄，守其雌，",
+          "page": 50,
+          "pinyinOcr": "zhi  qi  xiong shou   qi  ci"
+        },
+        {
+          "text": "为天下谿。",
+          "page": 50,
+          "pinyinOcr": "weitian xia xi"
+        },
+        {
+          "text": "为天下谿，常德不离，",
+          "page": 50,
+          "pinyinOcr": "wéi tian xia xi changdé bu li"
+        },
+        {
+          "text": "复归于婴儿。",
+          "page": 50,
+          "pinyinOcr": "fu guiyuyingér"
+        },
+        {
+          "text": "知其白，守其黑，为天下式。",
+          "page": 50,
+          "pinyinOcr": "zhi qi bai shou qi hei wéi tian xia shi"
+        },
+        {
+          "text": "为天下式，常德不忒，",
+          "page": 50,
+          "pinyinOcr": "wéi tian xia shi changdé bu te"
+        },
+        {
+          "text": "复归于无极。",
+          "page": 50,
+          "pinyinOcr": "fu guiyuwuji"
+        },
+        {
+          "text": "知其荣，守其辱，为天下谷。",
+          "page": 50,
+          "pinyinOcr": "zhi qi rong shou qi n wéitian xid gu"
+        },
+        {
+          "text": "为天下谷，常德乃足，复归于朴。",
+          "page": 51,
+          "pinyinOcr": "wéitianxiagu chángdénaizu ndIn"
+        },
+        {
+          "text": "朴散则为器，圣人用之，",
+          "page": 51,
+          "pinyinOcr": "pu san  zé   wei qi sheng rén yong zhi"
+        },
+        {
+          "text": "则为官长。",
+          "page": 51,
+          "pinyinOcr": "zéwéiguanzhang"
+        },
+        {
+          "text": "故大制不割。",
+          "page": 51,
+          "pinyinOcr": "4zppn6 bu ge"
+        }
+      ]
+    },
+    {
+      "chapter": "第二十九章",
+      "page": 52,
+      "rows": [
+        {
+          "text": "将欲取天下而为之，",
+          "page": 52,
+          "pinyinOcr": "jiangyu qu tian xiaér weéi zhi"
+        },
+        {
+          "text": "吾见其不得已。",
+          "page": 52,
+          "pinyinOcr": "wujian qi budé yi"
+        },
+        {
+          "text": "天下神器，不可为也，",
+          "page": 52,
+          "pinyinOcr": "tianxia shén qi bukewéiyé"
+        },
+        {
+          "text": "不可执也。",
+          "page": 52,
+          "pinyinOcr": "bu ké zhi yé"
+        },
+        {
+          "text": "为者败之，执者失之。",
+          "page": 52,
+          "pinyinOcr": "wéizhebaizhi"
+        },
+        {
+          "text": "是以圣人无为，故无败；",
+          "page": 52,
+          "pinyinOcr": "shi yisheng rén wu wéi n6  wu bai"
+        },
+        {
+          "text": "无执，故无失。",
+          "page": 52,
+          "pinyinOcr": "zhi gu wu shi"
+        },
+        {
+          "text": "夫物或行或随；或嘘或吹；",
+          "page": 52,
+          "pinyinOcr": "wu huo xing huo sui huo xu huo chui"
+        },
+        {
+          "text": "或强或羸；或载或隳。",
+          "page": 52,
+          "pinyinOcr": "huo ）qiáng huoléi huozai huo   hui"
+        },
+        {
+          "text": "是以圣人去甚，去奢，去泰。",
+          "page": 52,
+          "pinyinOcr": "shi yi shengrén qu shen qu  she nb tai"
+        }
+      ]
+    },
+    {
+      "chapter": "第三十章",
+      "page": 53,
+      "rows": [
+        {
+          "text": "以道佐人主者，不以兵强天下。",
+          "page": 53,
+          "pinyinOcr": "zuzanonzopp bu  yi  bing  qiang tian  xid"
+        },
+        {
+          "text": "其事好还。",
+          "page": 53,
+          "pinyinOcr": "qi shi hao huán"
+        },
+        {
+          "text": "师之所处，荆棘生焉。",
+          "page": 53,
+          "pinyinOcr": "shizhisuochu jing  ji  sheng yan"
+        },
+        {
+          "text": "大军之後，必有凶年。",
+          "page": 53,
+          "pinyinOcr": "dajunzhihou bi  you xiong nian"
+        },
+        {
+          "text": "善有果而已，不敢以取强。",
+          "page": 53,
+          "pinyinOcr": "shan you guo ér yi buguan  yiqu qiáng"
+        },
+        {
+          "text": "果而勿矜，果而勿伐，果而勿骄。",
+          "page": 53,
+          "pinyinOcr": "guo ér wu jin guoér wufá gu ér wu jiao"
+        },
+        {
+          "text": "果而不得已，果而勿强。",
+          "page": 53,
+          "pinyinOcr": "guoérbudé yi guérwuqiáng"
+        },
+        {
+          "text": "物壮则老，是谓不道，",
+          "page": 53,
+          "pinyinOcr": "wu zhuang zéao shiweibudao"
+        },
+        {
+          "text": "不道早已。",
+          "page": 53,
+          "pinyinOcr": "bu dao  zäo yi"
+        }
+      ]
+    },
+    {
+      "chapter": "第三十一章",
+      "page": 54,
+      "rows": [
+        {
+          "text": "夫兵者，不祥之器，",
+          "page": 54,
+          "pinyinOcr": "fubing zhe bu   xiang  zhi qi"
+        },
+        {
+          "text": "物或恶之，故有道者不处。",
+          "page": 54,
+          "pinyinOcr": "wu huo wuzhi guyoudao zhébuchu"
+        },
+        {
+          "text": "君子居则贵左，用兵则贵右。",
+          "page": 54,
+          "pinyinOcr": "onzin69zn!1zun! yong bing zégui you"
+        },
+        {
+          "text": "兵者不祥之器，非君子之器，",
+          "page": 54,
+          "pinyinOcr": "bing zhebu xiáng zhi  b"
+        },
+        {
+          "text": "不得已而用之，恬淡为上。",
+          "page": 54,
+          "pinyinOcr": "budé yi ér yongzhi tian   dan wei shang"
+        },
+        {
+          "text": "胜而不美，而美之者，是乐杀人。",
+          "page": 54,
+          "pinyinOcr": "sheng érbumei érmei zhi zhe shilesharén"
+        },
+        {
+          "text": "夫乐杀人者，",
+          "page": 54,
+          "pinyinOcr": "fulesharénzhe"
+        },
+        {
+          "text": "则不可得志于天下矣。",
+          "page": 54,
+          "pinyinOcr": "Zzé  bu  ke  de   zhi   yu   ian   xia   yi"
+        },
+        {
+          "text": "吉事尚左，凶事尚右。",
+          "page": 55,
+          "pinyinOcr": "jishi shang zuo xiong shi shang you"
+        },
+        {
+          "text": "偏将军居左，上将军居右，",
+          "page": 55,
+          "pinyinOcr": "pian jiang  jun ju  zuo shang jiang jun  ju  you"
+        },
+        {
+          "text": "言以丧礼处之。",
+          "page": 55,
+          "pinyinOcr": "yan yi sang li chu  zhi"
+        },
+        {
+          "text": "杀人之众，以哀悲莅之，",
+          "page": 55,
+          "pinyinOcr": "sha rén zhi zhong yiaibei li zhi"
+        },
+        {
+          "text": "战胜以丧礼处之。",
+          "page": 55,
+          "pinyinOcr": "zhan sheng   yi   sang   li ( chuzhi"
+        }
+      ]
+    },
+    {
+      "chapter": "第三十二章",
+      "page": 56,
+      "rows": [
+        {
+          "text": "道常无名、朴。",
+          "page": 56,
+          "pinyinOcr": "dao chang wu ming nd"
+        },
+        {
+          "text": "虽小，天下莫能臣。",
+          "page": 56,
+          "pinyinOcr": "sui xiao tian xia mo neng chén"
+        },
+        {
+          "text": "侯王若能守之，万物将自宾。",
+          "page": 56,
+          "pinyinOcr": "hou wang ruo néng shou zhi wanwu jiang zibin"
+        },
+        {
+          "text": "天地相合，以降甘露，",
+          "page": 56,
+          "pinyinOcr": "tian di xiang  hé yi  jiang  ganlu"
+        },
+        {
+          "text": "民莫之令而自均。",
+          "page": 56,
+          "pinyinOcr": "min mo  zhi ling ér zi jun"
+        },
+        {
+          "text": "始制有名，名亦既有，",
+          "page": 56,
+          "pinyinOcr": "shi zhi you ming ming  yijiyou"
+        },
+        {
+          "text": "夫亦将知止，知止可以不殆。",
+          "page": 56,
+          "pinyinOcr": "!zyzu!"
+        },
+        {
+          "text": "譬道之在天下，犹川谷之于江海。",
+          "page": 56,
+          "pinyinOcr": "you chuanguzhiyuj  jiang hai"
+        }
+      ]
+    },
+    {
+      "chapter": "第三十三章",
+      "page": 57,
+      "rows": [
+        {
+          "text": "知人者智，自知者明。",
+          "page": 57,
+          "pinyinOcr": "zhirénzhézhi zi zhi zhé ming"
+        },
+        {
+          "text": "胜人者有力，自胜者强。",
+          "page": 57,
+          "pinyinOcr": "shengrénzhe youli zisheng zhe qiáng"
+        },
+        {
+          "text": "知足者富。",
+          "page": 57,
+          "pinyinOcr": "yzyz"
+        },
+        {
+          "text": "强行者有志。",
+          "page": 57,
+          "pinyinOcr": "qiang xing zheyouzhi"
+        },
+        {
+          "text": "不失其所者久。",
+          "page": 57,
+          "pinyinOcr": "bu shi qi suo zhejiu"
+        },
+        {
+          "text": "死而不亡者寿。",
+          "page": 57,
+          "pinyinOcr": "siérbuwang zhéshou"
+        }
+      ]
+    },
+    {
+      "chapter": "第三十四章",
+      "page": 58,
+      "rows": [
+        {
+          "text": "大道氾兮，其可左右。",
+          "page": 58,
+          "pinyinOcr": "dadaofan Xi noonzyb"
+        },
+        {
+          "text": "万物恃之以生而不辞，",
+          "page": 58,
+          "pinyinOcr": "wan   wu  shi  zhi   yi  sheng ér  bu  ci"
+        },
+        {
+          "text": "功成而不有。",
+          "page": 58,
+          "pinyinOcr": "gong chéngérbuyou"
+        },
+        {
+          "text": "衣养万物而不为主，",
+          "page": 58,
+          "pinyinOcr": "yi yäng zmnqlenmupm"
+        },
+        {
+          "text": "常无欲，可名于小；",
+          "page": 58,
+          "pinyinOcr": "chang  wu yu keming  yu xido"
+        },
+        {
+          "text": "万物归焉而不为主，可名为大。",
+          "page": 58,
+          "pinyinOcr": "wan wu gui yan ér bu wei zhu ké ming weida"
+        },
+        {
+          "text": "以其终不自为大，故能成其大。",
+          "page": 58,
+          "pinyinOcr": "pp!9mznqbuouzib gu neng cheng qi  da"
+        }
+      ]
+    },
+    {
+      "chapter": "第三十五章",
+      "page": 59,
+      "rows": [
+        {
+          "text": "执大象，天下往。",
+          "page": 59,
+          "pinyinOcr": "zhi da  xiang tian xia wang"
+        },
+        {
+          "text": "往而不害，安平太。",
+          "page": 59,
+          "pinyinOcr": "wangérbu hai an   ping  tai"
+        },
+        {
+          "text": "乐与饵，过客止。",
+          "page": 59,
+          "pinyinOcr": "yue yuér guo ke zhi"
+        },
+        {
+          "text": "道之出口，",
+          "page": 59,
+          "pinyinOcr": "dao zhi chu kou"
+        },
+        {
+          "text": "淡乎其无味，视之不足见，",
+          "page": 59,
+          "pinyinOcr": "dan hu qi wu wei shi  zhi  bu   zu jian"
+        },
+        {
+          "text": "听之不足闻，用之不足既。",
+          "page": 59,
+          "pinyinOcr": "ting  zhi bu zu wén nznq1yzbuo"
+        }
+      ]
+    },
+    {
+      "chapter": "第三十六章",
+      "page": 60,
+      "rows": [
+        {
+          "text": "将欲歙之，必固张之；",
+          "page": 60,
+          "pinyinOcr": "jiang  yu xi zhi bi gu zhang   zhi"
+        },
+        {
+          "text": "将欲弱之，必固强之；",
+          "page": 60,
+          "pinyinOcr": "jiang  yu ruo zhi bi   gu qiang  zhi"
+        },
+        {
+          "text": "将欲废之，必固兴之；",
+          "page": 60,
+          "pinyinOcr": "jiang yu fei zhi 14z bu1x n6！q"
+        },
+        {
+          "text": "将欲夺之，必固与之。",
+          "page": 60,
+          "pinyinOcr": "jiang yu duo zhi bi n6  zhi"
+        },
+        {
+          "text": "是谓微明。",
+          "page": 60,
+          "pinyinOcr": "shi wei wei ming"
+        },
+        {
+          "text": "柔弱胜刚强。",
+          "page": 60,
+          "pinyinOcr": "rouruoshenggangqiang"
+        },
+        {
+          "text": "鱼不可脱于渊，",
+          "page": 60,
+          "pinyinOcr": "yu bukétuo yuyuan"
+        },
+        {
+          "text": "国之利器不可以示人。",
+          "page": 60,
+          "pinyinOcr": "b！uzonb bu ké  yi shi rén"
+        }
+      ]
+    },
+    {
+      "chapter": "第三十七章",
+      "page": 61,
+      "rows": [
+        {
+          "text": "道常无为而无不为。",
+          "page": 61,
+          "pinyinOcr": "daochangwuwéi érwu bu wéi"
+        },
+        {
+          "text": "侯王若能守之，万物将自化。",
+          "page": 61,
+          "pinyinOcr": "hou wang ruo néng shou zhi pny Iz 6upi nm upm"
+        },
+        {
+          "text": "化而欲作，",
+          "page": 61,
+          "pinyinOcr": "hua ér yu zuo"
+        },
+        {
+          "text": "吾将镇之以无名之朴。",
+          "page": 61,
+          "pinyinOcr": "wu jiang zhen zhi  yi  wu ming zhi pu"
+        },
+        {
+          "text": "镇之以无名之朴，夫将不欲。",
+          "page": 61,
+          "pinyinOcr": "zhen zhi yi wu mingzhi pu fu jiang bu yu"
+        },
+        {
+          "text": "不欲以静，天下将自定。",
+          "page": 61,
+          "pinyinOcr": "bu yu yijing tian  xia jiang  zi  ding"
+        }
+      ]
+    },
+    {
+      "chapter": "第三十八章",
+      "page": 62,
+      "rows": [
+        {
+          "text": "上德不德，是以有德；",
+          "page": 62,
+          "pinyinOcr": "shangdébudé shi yiyou dé"
+        },
+        {
+          "text": "下德不失德，是以无德。",
+          "page": 62,
+          "pinyinOcr": "xiadébu shidé shi yiwudé"
+        },
+        {
+          "text": "上德无为而无以为；",
+          "page": 62,
+          "pinyinOcr": "shangdé wu wéiérwu yi wéi"
+        },
+        {
+          "text": "下德无为而有以为。",
+          "page": 62,
+          "pinyinOcr": "xia  de  wu  wéi  ér  you  yi  wéi"
+        },
+        {
+          "text": "上仁为之而无以为；",
+          "page": 62,
+          "pinyinOcr": "shangrén wéi zhi érwu yi wéi"
+        },
+        {
+          "text": "上义为之而有以为。",
+          "page": 62,
+          "pinyinOcr": "shang   yi   wéi  zhi   ér   you   yi   wéi"
+        },
+        {
+          "text": "上礼为之而莫之应，",
+          "page": 62,
+          "pinyinOcr": ""
+        },
+        {
+          "text": "则攘臂而扔之。",
+          "page": 62,
+          "pinyinOcr": "zé  rang bi ér reng zhi"
+        },
+        {
+          "text": "故失道而後德，失德而後仁；",
+          "page": 63,
+          "pinyinOcr": "gu shi dao ér houdé shidé ér hou rén"
+        },
+        {
+          "text": "失仁而後义，失义而後礼。",
+          "page": 63,
+          "pinyinOcr": "shi  rén ér  hou yi shiyiér houli"
+        },
+        {
+          "text": "夫礼者，忠信之薄，而乱之首。",
+          "page": 63,
+          "pinyinOcr": "fulizhé zhong xin  zhi bo érluan zhi shou"
+        },
+        {
+          "text": "前识者，道之华，而愚之始。",
+          "page": 63,
+          "pinyinOcr": "qiánshi zhe daozhihuá éryuzhishi"
+        },
+        {
+          "text": "是以大丈夫处其厚，不居其薄；",
+          "page": 63,
+          "pinyinOcr": "shi yi da zhang fu chuqi  hou bujuqibo"
+        },
+        {
+          "text": "处其实，不居其华。",
+          "page": 63,
+          "pinyinOcr": "chu qi shi bujuqi huá"
+        },
+        {
+          "text": "故去彼取此。",
+          "page": 63,
+          "pinyinOcr": "guqubiquci"
+        }
+      ]
+    },
+    {
+      "chapter": "第三十九章",
+      "page": 64,
+      "rows": [
+        {
+          "text": "昔之得一者：天得一以清；",
+          "page": 64,
+          "pinyinOcr": "zhe tiandéyiyiqing"
+        },
+        {
+          "text": "地得一以宁；神得一以灵；",
+          "page": 64,
+          "pinyinOcr": "di déyi yi ning shéndé yi yi ling"
+        },
+        {
+          "text": "谷得一以盈；万物得一以生；",
+          "page": 64,
+          "pinyinOcr": "gudéyiyiying wan wudé yi yi sheng"
+        },
+        {
+          "text": "侯王得一以为天下正。",
+          "page": 64,
+          "pinyinOcr": "hou  wang  deé yi   yi   wéi   tian  xia   zheng"
+        },
+        {
+          "text": "其致之也，",
+          "page": 64,
+          "pinyinOcr": ""
+        },
+        {
+          "text": "谓天无以清，将恐裂；",
+          "page": 64,
+          "pinyinOcr": "wei tian wu yi qing jiang kong lie"
+        },
+        {
+          "text": "地无以宁，将恐发；",
+          "page": 64,
+          "pinyinOcr": "di wuyining  jiang kong fei"
+        },
+        {
+          "text": "神无以灵，将恐歇；",
+          "page": 64,
+          "pinyinOcr": "shén wu yi ling jiang kong  xie"
+        },
+        {
+          "text": "谷无以盈，将恐竭；",
+          "page": 65,
+          "pinyinOcr": "gu wuyiying jiang kong  jié"
+        },
+        {
+          "text": "万物无以生，将恐灭；",
+          "page": 65,
+          "pinyinOcr": "wanwuwuyisheng jiang kong mie"
+        },
+        {
+          "text": "侯王无以为贞，将恐蹶。",
+          "page": 65,
+          "pinyinOcr": "hou wang wu yi wéi zheng jiang kong jue"
+        },
+        {
+          "text": "故贵以贱为本，高以下为基。",
+          "page": 65,
+          "pinyinOcr": "gu guiyijian wéibén gao yi xia wéi ji"
+        },
+        {
+          "text": "是以侯王自称孤、寡、不榖。",
+          "page": 65,
+          "pinyinOcr": "shi yihou wang zicheng gu gua bu gu"
+        },
+        {
+          "text": "此非以贱为本邪？非乎？",
+          "page": 65,
+          "pinyinOcr": "cifei yi jian wéibényé fei hu"
+        },
+        {
+          "text": "故致誉无誉。",
+          "page": 65,
+          "pinyinOcr": "nmn1uzn6"
+        },
+        {
+          "text": "是故不欲碌碌如玉，珞珞如石。",
+          "page": 65,
+          "pinyinOcr": "shigubuyululu ru yu luoluo ru shi"
+        }
+      ]
+    },
+    {
+      "chapter": "第四十章",
+      "page": 66,
+      "rows": [
+        {
+          "text": "反者道之动；",
+          "page": 66,
+          "pinyinOcr": "fan zhé daozhi dong"
+        },
+        {
+          "text": "弱者道之用。",
+          "page": 66,
+          "pinyinOcr": "ruo zhe daozhi yong"
+        },
+        {
+          "text": "天下万物生于有，",
+          "page": 66,
+          "pinyinOcr": "tianxia wan wu sheng yuyou"
+        },
+        {
+          "text": "有生于无。",
+          "page": 66,
+          "pinyinOcr": "you  shengyu wu"
+        }
+      ]
+    },
+    {
+      "chapter": "第四十一章",
+      "page": 67,
+      "rows": [
+        {
+          "text": "上士闻道，勤而行之；",
+          "page": 67,
+          "pinyinOcr": "shangshiwéndao qin    ér  xing  zhi"
+        },
+        {
+          "text": "中士闻道，若存若亡；",
+          "page": 67,
+          "pinyinOcr": "zhong shi wén dao ruo cun ruo wang"
+        },
+        {
+          "text": "下士闻道，大笑之。",
+          "page": 67,
+          "pinyinOcr": "xia shi wén dao l4Z OpIx pp"
+        },
+        {
+          "text": "不笑不足以为道。",
+          "page": 67,
+          "pinyinOcr": "bu  xido bu.  zu yi   wéi   dao"
+        },
+        {
+          "text": "故建言有之：",
+          "page": 67,
+          "pinyinOcr": "gu jian  yán youzhi"
+        },
+        {
+          "text": "明道若昧；进道若退；",
+          "page": 67,
+          "pinyinOcr": "ming daoruomei jin  daoruo tui"
+        },
+        {
+          "text": "夷道若類；上德若谷；",
+          "page": 67,
+          "pinyinOcr": "yi dao ruo lei shang dé ruo"
+        },
+        {
+          "text": "大白若辱；广德若不足；",
+          "page": 67,
+          "pinyinOcr": "nipqp guängdéruo bu zu"
+        },
+        {
+          "text": "建德若偷；质真若渝；",
+          "page": 68,
+          "pinyinOcr": "jian dé ruo tou zhi zhen  ruoyu"
+        },
+        {
+          "text": "大方无隅；大器晚成；",
+          "page": 68,
+          "pinyinOcr": "da fang wu yu wan cheng"
+        },
+        {
+          "text": "大音希声；大象无形；",
+          "page": 68,
+          "pinyinOcr": "da yin xi sheng daxiang wu xing"
+        },
+        {
+          "text": "道隐无名。",
+          "page": 68,
+          "pinyinOcr": "daoyin wu ming"
+        },
+        {
+          "text": "夫唯道，善贷且成。",
+          "page": 68,
+          "pinyinOcr": "fu wéi dao shandai qie  chéng"
+        }
+      ]
+    },
+    {
+      "chapter": "第四十二章",
+      "page": 69,
+      "rows": [
+        {
+          "text": "道生一，一生二，",
+          "page": 69,
+          "pinyinOcr": "dao shengyi yi   sheng er"
+        },
+        {
+          "text": "二生三，三生万物。",
+          "page": 69,
+          "pinyinOcr": "er sheng san san sheng wan wu"
+        },
+        {
+          "text": "万物负阴而抱阳，冲气以为和。",
+          "page": 69,
+          "pinyinOcr": "wanwufuyinér bao yáng chong qiyiwéihé"
+        },
+        {
+          "text": "人之所恶，唯孤、寡、不穀，",
+          "page": 69,
+          "pinyinOcr": "rénzhisuowu wei gu gua bu gu"
+        },
+        {
+          "text": "而王公以为称。",
+          "page": 69,
+          "pinyinOcr": "ér   wáng gong  yi  wéi cheng"
+        },
+        {
+          "text": "故物或损之而益，或益之而损。",
+          "page": 69,
+          "pinyinOcr": "gu Jθuzunsonynm huo yizhiér sun"
+        },
+        {
+          "text": "人之所教，我亦教之。",
+          "page": 69,
+          "pinyinOcr": "rénzhisuo jiao wo yijido zhi"
+        },
+        {
+          "text": "强梁者不得其死，吾将以为教父。",
+          "page": 69,
+          "pinyinOcr": "qiang liang zhe budéqisi wu jiangyi wéijiaofu"
+        }
+      ]
+    },
+    {
+      "chapter": "第四十三章",
+      "page": 70,
+      "rows": [
+        {
+          "text": "天下之至柔，",
+          "page": 70,
+          "pinyinOcr": "tianxiazhizhirou"
+        },
+        {
+          "text": "驰骋天下之至坚。",
+          "page": 70,
+          "pinyinOcr": "chi  cheng tian   xia  zhi   zhi  jian"
+        },
+        {
+          "text": "无有入无间，",
+          "page": 70,
+          "pinyinOcr": "wu you ru wu jian"
+        },
+        {
+          "text": "吾是以知无为之有益。",
+          "page": 70,
+          "pinyinOcr": "wu nouzmnmzu"
+        },
+        {
+          "text": "不言之教，无为之益，",
+          "page": 70,
+          "pinyinOcr": "bu   yan  zhi  jiao wu wéi zhi yi"
+        },
+        {
+          "text": "天下希及之。",
+          "page": 70,
+          "pinyinOcr": "tian   xia  xi ji   zhi"
+        }
+      ]
+    },
+    {
+      "chapter": "第四十四章",
+      "page": 71,
+      "rows": [
+        {
+          "text": "名与身孰亲？",
+          "page": 71,
+          "pinyinOcr": "ming yu shen shu qin"
+        },
+        {
+          "text": "身与货孰多？",
+          "page": 71,
+          "pinyinOcr": "shen yu huo shu duo"
+        },
+        {
+          "text": "得与亡孰病？",
+          "page": 71,
+          "pinyinOcr": "dé yu  wang  shu bing"
+        },
+        {
+          "text": "甚爱必大费；多藏必厚亡。",
+          "page": 71,
+          "pinyinOcr": "shen  ai bidafei duo cang bi hou wang"
+        },
+        {
+          "text": "故知足不辱，知止不殆，",
+          "page": 71,
+          "pinyinOcr": "nnqnzuzn6 ppnquz14z"
+        },
+        {
+          "text": "可以长久。",
+          "page": 71,
+          "pinyinOcr": "ké yi chang jiu"
+        }
+      ]
+    },
+    {
+      "chapter": "第四十五章",
+      "page": 72,
+      "rows": [
+        {
+          "text": "大成若缺，其用不弊。",
+          "page": 72,
+          "pinyinOcr": "da   chéng ruoque qi yongbu bi"
+        },
+        {
+          "text": "大盈若冲，其用不穷。",
+          "page": 72,
+          "pinyinOcr": "da ying ruo chong qiyong bu qiong"
+        },
+        {
+          "text": "大直若屈，大巧若拙，",
+          "page": 72,
+          "pinyinOcr": "da zhiruo（ nb onuz onu opibpp"
+        },
+        {
+          "text": "大辩若讷。",
+          "page": 72,
+          "pinyinOcr": "dabianruo ne"
+        },
+        {
+          "text": "静胜躁，寒胜热。",
+          "page": 72,
+          "pinyinOcr": "jing sheng zao han sheng re"
+        },
+        {
+          "text": "清静为天下正。",
+          "page": 72,
+          "pinyinOcr": "qingjing wéitian xia zheng"
+        }
+      ]
+    },
+    {
+      "chapter": "第四十六章",
+      "page": 73,
+      "rows": [
+        {
+          "text": "天下有道，却走马以粪。",
+          "page": 73,
+          "pinyinOcr": "tianxiayoudao que zou ma yi fen"
+        },
+        {
+          "text": "天下无道，戎马生于郊。",
+          "page": 73,
+          "pinyinOcr": "tian oppnmpIx rong ma sheng yu jiao"
+        },
+        {
+          "text": "祸莫大于不知足；",
+          "page": 73,
+          "pinyinOcr": "huomodayubuzhizu"
+        },
+        {
+          "text": "咎莫大于欲得。",
+          "page": 73,
+          "pinyinOcr": "jiu modayuyudé"
+        },
+        {
+          "text": "故知足之足，常足矣。",
+          "page": 73,
+          "pinyinOcr": "nz14znz14zn6 cháng  zu  yi"
+        }
+      ]
+    },
+    {
+      "chapter": "第四十七章",
+      "page": 74,
+      "rows": [
+        {
+          "text": "不出户，知天下；",
+          "page": 74,
+          "pinyinOcr": "bu chu hu zhi  tian  xia"
+        },
+        {
+          "text": "不窥牖，见天道。",
+          "page": 74,
+          "pinyinOcr": "nq iny you jian   tian dao"
+        },
+        {
+          "text": "其出弥远，其知弥少。",
+          "page": 74,
+          "pinyinOcr": "qi chu mi yuan qizhimi shäo"
+        },
+        {
+          "text": "是以圣人不行而知，",
+          "page": 74,
+          "pinyinOcr": "shi   yi  sheng  rén bu   xing   ér   zhi"
+        },
+        {
+          "text": "不见而明，不为而成。",
+          "page": 74,
+          "pinyinOcr": "bu jian  ér  ming bu wéi érchéng"
+        }
+      ]
+    },
+    {
+      "chapter": "第四十八章",
+      "page": 75,
+      "rows": [
+        {
+          "text": "为学日益，为道日损。",
+          "page": 75,
+          "pinyinOcr": "wéixue ri yi wéidao risun"
+        },
+        {
+          "text": "损之又损，以至于无为。",
+          "page": 75,
+          "pinyinOcr": "sun zhi you sun yizhiyuwuwéi"
+        },
+        {
+          "text": "无为而无不为。",
+          "page": 75,
+          "pinyinOcr": "wu wéiérwubuwei"
+        },
+        {
+          "text": "取天下常以无事，",
+          "page": 75,
+          "pinyinOcr": "nb tian  xia chang yi   wu  shi"
+        },
+        {
+          "text": "及其有事，不足以取天下。",
+          "page": 75,
+          "pinyinOcr": "jiqiyou  shi bu  zu yi   qu ian   ia"
+        }
+      ]
+    },
+    {
+      "chapter": "第四十九章",
+      "page": 76,
+      "rows": [
+        {
+          "text": "圣人无常心，以百姓心为心。",
+          "page": 76,
+          "pinyinOcr": "sheng rén wu chang xin yi bai  xing  xin wéi xin"
+        },
+        {
+          "text": "善者，吾善之；",
+          "page": 76,
+          "pinyinOcr": "shan zhe wushan zhi"
+        },
+        {
+          "text": "不善者，吾亦善之；德善。",
+          "page": 76,
+          "pinyinOcr": "bu  shan zhé wuyishanzhi dé shan"
+        },
+        {
+          "text": "信者，吾信之；",
+          "page": 76,
+          "pinyinOcr": "xin zhe wu xin zhi"
+        },
+        {
+          "text": "不信者，吾亦信之；德信。",
+          "page": 76,
+          "pinyinOcr": "bu xin zhé dé xin"
+        },
+        {
+          "text": "圣人在天下，歙歙焉，",
+          "page": 76,
+          "pinyinOcr": "sheng rén.zai tianxia xi xiyan"
+        },
+        {
+          "text": "为天下浑其心，百姓皆注其耳目，",
+          "page": 76,
+          "pinyinOcr": "wéi  tian  xia hun  qi  xin nwJajbnuzalbuixioq"
+        },
+        {
+          "text": "圣人皆孩之。",
+          "page": 76,
+          "pinyinOcr": "sheng  rén jie hái zhi"
+        }
+      ]
+    },
+    {
+      "chapter": "第五十章",
+      "page": 77,
+      "rows": [
+        {
+          "text": "出生入死。",
+          "page": 77,
+          "pinyinOcr": "chu shengru si"
+        },
+        {
+          "text": "生之徒，十有三；",
+          "page": 77,
+          "pinyinOcr": "sheng zhi tu shi   you san"
+        },
+        {
+          "text": "死之徒，十有三；",
+          "page": 77,
+          "pinyinOcr": "sizhitu shi   you san"
+        },
+        {
+          "text": "人之生，动之于死地，",
+          "page": 77,
+          "pinyinOcr": "rén zhi sheng !lsnuz buop"
+        },
+        {
+          "text": "亦十有三。",
+          "page": 77,
+          "pinyinOcr": "yi shi  you san"
+        },
+        {
+          "text": "夫何故？以其生生之厚。",
+          "page": 77,
+          "pinyinOcr": "fuhégu nou luz buaus buaus jb "
+        },
+        {
+          "text": "盖闻善摄生者，",
+          "page": 77,
+          "pinyinOcr": "gai wen shan she sheng zhe"
+        },
+        {
+          "text": "路行不遇兕虎，",
+          "page": 77,
+          "pinyinOcr": "lu xing  bu  yu si  hu"
+        },
+        {
+          "text": "入军不被甲兵；",
+          "page": 78,
+          "pinyinOcr": "ru jun bu bei jia bing"
+        },
+        {
+          "text": "兕无所投其角，",
+          "page": 78,
+          "pinyinOcr": "siwusuotouqijido"
+        },
+        {
+          "text": "虎无所用其爪，",
+          "page": 78,
+          "pinyinOcr": "hu opuz jb buoΛ ons nm"
+        },
+        {
+          "text": "兵无所容其刃。",
+          "page": 78,
+          "pinyinOcr": "bing wu suo rongqiren"
+        },
+        {
+          "text": "夫何故？以其无死地。",
+          "page": 78,
+          "pinyinOcr": "fuhégu yiqi wusidi"
+        }
+      ]
+    },
+    {
+      "chapter": "第五十一章",
+      "page": 79,
+      "rows": [
+        {
+          "text": "道生之，德畜之，",
+          "page": 79,
+          "pinyinOcr": "daosheng zhi dé xu zhi"
+        },
+        {
+          "text": "物形之，势成之。",
+          "page": 79,
+          "pinyinOcr": "wu  xing  zhi shi cheng   zhi"
+        },
+        {
+          "text": "是以万物莫不尊道而贵德。",
+          "page": 79,
+          "pinyinOcr": "shi yi wan wumobuzundaoér gui dé"
+        },
+        {
+          "text": "道之尊，德之贵，",
+          "page": 79,
+          "pinyinOcr": "dao zhizun dé zhi gui"
+        },
+        {
+          "text": "夫莫之命而常自然。",
+          "page": 79,
+          "pinyinOcr": "fu mo zhi ming ércháng  zi rán"
+        },
+        {
+          "text": "故道生之，德畜之；",
+          "page": 79,
+          "pinyinOcr": "gudao sheng zhi déxuzhi"
+        },
+        {
+          "text": "长之育之；亭之毒之；",
+          "page": 79,
+          "pinyinOcr": "IyznIyz6upuz 14znp14z 6u1"
+        },
+        {
+          "text": "养之覆之。",
+          "page": 79,
+          "pinyinOcr": "zhifu zhi"
+        },
+        {
+          "text": "生而不有，为而不恃，",
+          "page": 80,
+          "pinyinOcr": "sheng érbuyou wéi ér bu shi"
+        },
+        {
+          "text": "长而不宰。",
+          "page": 80,
+          "pinyinOcr": "!zng1θupuz"
+        },
+        {
+          "text": "是谓玄德。",
+          "page": 80,
+          "pinyinOcr": "shi weixuandé"
+        }
+      ]
+    },
+    {
+      "chapter": "第五十二章",
+      "page": 81,
+      "rows": [
+        {
+          "text": "天下有始，以为天下母。",
+          "page": 81,
+          "pinyinOcr": "tian xia youshi yi wéi tianxia mu"
+        },
+        {
+          "text": "既得其母，以知其子，既知其子，",
+          "page": 81,
+          "pinyinOcr": "jidéqimu"
+        },
+        {
+          "text": "复守其母，没身不殆。",
+          "page": 81,
+          "pinyinOcr": "fushou qimu mo shen bu  dai"
+        },
+        {
+          "text": "塞其兑，闭其门，终身不勤。",
+          "page": 81,
+          "pinyinOcr": "inpbps biqi mén zhong shen bu qin"
+        },
+        {
+          "text": "开其兑，济其事，终身不救。",
+          "page": 81,
+          "pinyinOcr": "nby qi shi zhong shen bu   jiu"
+        },
+        {
+          "text": "见小曰明，守柔曰强。",
+          "page": 81,
+          "pinyinOcr": "jian   xiao yue ming shou rou yue qiang"
+        },
+        {
+          "text": "用其光，复归其明，无遗身殃；",
+          "page": 81,
+          "pinyinOcr": "yong qi guang fu guiqiming wu   yi shen yang"
+        },
+        {
+          "text": "是为习常。",
+          "page": 81,
+          "pinyinOcr": "shi wéi xi chang"
+        }
+      ]
+    },
+    {
+      "chapter": "第五十三章",
+      "page": 82,
+      "rows": [
+        {
+          "text": "使我介然有知，行于大道，",
+          "page": 82,
+          "pinyinOcr": "shi wo  jie ran you zhi xing  yudadao"
+        },
+        {
+          "text": "唯施是畏。",
+          "page": 82,
+          "pinyinOcr": "yi shiwei"
+        },
+        {
+          "text": "大道甚夷，而人好径。",
+          "page": 82,
+          "pinyinOcr": "da dao shen yi ér  rén  hao jing"
+        },
+        {
+          "text": "朝甚除，田甚芜，仓甚虚；",
+          "page": 82,
+          "pinyinOcr": "chao shen chu tián shen wu cang shen xu"
+        },
+        {
+          "text": "服文采，带利剑，厌饮食，",
+          "page": 82,
+          "pinyinOcr": "fu wen cai dai li jian"
+        },
+        {
+          "text": "财货有馀；是谓盗夸。",
+          "page": 82,
+          "pinyinOcr": "cai huo you yu shiweidaokua"
+        },
+        {
+          "text": "非道也哉！",
+          "page": 82,
+          "pinyinOcr": "fei idao ye zai"
+        }
+      ]
+    },
+    {
+      "chapter": "第五十四章",
+      "page": 83,
+      "rows": [
+        {
+          "text": "善建者不拔，善抱者不脱，",
+          "page": 83,
+          "pinyinOcr": "shanjian zhebubá shanbao zhebu tuo"
+        },
+        {
+          "text": "子孙以祭祀不辍。",
+          "page": 83,
+          "pinyinOcr": "zi sunyijisibuchuo"
+        },
+        {
+          "text": "修之于身，其德乃真；",
+          "page": 83,
+          "pinyinOcr": "xiuzhi yushen nai zhen"
+        },
+        {
+          "text": "修之于家，其德乃馀；",
+          "page": 83,
+          "pinyinOcr": "xiu zhi yujia qidénaiyu"
+        },
+        {
+          "text": "修之于乡，其德乃长；",
+          "page": 83,
+          "pinyinOcr": "buix n Iyznix bupuz!uepb"
+        },
+        {
+          "text": "修之于邦，其德乃丰；",
+          "page": 83,
+          "pinyinOcr": "n!x zhiyubang qidénaifeng"
+        },
+        {
+          "text": "修之于天下，其德乃普。",
+          "page": 83,
+          "pinyinOcr": "!Xunyz!x nd"
+        },
+        {
+          "text": "故以身观身，以家观家，",
+          "page": 83,
+          "pinyinOcr": "gu yi, shen guan shen yijia guan  jia"
+        },
+        {
+          "text": "以乡观乡，以邦观邦，",
+          "page": 84,
+          "pinyinOcr": "yi  xiang guan xiang yibang guan bang"
+        },
+        {
+          "text": "以天下观天下。",
+          "page": 84,
+          "pinyinOcr": "yi   tian   xia  guan tian  xid"
+        },
+        {
+          "text": "吾何以知天下然哉？以此。",
+          "page": 84,
+          "pinyinOcr": "wu hé yi zhi tian xia rán zai yi  ci"
+        }
+      ]
+    },
+    {
+      "chapter": "第五十五章",
+      "page": 85,
+      "rows": [
+        {
+          "text": "含德之厚，比于赤子。",
+          "page": 85,
+          "pinyinOcr": "hándézhihou biyuchizi"
+        },
+        {
+          "text": "毒虫不螫，猛兽不据，",
+          "page": 85,
+          "pinyinOcr": "duchong bu shi meng shou bu ju"
+        },
+        {
+          "text": "攫鸟不搏。",
+          "page": 85,
+          "pinyinOcr": "jué niao bu bo"
+        },
+        {
+          "text": "骨弱筋柔而握固。",
+          "page": 85,
+          "pinyinOcr": "gu ruojin rouér wo gu"
+        },
+        {
+          "text": "未知牝牡之合而全作，",
+          "page": 85,
+          "pinyinOcr": "ljyluznwuduzam zui zuo"
+        },
+        {
+          "text": "精之至也。",
+          "page": 85,
+          "pinyinOcr": "jing   zhi zhi  yé"
+        },
+        {
+          "text": "终日号而不嗄，和之至也。",
+          "page": 85,
+          "pinyinOcr": "zhong riháo ér bu sha hézhizhiyé"
+        },
+        {
+          "text": "知和曰常，知常曰明。",
+          "page": 85,
+          "pinyinOcr": "zhi  hé yue chang zhi chang yue ming"
+        },
+        {
+          "text": "益生曰祥。",
+          "page": 86,
+          "pinyinOcr": "yi sheng yuexiáng"
+        },
+        {
+          "text": "心使气曰强。",
+          "page": 86,
+          "pinyinOcr": "xin  shi  qi  yueqiang"
+        },
+        {
+          "text": "物壮则老，谓之不道，",
+          "page": 86,
+          "pinyinOcr": "wuzhuangzéläo wei zhi bu dao"
+        },
+        {
+          "text": "不道早已。",
+          "page": 86,
+          "pinyinOcr": "opzoppnq"
+        }
+      ]
+    },
+    {
+      "chapter": "第五十六章",
+      "page": 87,
+      "rows": [
+        {
+          "text": "知者不言，言者不知。",
+          "page": 87,
+          "pinyinOcr": "zhi zhébu yán yán zhebuzhi"
+        },
+        {
+          "text": "塞其兑，闭其门；",
+          "page": 87,
+          "pinyinOcr": "se inpb bi qi  mén"
+        },
+        {
+          "text": "挫其锐，解其纷，",
+          "page": 87,
+          "pinyinOcr": "cuo q rui jie qi fen"
+        },
+        {
+          "text": "和其光，同其尘，是谓玄同。",
+          "page": 87,
+          "pinyinOcr": "héqiguang tong qi chén shi wei xuan tong"
+        },
+        {
+          "text": "故不可得而亲，不可得而疏；",
+          "page": 87,
+          "pinyinOcr": "gu eyg bukedé érshu"
+        },
+        {
+          "text": "不可得而利，不可得而害；",
+          "page": 87,
+          "pinyinOcr": "bukedé érli bukedééerhai"
+        },
+        {
+          "text": "不可得而贵，不可得而贱。",
+          "page": 87,
+          "pinyinOcr": "nq kédéérgui buke déér jian"
+        },
+        {
+          "text": "故为天下贵。",
+          "page": 87,
+          "pinyinOcr": "gu In6 p!x up! !9m"
+        }
+      ]
+    },
+    {
+      "chapter": "第五十七章",
+      "page": 88,
+      "rows": [
+        {
+          "text": "以正治国，以奇用兵，",
+          "page": 88,
+          "pinyinOcr": "yi  zheng zhi  guo yiqi yong bing"
+        },
+        {
+          "text": "以无事取天下。",
+          "page": 88,
+          "pinyinOcr": "yi wushi qu tian xia"
+        },
+        {
+          "text": "吾何以知其然哉？",
+          "page": 88,
+          "pinyinOcr": ""
+        },
+        {
+          "text": "以此：天下多忌讳，而民弥贫；",
+          "page": 88,
+          "pinyinOcr": "yi  ci tian xia duoji hui érminmi pin"
+        },
+        {
+          "text": "人多利器，国家滋昏；",
+          "page": 88,
+          "pinyinOcr": "rén  duoliqi guo jia zihun"
+        },
+        {
+          "text": "人多伎巧，奇物滋起；",
+          "page": 88,
+          "pinyinOcr": "rén duojiqido qi wu b"
+        },
+        {
+          "text": "法令滋彰，盗贼多有。",
+          "page": 88,
+          "pinyinOcr": "fälingzizhang dao zéiduo you"
+        },
+        {
+          "text": "故圣人云：“我无为，而民自化；",
+          "page": 88,
+          "pinyinOcr": "gu sheng rén yun wowuwéi érminzihua"
+        },
+        {
+          "text": "我好静，而民自正；",
+          "page": 89,
+          "pinyinOcr": "wohao jing ér min  zi zheng"
+        },
+        {
+          "text": "我无事，而民自富；",
+          "page": 89,
+          "pinyinOcr": "wo wu shi ér min zi fu"
+        },
+        {
+          "text": "我无欲，而民自朴。”",
+          "page": 89,
+          "pinyinOcr": "wo wu   yu ér min zi pu"
+        }
+      ]
+    },
+    {
+      "chapter": "第五十八章",
+      "page": 90,
+      "rows": [
+        {
+          "text": "其政闷闷，其民淳淳；",
+          "page": 90,
+          "pinyinOcr": "qi zheng men men qi min chun chun"
+        },
+        {
+          "text": "其政察察，其民缺缺。",
+          "page": 90,
+          "pinyinOcr": "qi  zheng cha chá qi  min que que"
+        },
+        {
+          "text": "祸兮福之所倚，福兮祸之所伏。",
+          "page": 90,
+          "pinyinOcr": "huo xifuzhisuo yi fu xi huozhisuofu"
+        },
+        {
+          "text": "孰知其极？其无正也。",
+          "page": 90,
+          "pinyinOcr": "!buznus qi  wu zhengyé"
+        },
+        {
+          "text": "正复为奇，善复为妖。",
+          "page": 90,
+          "pinyinOcr": "zheng  fu weéi qi shan  fu   wéi yao"
+        },
+        {
+          "text": "人之迷，其日固久。",
+          "page": 90,
+          "pinyinOcr": "rénzhimi ib n6"
+        },
+        {
+          "text": "是以圣人方而不割，廉而不刿，",
+          "page": 90,
+          "pinyinOcr": "shi yi shengrénfang érbu ge lián érbu gui"
+        },
+        {
+          "text": "直而不肆，光而不耀。",
+          "page": 90,
+          "pinyinOcr": "zhiér bu si guang érbuyao"
+        }
+      ]
+    },
+    {
+      "chapter": "第五十九章",
+      "page": 91,
+      "rows": [
+        {
+          "text": "治人事天，莫若啬。",
+          "page": 91,
+          "pinyinOcr": "zhirénshitian moruose"
+        },
+        {
+          "text": "夫唯啬，是谓早服；",
+          "page": 91,
+          "pinyinOcr": "fu weéi se shi weizáo fu"
+        },
+        {
+          "text": "早服谓之重积德；",
+          "page": 91,
+          "pinyinOcr": "záo fu weizhichongj dé"
+        },
+        {
+          "text": "重积德则无不克；",
+          "page": 91,
+          "pinyinOcr": "chongjidézé wu buke"
+        },
+        {
+          "text": "无不克则莫知其极；",
+          "page": 91,
+          "pinyinOcr": "wubukezémozhiqiji"
+        },
+        {
+          "text": "莫知其极，可以有国；",
+          "page": 91,
+          "pinyinOcr": "bzow kéyiyou guo"
+        },
+        {
+          "text": "有国之母，可以长久；",
+          "page": 91,
+          "pinyinOcr": "nw 1uz on6 noK ke yi cháng jiu"
+        },
+        {
+          "text": "是谓深根固柢，长生久视之道。",
+          "page": 91,
+          "pinyinOcr": "shi wei shen gen !pnb chang shengjiushi zhi dao"
+        }
+      ]
+    },
+    {
+      "chapter": "第六十章",
+      "page": 92,
+      "rows": [
+        {
+          "text": "治大国，若烹小鲜。",
+          "page": 92,
+          "pinyinOcr": "zhi da guo ruo peng xiao xian"
+        },
+        {
+          "text": "以道莅天下，其鬼不神；",
+          "page": 92,
+          "pinyinOcr": "yi  dao li tian  xia qi gui bu shén"
+        },
+        {
+          "text": "非其鬼不神，其神不伤人；",
+          "page": 92,
+          "pinyinOcr": "feiqi guibu shén qi shén bu shang rén"
+        },
+        {
+          "text": "非其神不伤人，",
+          "page": 92,
+          "pinyinOcr": "fei qi shén bu shang rén"
+        },
+        {
+          "text": "圣人亦不伤人。",
+          "page": 92,
+          "pinyinOcr": "shengréen yi bu shang ren"
+        },
+        {
+          "text": "夫两不相伤，故德交归焉。",
+          "page": 92,
+          "pinyinOcr": "fuliang bu xiang shang gu dé jiao gui yan"
+        }
+      ]
+    },
+    {
+      "chapter": "第六十一章",
+      "page": 93,
+      "rows": [
+        {
+          "text": "大邦者下流，天下之牝，",
+          "page": 93,
+          "pinyinOcr": "da  bang  zhe  xialiu tian  xia zhi  pin"
+        },
+        {
+          "text": "天下之交也。",
+          "page": 93,
+          "pinyinOcr": "tian  xia zhi jiao  yé"
+        },
+        {
+          "text": "牝常以静胜牡，以静为下。",
+          "page": 93,
+          "pinyinOcr": "pin cháng yi jing  sheng  mu yi jing wéi xid"
+        },
+        {
+          "text": "故大邦以下小邦，则取小邦；",
+          "page": 93,
+          "pinyinOcr": "gudabangyixidxiao bang zéqu xiao bang"
+        },
+        {
+          "text": "小邦以下大邦，则取大邦。",
+          "page": 93,
+          "pinyinOcr": "xido bang yi xiada bang zé qu dabang"
+        },
+        {
+          "text": "故或下以取，或下而取。",
+          "page": 93,
+          "pinyinOcr": "gu huo bony"
+        },
+        {
+          "text": "大邦不过欲兼畜人，",
+          "page": 93,
+          "pinyinOcr": "dabangbuguoyujian xu rén"
+        },
+        {
+          "text": "小邦不过欲入事人。",
+          "page": 93,
+          "pinyinOcr": "xiao bangbuguoyuru shirén"
+        },
+        {
+          "text": "夫两者各得所欲，大者宜为下。",
+          "page": 93,
+          "pinyinOcr": "fuliangzhegedésuo yu da zhe yi  wéi xia"
+        }
+      ]
+    },
+    {
+      "chapter": "第六十二章",
+      "page": 94,
+      "rows": [
+        {
+          "text": "道者万物之奥。",
+          "page": 94,
+          "pinyinOcr": "oplznmupmauzopp"
+        },
+        {
+          "text": "善人之宝，不善人之所保。",
+          "page": 94,
+          "pinyinOcr": "shanrénzhibao bushanrénzhisuo bao"
+        },
+        {
+          "text": "美言可以市尊，美行可以加人。",
+          "page": 94,
+          "pinyinOcr": "mei yán  ke yi  shi zun mei  xing  ke yi jiarén"
+        },
+        {
+          "text": "人之不善，何弃之有？",
+          "page": 94,
+          "pinyinOcr": "rén zhi bu shan héqizhiyou"
+        },
+        {
+          "text": "故立天子，置三公，",
+          "page": 94,
+          "pinyinOcr": "zhi san gong"
+        },
+        {
+          "text": "虽有拱璧以先驷马，",
+          "page": 94,
+          "pinyinOcr": "sui you gongbi yixian si ma"
+        },
+        {
+          "text": "不如坐进此道。",
+          "page": 94,
+          "pinyinOcr": "bu ru zuo jin cidao"
+        },
+        {
+          "text": "古之所以贵此道者何？",
+          "page": 94,
+          "pinyinOcr": "guzhisuoyiguicidaozhehé"
+        },
+        {
+          "text": "不曰：求以得，有罪以免邪？",
+          "page": 95,
+          "pinyinOcr": "bu yue qiuyidé you zui  yi  mian  yé"
+        },
+        {
+          "text": "故为天下贵。",
+          "page": 95,
+          "pinyinOcr": "gu weéi tian xid gui"
+        }
+      ]
+    },
+    {
+      "chapter": "第六十三章",
+      "page": 96,
+      "rows": [
+        {
+          "text": "为无为，事无事，味无味。",
+          "page": 96,
+          "pinyinOcr": "wéiwuwei shiwushi weiwuwei"
+        },
+        {
+          "text": "大小多少。报怨以德。",
+          "page": 96,
+          "pinyinOcr": "daxiaoduo shao bao  yuan yidé"
+        },
+        {
+          "text": "图难于其易，为大于其细；",
+          "page": 96,
+          "pinyinOcr": "tunan yuqi yi xbnp!M"
+        },
+        {
+          "text": "天下难事，必作于易；",
+          "page": 96,
+          "pinyinOcr": "tian   xia   nan   shi bi zuo yuyi"
+        },
+        {
+          "text": "天下大事，必作于细。",
+          "page": 96,
+          "pinyinOcr": "tianxiadashi onz！q"
+        },
+        {
+          "text": "是以圣人终不为大，故能成其大。",
+          "page": 96,
+          "pinyinOcr": "shiyisheng rénzhongbuwéida gu nengcheng qida"
+        },
+        {
+          "text": "夫轻诺必寡信，多易必多难。",
+          "page": 96,
+          "pinyinOcr": "fuqing nuo bi guä xin duo  yi biduonán"
+        },
+        {
+          "text": "是以圣人犹难之，故终无难矣。",
+          "page": 96,
+          "pinyinOcr": "shi yi  sheng rén you nánzhi gu zhong  wu nan yi"
+        }
+      ]
+    },
+    {
+      "chapter": "第六十四章",
+      "page": 97,
+      "rows": [
+        {
+          "text": "其安易持，其未兆易谋。",
+          "page": 97,
+          "pinyinOcr": "qianyi chi qi  wei zhao yi mou"
+        },
+        {
+          "text": "其脆易泮，其微易散。",
+          "page": 97,
+          "pinyinOcr": "qi cuiyipan qi wei yisan"
+        },
+        {
+          "text": "为之于未有，治之于未乱。",
+          "page": 97,
+          "pinyinOcr": "wéizhiyuwei you upn!amnIuzluz"
+        },
+        {
+          "text": "合抱之木，生于毫末；",
+          "page": 97,
+          "pinyinOcr": "hébao zhi mu sheng yu háo mo"
+        },
+        {
+          "text": "九层之台，起于累土；",
+          "page": 97,
+          "pinyinOcr": "jiu céng  zhi tai qiyuléi tu"
+        },
+        {
+          "text": "千里之行，始于足下。",
+          "page": 97,
+          "pinyinOcr": "qian lizhixing Inznus"
+        },
+        {
+          "text": "为者败之，执者失之。",
+          "page": 97,
+          "pinyinOcr": "wéizhe baizhi zhizhé shi zhi"
+        },
+        {
+          "text": "是以圣人无为，故无败；",
+          "page": 97,
+          "pinyinOcr": "shi yi sheng rén wu wei gu wu bai"
+        },
+        {
+          "text": "无执故无失。",
+          "page": 98,
+          "pinyinOcr": "wuzhi guwu shi"
+        },
+        {
+          "text": "民之从事，常于几成而败之。",
+          "page": 98,
+          "pinyinOcr": "minzhicongshi cháng  yu ji chéngérbaizhi"
+        },
+        {
+          "text": "慎终如始，则无败事。",
+          "page": 98,
+          "pinyinOcr": "shen zhong ru shi zé wu bai shi"
+        },
+        {
+          "text": "是以圣人欲不欲，",
+          "page": 98,
+          "pinyinOcr": "shi i  yi  sheng  rén yu bu yu"
+        },
+        {
+          "text": "不贵难得之货，",
+          "page": 98,
+          "pinyinOcr": "bu gui nándé zhi huo"
+        },
+        {
+          "text": "学不学，复众人之所过，",
+          "page": 98,
+          "pinyinOcr": "xuébu xué fu zhong rén zhi suo guo"
+        },
+        {
+          "text": "以辅万物之自然而不敢为。",
+          "page": 98,
+          "pinyinOcr": "yifuwan wu zhiziranérbu ganwéi"
+        }
+      ]
+    },
+    {
+      "chapter": "第六十五章",
+      "page": 99,
+      "rows": [
+        {
+          "text": "古之善为道者，",
+          "page": 99,
+          "pinyinOcr": "guzhi shanweidaozhe"
+        },
+        {
+          "text": "非以明民，将以愚之。",
+          "page": 99,
+          "pinyinOcr": "fei yi  ming min jiang yiyuzhi"
+        },
+        {
+          "text": "民之难治，以其智多。",
+          "page": 99,
+          "pinyinOcr": "minzhinanzhi onpuzb"
+        },
+        {
+          "text": "故以智治国，国之贼；",
+          "page": 99,
+          "pinyinOcr": "on61uz！4z！n6 guo   zhi  zéi"
+        },
+        {
+          "text": "不以智治国，国之福。",
+          "page": 99,
+          "pinyinOcr": "on1uz1uznq guo   zhi  fu"
+        },
+        {
+          "text": "知此两者，亦稽式。",
+          "page": 99,
+          "pinyinOcr": "zhi ciliang zhe yijshi"
+        },
+        {
+          "text": "常知稽式，是谓玄德。",
+          "page": 99,
+          "pinyinOcr": "chang zhtjishi shiwei xuan dé"
+        },
+        {
+          "text": "玄德深矣，远矣，与物反矣，",
+          "page": 99,
+          "pinyinOcr": "xuan  dé  shen   yi yuanyi yu wufan yi"
+        },
+        {
+          "text": "然後乃至大顺。",
+          "page": 99,
+          "pinyinOcr": "rán hou nai zhi da shun"
+        }
+      ]
+    },
+    {
+      "chapter": "第六十六章",
+      "page": 100,
+      "rows": [
+        {
+          "text": "江海之所以能为百谷王者，",
+          "page": 100,
+          "pinyinOcr": "jiang   hai   zhi   suo yi   néng  wei  bai   gu  wang  zhe"
+        },
+        {
+          "text": "以其善下之，故能为百谷王。",
+          "page": 100,
+          "pinyinOcr": "lyz!x upus b！ gu néng wéi bai gu wang"
+        },
+        {
+          "text": "是以圣人欲上民，必以言下之；",
+          "page": 100,
+          "pinyinOcr": "shi   yi sheng rén yu shang min biyiyánxiazhi"
+        },
+        {
+          "text": "欲先民，必以身後之。",
+          "page": 100,
+          "pinyinOcr": "yu xian min biyishen houzhi"
+        },
+        {
+          "text": "是以圣人处上而民不重，",
+          "page": 100,
+          "pinyinOcr": "shi i yi shengrén chu  shang ér min bu zhong"
+        },
+        {
+          "text": "处前而民不害。",
+          "page": 100,
+          "pinyinOcr": "chu  qián ér  min bu  hai"
+        },
+        {
+          "text": "是以天下乐推而不厌。",
+          "page": 100,
+          "pinyinOcr": "shi yi tian  xia  le tui ér bu yan"
+        },
+        {
+          "text": "以其不争，故天下莫能与之争。",
+          "page": 100,
+          "pinyinOcr": "yiqi bu zheng gu tian xia mo néeng  yu  zhi  zheng"
+        }
+      ]
+    },
+    {
+      "chapter": "第六十七章",
+      "page": 101,
+      "rows": [
+        {
+          "text": "天下皆谓我“道”大，似不肖。",
+          "page": 101,
+          "pinyinOcr": "tian xia jie wei wo dao da sibu xiao"
+        },
+        {
+          "text": "夫唯大，故似不肖。",
+          "page": 101,
+          "pinyinOcr": "fu wéi da gu sibu xido"
+        },
+        {
+          "text": "若肖，久矣其细也夫！",
+          "page": 101,
+          "pinyinOcr": "ruo xiao jiuyiqixiyéfu"
+        },
+        {
+          "text": "我有三宝，持而保之：",
+          "page": 101,
+          "pinyinOcr": "woyou san bäo chi érbáo zhi"
+        },
+        {
+          "text": "一曰慈，二曰俭，",
+          "page": 101,
+          "pinyinOcr": "yi yue ci er   yue  jian"
+        },
+        {
+          "text": "三曰不敢为天下先。",
+          "page": 101,
+          "pinyinOcr": "san yuebugan wéitianxia xian"
+        },
+        {
+          "text": "慈故能勇；俭故能广；",
+          "page": 101,
+          "pinyinOcr": "ci gu neng yong jiängu  néng guang"
+        },
+        {
+          "text": "不敢为天下先，故能成器长。",
+          "page": 101,
+          "pinyinOcr": "bu gan wéi tian xia  xian gu neng chéng qi zhang"
+        },
+        {
+          "text": "今舍慈且勇，舍俭且广，",
+          "page": 102,
+          "pinyinOcr": "jin  shé ci qiè yong she jianqie guang"
+        },
+        {
+          "text": "舍後且先，死矣！",
+          "page": 102,
+          "pinyinOcr": "she hou qie xian si   yi"
+        },
+        {
+          "text": "夫慈，以战则胜，以守则固。",
+          "page": 102,
+          "pinyinOcr": "fu ci"
+        },
+        {
+          "text": "天将救之，以慈卫之。",
+          "page": 102,
+          "pinyinOcr": "tian  jiang  jiu  zhi yici wei zhi"
+        }
+      ]
+    },
+    {
+      "chapter": "第六十八章",
+      "page": 103,
+      "rows": [
+        {
+          "text": "善为士者，不武；",
+          "page": 103,
+          "pinyinOcr": "shanweishi zhé bu wu"
+        },
+        {
+          "text": "善战者，不怒；",
+          "page": 103,
+          "pinyinOcr": "shan zhan zhe bu nu"
+        },
+        {
+          "text": "善胜敌者，不与；",
+          "page": 103,
+          "pinyinOcr": "shan sheng di zhé bu yu"
+        },
+        {
+          "text": "善用人者，为之下。",
+          "page": 103,
+          "pinyinOcr": "shan yong rénzhe wéi  zhi xia"
+        },
+        {
+          "text": "是谓不争之德，是谓用人之力，",
+          "page": 103,
+          "pinyinOcr": "shi  wei yongrén zhili"
+        },
+        {
+          "text": "是谓配天，古之极。",
+          "page": 103,
+          "pinyinOcr": "shiweipeitian !14zn6"
+        }
+      ]
+    },
+    {
+      "chapter": "第六十九章",
+      "page": 104,
+      "rows": [
+        {
+          "text": "用兵有言：",
+          "page": 104,
+          "pinyinOcr": "yong bing you yan"
+        },
+        {
+          "text": "“吾不敢为主，而为客；",
+          "page": 104,
+          "pinyinOcr": "wubugan wéizhu érwéike"
+        },
+        {
+          "text": "不敢进寸，而退尺。”",
+          "page": 104,
+          "pinyinOcr": "bu   gan   jin   cun ér   tui  chi"
+        },
+        {
+          "text": "是谓行无行；攘无臂；",
+          "page": 104,
+          "pinyinOcr": "shi wei hang wu hang rang  wu bi"
+        },
+        {
+          "text": "扔无敌；执无兵。",
+          "page": 104,
+          "pinyinOcr": "reng wudi zhi   wu bing"
+        },
+        {
+          "text": "祸莫大于轻敌，轻敌几丧吾宝。",
+          "page": 104,
+          "pinyinOcr": "huo mo  da  yu  qing  di qing   di  ji   sang  wu  báo"
+        },
+        {
+          "text": "故抗兵相若，哀者胜矣。",
+          "page": 104,
+          "pinyinOcr": "gu  kang bing xiang ruo ai zhe sheng  yi"
+        }
+      ]
+    },
+    {
+      "chapter": "第七十章",
+      "page": 105,
+      "rows": [
+        {
+          "text": "吾言甚易知，甚易行。",
+          "page": 105,
+          "pinyinOcr": "wuyanshen yi zhi shen yi  xing"
+        },
+        {
+          "text": "天下莫能知，莫能行。",
+          "page": 105,
+          "pinyinOcr": "tian   xia  mo  néng  zhi mo neng xing"
+        },
+        {
+          "text": "言有宗，事有君。",
+          "page": 105,
+          "pinyinOcr": "yan you zong shi you jun"
+        },
+        {
+          "text": "夫唯无知，是以不我知。",
+          "page": 105,
+          "pinyinOcr": "fu wéi wuzhi shiyibu wo zhi"
+        },
+        {
+          "text": "知我者希，则我者贵。",
+          "page": 105,
+          "pinyinOcr": "zhi wozhé xi zé wozhegui"
+        },
+        {
+          "text": "是以圣人被褐而怀玉。",
+          "page": 105,
+          "pinyinOcr": "shi  yi  sheng rén pi he ér hudi yu"
+        }
+      ]
+    },
+    {
+      "chapter": "第七十一章",
+      "page": 106,
+      "rows": [
+        {
+          "text": "知不知，尚矣；",
+          "page": 106,
+          "pinyinOcr": "zhi  bu zhi"
+        },
+        {
+          "text": "不知知，病也。",
+          "page": 106,
+          "pinyinOcr": "bu zhi zhi bing   ye"
+        },
+        {
+          "text": "圣人不病，以其病病。",
+          "page": 106,
+          "pinyinOcr": "shengrenbubing yi qi bing bing"
+        },
+        {
+          "text": "夫唯病病，是以不病。",
+          "page": 106,
+          "pinyinOcr": "fuwei bing bing shiyibubing"
+        }
+      ]
+    },
+    {
+      "chapter": "第七十二章",
+      "page": 107,
+      "rows": [
+        {
+          "text": "民不畏威，则大威至。",
+          "page": 107,
+          "pinyinOcr": "minbuweiwei zé da wei zhi"
+        },
+        {
+          "text": "无狎其所居，无厌其所生。",
+          "page": 107,
+          "pinyinOcr": "wu  xiáa qi  suo ju wu yan qi  suo sheng"
+        },
+        {
+          "text": "夫唯不厌，是以不厌。",
+          "page": 107,
+          "pinyinOcr": "fuwéibu yan shi yibuyan"
+        },
+        {
+          "text": "是以圣人自知不自见；",
+          "page": 107,
+          "pinyinOcr": "shiyishengrénzizhibuzixian"
+        },
+        {
+          "text": "自爱不自贵。",
+          "page": 107,
+          "pinyinOcr": "nzngz"
+        },
+        {
+          "text": "故去彼取此。",
+          "page": 107,
+          "pinyinOcr": "guqubiquci"
+        }
+      ]
+    },
+    {
+      "chapter": "第七十三章",
+      "page": 108,
+      "rows": [
+        {
+          "text": "勇于敢则杀，勇于不敢则活。",
+          "page": 108,
+          "pinyinOcr": "yong yu gan zésha yong yubu gän zéhuo"
+        },
+        {
+          "text": "此两者，或利或害。",
+          "page": 108,
+          "pinyinOcr": "ciliang zhe huo li huo  hai"
+        },
+        {
+          "text": "天之所恶，孰知其故？",
+          "page": 108,
+          "pinyinOcr": "tianzhisuowu n6jbluz nus"
+        },
+        {
+          "text": "是以圣人犹难之。",
+          "page": 108,
+          "pinyinOcr": "shi  yi  sheng  reén  you nán  zhi"
+        },
+        {
+          "text": "天之道，不争而善胜，",
+          "page": 108,
+          "pinyinOcr": "tian zhidao bu zhengér shan sheng"
+        },
+        {
+          "text": "不言而善应，不召而自来，",
+          "page": 108,
+          "pinyinOcr": "bu  yán  ér  shan ying zuzng"
+        },
+        {
+          "text": "繟然而善谋。",
+          "page": 108,
+          "pinyinOcr": "chanran érshan mou"
+        },
+        {
+          "text": "天网恢恢，疏而不失。",
+          "page": 108,
+          "pinyinOcr": "tian  wang hui hui shuérbu shi"
+        }
+      ]
+    },
+    {
+      "chapter": "第七十四章",
+      "page": 109,
+      "rows": [
+        {
+          "text": "民不畏死，奈何以死惧之？",
+          "page": 109,
+          "pinyinOcr": "min bu wei si yznsyIou"
+        },
+        {
+          "text": "若使民常畏死，而为奇者，",
+          "page": 109,
+          "pinyinOcr": "ruo shi  min chang  wei  si ér   weéi   qi zhé"
+        },
+        {
+          "text": "吾得执而杀之，孰敢？",
+          "page": 109,
+          "pinyinOcr": "wu de zhi érshazhi shu  gän"
+        },
+        {
+          "text": "常有司杀者杀。",
+          "page": 109,
+          "pinyinOcr": "chang you sisha zhé sha"
+        },
+        {
+          "text": "夫代司杀者杀，是谓代大匠斲，",
+          "page": 109,
+          "pinyinOcr": "fu dai sisha zhe sha shi wei dai da jiangzhuo"
+        },
+        {
+          "text": "夫代大匠斲者，希有不伤其手矣。",
+          "page": 109,
+          "pinyinOcr": "fudai da jiangzhuo zhe Xi you bu shang qi shou yi"
+        }
+      ]
+    },
+    {
+      "chapter": "第七十五章",
+      "page": 110,
+      "rows": [
+        {
+          "text": "民之饥，以其上食税之多，",
+          "page": 110,
+          "pinyinOcr": "min zhij yiqi shang shi shui zhiduo"
+        },
+        {
+          "text": "是以饥。",
+          "page": 110,
+          "pinyinOcr": "shi yij"
+        },
+        {
+          "text": "民之难治，以其上之有为，",
+          "page": 110,
+          "pinyinOcr": "min z upu Iyz yiqi shang zhi you wéi"
+        },
+        {
+          "text": "是以难治。",
+          "page": 110,
+          "pinyinOcr": "shi iyi nán zhi"
+        },
+        {
+          "text": "民之轻死，以其上求生之厚，",
+          "page": 110,
+          "pinyinOcr": "min  zhi  qing   si yiqi  shang qiu sheng zhi hou"
+        },
+        {
+          "text": "是以轻死。",
+          "page": 110,
+          "pinyinOcr": "shi iyiqing si"
+        },
+        {
+          "text": "夫唯无以生为者，是贤于贵生。",
+          "page": 110,
+          "pinyinOcr": "fuweiwuyishengwei zhe shi xián yugui sheng"
+        }
+      ]
+    },
+    {
+      "chapter": "第七十六章",
+      "page": 111,
+      "rows": [
+        {
+          "text": "人之生也柔弱，其死也坚强。",
+          "page": 111,
+          "pinyinOcr": "rénzhi sheng yérou ruo qisiyéjianqiang"
+        },
+        {
+          "text": "草木之生也柔脆，其死也枯槁。",
+          "page": 111,
+          "pinyinOcr": "caomuzhishengyéroucui qisiyékugáo"
+        },
+        {
+          "text": "故坚强者死之徒，柔弱者生之徒。",
+          "page": 111,
+          "pinyinOcr": "gujian qiang zhe sizhi tu rouruozhe sheng zhitu"
+        },
+        {
+          "text": "是以兵强则灭，木强则折。",
+          "page": 111,
+          "pinyinOcr": "shi iyibing qiangzé mie mu qiang zé zhé"
+        },
+        {
+          "text": "强大处下，柔弱处上。",
+          "page": 111,
+          "pinyinOcr": "qiángda chu xia rou ruo chu shang"
+        }
+      ]
+    },
+    {
+      "chapter": "第七十七章",
+      "page": 112,
+      "rows": [
+        {
+          "text": "天之道，其犹张弓与？",
+          "page": 112,
+          "pinyinOcr": "tianzhidao qiyou zhang gong yu"
+        },
+        {
+          "text": "高者抑之，下者举之，",
+          "page": 112,
+          "pinyinOcr": "gaozhe yi zhi lyzn!uZDIX"
+        },
+        {
+          "text": "有馀者损之，不足者补之。",
+          "page": 112,
+          "pinyinOcr": "you yu zhe sun zhi bu zu zhébu zhi"
+        },
+        {
+          "text": "天之道，损有馀而补不足。",
+          "page": 112,
+          "pinyinOcr": "tian zhi dao nznqnglθnnouns"
+        },
+        {
+          "text": "人之道，则不然，损不足以奉有馀。",
+          "page": 112,
+          "pinyinOcr": "rénzhidao zéburán sun buzuyi feng youyu"
+        },
+        {
+          "text": "孰能有馀以奉天下，唯有道者。",
+          "page": 112,
+          "pinyinOcr": "shu néng you yuyifeng tianxid wei youdaozhé"
+        },
+        {
+          "text": "是以圣人为而不恃，",
+          "page": 112,
+          "pinyinOcr": "shi yi shengrén wéi ér bu shi"
+        },
+        {
+          "text": "功成而不处，其不欲见贤。",
+          "page": 112,
+          "pinyinOcr": "gong chéng ér bu  chu upixnnqb xian"
+        }
+      ]
+    },
+    {
+      "chapter": "第七十八章",
+      "page": 113,
+      "rows": [
+        {
+          "text": "天下莫柔弱于水，",
+          "page": 113,
+          "pinyinOcr": "tianxidmorouruoyushui"
+        },
+        {
+          "text": "而攻坚强者莫之能胜，",
+          "page": 113,
+          "pinyinOcr": "ér gong jian qiang zhe mo zhi  néng sheng"
+        },
+        {
+          "text": "以其无以易之。",
+          "page": 113,
+          "pinyinOcr": "yi jb wu   yi yi zhi"
+        },
+        {
+          "text": "弱之胜强，柔之胜刚，",
+          "page": 113,
+          "pinyinOcr": "ruo zhi sheng qiang rou zhi sheng gang"
+        },
+        {
+          "text": "天下莫不知，莫能行。",
+          "page": 113,
+          "pinyinOcr": "tian  xia mo bu zhi mo neng xing"
+        },
+        {
+          "text": "是以圣人云：",
+          "page": 113,
+          "pinyinOcr": "shi iyisheng rényun"
+        },
+        {
+          "text": "“受国之垢，是谓社稷主；",
+          "page": 113,
+          "pinyinOcr": "shou guo zhi gou shi wei she ji zhu"
+        },
+        {
+          "text": "受国不祥，是为天下王。”",
+          "page": 113,
+          "pinyinOcr": "shou guobu xiang shi  wei tian xia  wang"
+        },
+        {
+          "text": "正言若反。",
+          "page": 113,
+          "pinyinOcr": "zheng yan ruo fan"
+        }
+      ]
+    },
+    {
+      "chapter": "第七十九章",
+      "page": 114,
+      "rows": [
+        {
+          "text": "和大怨，必有馀怨；",
+          "page": 114,
+          "pinyinOcr": "he dayuan biyou yu yuan"
+        },
+        {
+          "text": "报怨以德，安可以为善？",
+          "page": 114,
+          "pinyinOcr": "bao yuan yi dé an ke yi wei shan"
+        },
+        {
+          "text": "是以圣人执左契，",
+          "page": 114,
+          "pinyinOcr": "shi bonzjuzuabuaus"
+        },
+        {
+          "text": "而不责于人。",
+          "page": 114,
+          "pinyinOcr": "ér buzé yurén"
+        },
+        {
+          "text": "有德司契，无德司彻。",
+          "page": 114,
+          "pinyinOcr": "you wudé siche"
+        },
+        {
+          "text": "天道无亲，常与善人。",
+          "page": 114,
+          "pinyinOcr": "tiandao  wuqin chang  yu shan rén"
+        }
+      ]
+    },
+    {
+      "chapter": "第八十章",
+      "page": 115,
+      "rows": [
+        {
+          "text": "小国寡民。",
+          "page": 115,
+          "pinyinOcr": "ujw on6 on6 op!x"
+        },
+        {
+          "text": "使有什伯之器而不用；",
+          "page": 115,
+          "pinyinOcr": "shi you shi bai b4z ér bu yong"
+        },
+        {
+          "text": "使民重死而不远徙。",
+          "page": 115,
+          "pinyinOcr": "shi min zhong  si ér bu yuan xi"
+        },
+        {
+          "text": "虽有舟舆，无所乘之；",
+          "page": 115,
+          "pinyinOcr": "sui you zhou yu wusuo chéng zhi"
+        },
+        {
+          "text": "虽有甲兵，无所陈之。",
+          "page": 115,
+          "pinyinOcr": "sui you jiabing wusuochen zhi"
+        },
+        {
+          "text": "使民复结绳而用之。",
+          "page": 115,
+          "pinyinOcr": "shi minfu jié sheéng éryong zhi"
+        },
+        {
+          "text": "至治之极。",
+          "page": 115,
+          "pinyinOcr": "Z4Z{4Z"
+        },
+        {
+          "text": "甘其食，美其服，",
+          "page": 115,
+          "pinyinOcr": "gan qi shi mei iqifu"
+        },
+        {
+          "text": "安其居，乐其俗。",
+          "page": 116,
+          "pinyinOcr": "an qiju lé qisu"
+        },
+        {
+          "text": "邻国相望，鸡犬之声相闻，",
+          "page": 116,
+          "pinyinOcr": "lin guo xiang wang ji quan zhi sheng xiang wén"
+        },
+        {
+          "text": "民至老死不相往来。",
+          "page": 116,
+          "pinyinOcr": "min   zhi  láo  si   bu   xiang  wang lai"
+        }
+      ]
+    },
+    {
+      "chapter": "第八十一章",
+      "page": 117,
+      "rows": [
+        {
+          "text": "信言不美，美言不信。",
+          "page": 117,
+          "pinyinOcr": "xin  yán  bumei méi yan bu xin"
+        },
+        {
+          "text": "善者不辩，辩者不善。",
+          "page": 117,
+          "pinyinOcr": "shan zhébubian bianzhébushan"
+        },
+        {
+          "text": "知者不博，博者不知。",
+          "page": 117,
+          "pinyinOcr": "zhi zhé bu bo bo zhé bu zhi"
+        },
+        {
+          "text": "圣人不积，既以为人己愈有，",
+          "page": 117,
+          "pinyinOcr": "sheng  ren  buj ji yi wei rén jiyuyou"
+        },
+        {
+          "text": "既以与人己愈多。",
+          "page": 117,
+          "pinyinOcr": "jiyiyurénjiyuduo"
+        },
+        {
+          "text": "天之道，利而不害；",
+          "page": 117,
+          "pinyinOcr": "tian zhi dao liérbuhai"
+        },
+        {
+          "text": "圣人之道，为而不争。",
+          "page": 117,
+          "pinyinOcr": "shengreénzhidao wéiérbuzheng"
+        }
+      ]
+    }
+  ],
+  "reviewedCorrections": [
+    {
+      "chapter": 3,
+      "page": 18,
+      "ocr": "不见现可欲，使民心不乱。",
+      "reviewed": "不见可欲，使民心不乱。"
+    },
+    {
+      "chapter": 3,
+      "page": 18,
+      "ocr": "使夫知智者不敢为也。",
+      "reviewed": "使夫知者不敢为也。"
+    },
+    {
+      "chapter": 4,
+      "page": 19,
+      "ocr": "吾不知谁之子。，象帝之先。",
+      "reviewed": "吾不知谁之子，象帝之先。"
+    },
+    {
+      "chapter": 5,
+      "page": 20,
+      "ocr": "多言数速穷，不如守中冲。",
+      "reviewed": "多言数穷，不如守中。"
+    },
+    {
+      "chapter": 7,
+      "page": 22,
+      "ocr": "非以其无私邪耶？",
+      "reviewed": "非以其无私邪？"
+    },
+    {
+      "chapter": 9,
+      "page": 24,
+      "ocr": "揣而税锐之，不可长保。",
+      "reviewed": "揣而梲之，不可长保。"
+    },
+    {
+      "chapter": 10,
+      "page": 25,
+      "ocr": "爱民治国，能无知智乎？",
+      "reviewed": "爱民治国，能无知乎？"
+    },
+    {
+      "chapter": 14,
+      "page": 29,
+      "ocr": "故混而为一",
+      "reviewed": "故混而为一。"
+    },
+    {
+      "chapter": 14,
+      "page": 29,
+      "ocr": "其上不暾皎，其下不昧。",
+      "reviewed": "其上不皦，其下不昧。"
+    },
+    {
+      "chapter": 15,
+      "page": 31,
+      "ocr": "敦兮其若朴璞；",
+      "reviewed": "敦兮其若朴；"
+    },
+    {
+      "chapter": 15,
+      "page": 32,
+      "ocr": "旷兮其若谷；混浑兮其若浊；",
+      "reviewed": "旷兮其若谷；混兮其若浊；"
+    },
+    {
+      "chapter": 17,
+      "page": 34,
+      "ocr": "百姓皆谓：“我自然”",
+      "reviewed": "百姓皆谓：“我自然。”"
+    },
+    {
+      "chapter": 19,
+      "page": 36,
+      "ocr": "故令有所属：见现素抱朴，",
+      "reviewed": "故令有所属：见素抱朴，"
+    },
+    {
+      "chapter": 20,
+      "page": 37,
+      "ocr": "众人熙熙，如享飨太牢，",
+      "reviewed": "众人熙熙，如享太牢，"
+    },
+    {
+      "chapter": 20,
+      "page": 37,
+      "ocr": "沌沌兮，如婴儿之未孩咳；",
+      "reviewed": "沌沌兮，如婴儿之未孩；"
+    },
+    {
+      "chapter": 20,
+      "page": 38,
+      "ocr": "係係兮，若无所归。",
+      "reviewed": "儽儽兮，若无所归。"
+    },
+    {
+      "chapter": 20,
+      "page": 38,
+      "ocr": "众人皆有，而我独若遗。",
+      "reviewed": "众人皆有馀，而我独若遗。"
+    },
+    {
+      "chapter": 22,
+      "page": 40,
+      "ocr": "」不自见现，故明；",
+      "reviewed": "」不自见，故明；"
+    },
+    {
+      "chapter": 22,
+      "page": 40,
+      "ocr": "不自矜@，故长。",
+      "reviewed": "不自矜，故长。"
+    },
+    {
+      "chapter": 24,
+      "page": 44,
+      "ocr": "自见现者不明；自是者不彰；",
+      "reviewed": "自见者不明；自是者不彰；"
+    },
+    {
+      "chapter": 24,
+      "page": 44,
+      "ocr": "其在道也，曰：食赘行，",
+      "reviewed": "其在道也，曰：馀食赘行，"
+    },
+    {
+      "chapter": 25,
+      "page": 45,
+      "ocr": "强为之名日大。",
+      "reviewed": "强为之名曰大。"
+    },
+    {
+      "chapter": 28,
+      "page": 50,
+      "ocr": "为天下溪。",
+      "reviewed": "为天下谿。"
+    },
+    {
+      "chapter": 28,
+      "page": 50,
+      "ocr": "为天下谿溪，常德不离，",
+      "reviewed": "为天下谿，常德不离，"
+    },
+    {
+      "chapter": 34,
+      "page": 58,
+      "ocr": "大道氾泛兮，其可左右。",
+      "reviewed": "大道氾兮，其可左右。"
+    },
+    {
+      "chapter": 35,
+      "page": 59,
+      "ocr": "往而不害，安平太泰。",
+      "reviewed": "往而不害，安平太。"
+    },
+    {
+      "chapter": 36,
+      "page": 60,
+      "ocr": "将欲夺之，必固与予之。",
+      "reviewed": "将欲夺之，必固与之。"
+    },
+    {
+      "chapter": 39,
+      "page": 64,
+      "ocr": "地无以宁，将恐发废；",
+      "reviewed": "地无以宁，将恐发；"
+    },
+    {
+      "chapter": 39,
+      "page": 65,
+      "ocr": "此非以贱为本邪耶？非乎？",
+      "reviewed": "此非以贱为本邪？非乎？"
+    },
+    {
+      "chapter": 43,
+      "page": 70,
+      "ocr": "天下希稀及之。",
+      "reviewed": "天下希及之。"
+    },
+    {
+      "chapter": 45,
+      "page": 72,
+      "ocr": "大成若缺，其用不弊敝。",
+      "reviewed": "大成若缺，其用不弊。"
+    },
+    {
+      "chapter": 45,
+      "page": 72,
+      "ocr": "清静为天下正政。",
+      "reviewed": "清静为天下正。"
+    },
+    {
+      "chapter": 49,
+      "page": 76,
+      "ocr": "不善者，吾亦善之；德得善。",
+      "reviewed": "不善者，吾亦善之；德善。"
+    },
+    {
+      "chapter": 49,
+      "page": 76,
+      "ocr": "不信者，吾亦信之；德得信。",
+      "reviewed": "不信者，吾亦信之；德信。"
+    },
+    {
+      "chapter": 50,
+      "page": 77,
+      "ocr": "生之徒，十有又三；",
+      "reviewed": "生之徒，十有三；"
+    },
+    {
+      "chapter": 50,
+      "page": 77,
+      "ocr": "亦十有又三。",
+      "reviewed": "亦十有三。"
+    },
+    {
+      "chapter": 50,
+      "page": 78,
+      "ocr": "一兵无所容其刃。",
+      "reviewed": "兵无所容其刃。"
+    },
+    {
+      "chapter": 53,
+      "page": 82,
+      "ocr": "唯施迤是畏。",
+      "reviewed": "唯施是畏。"
+    },
+    {
+      "chapter": 53,
+      "page": 82,
+      "ocr": "服文采®，带利剑，厌饮食，",
+      "reviewed": "服文采，带利剑，厌饮食，"
+    },
+    {
+      "chapter": 53,
+      "page": 82,
+      "ocr": "财货有；是谓盗夸@。",
+      "reviewed": "财货有馀；是谓盗夸。"
+    },
+    {
+      "chapter": 54,
+      "page": 83,
+      "ocr": "修之于家，其德乃；",
+      "reviewed": "修之于家，其德乃馀；"
+    },
+    {
+      "chapter": 55,
+      "page": 85,
+      "ocr": "未知牝牡之合而全腹作，",
+      "reviewed": "未知牝牡之合而全作，"
+    },
+    {
+      "chapter": 55,
+      "page": 86,
+      "ocr": "益生日祥。",
+      "reviewed": "益生曰祥。"
+    },
+    {
+      "chapter": 56,
+      "page": 87,
+      "ocr": "知者不言，言者不知智。",
+      "reviewed": "知者不言，言者不知。"
+    },
+    {
+      "chapter": 62,
+      "page": 95,
+      "ocr": "不曰：求以得，有罪以免邪耶？",
+      "reviewed": "不曰：求以得，有罪以免邪？"
+    },
+    {
+      "chapter": 64,
+      "page": 97,
+      "ocr": "其脆易泮围，其微易散。",
+      "reviewed": "其脆易泮，其微易散。"
+    },
+    {
+      "chapter": 67,
+      "page": 101,
+      "ocr": "三日不敢为天下先。",
+      "reviewed": "三曰不敢为天下先。"
+    },
+    {
+      "chapter": 70,
+      "page": 105,
+      "ocr": "是以圣人被披褐而怀玉。",
+      "reviewed": "是以圣人被褐而怀玉。"
+    },
+    {
+      "chapter": 72,
+      "page": 107,
+      "ocr": "无狎狭其所居，无厌其所生。",
+      "reviewed": "无狎其所居，无厌其所生。"
+    },
+    {
+      "chapter": 72,
+      "page": 107,
+      "ocr": "是以圣人自知不自见现；",
+      "reviewed": "是以圣人自知不自见；"
+    },
+    {
+      "chapter": 73,
+      "page": 108,
+      "ocr": "然而善谋。",
+      "reviewed": "繟然而善谋。"
+    },
+    {
+      "chapter": 74,
+      "page": 109,
+      "ocr": "夫代大匠斲者，希稀有不伤其手矣。",
+      "reviewed": "夫代大匠斲者，希有不伤其手矣。"
+    },
+    {
+      "chapter": 77,
+      "page": 112,
+      "ocr": "天之道，其犹张弓与欧？",
+      "reviewed": "天之道，其犹张弓与？"
+    },
+    {
+      "chapter": 77,
+      "page": 112,
+      "ocr": "有者损之，不足者补之。",
+      "reviewed": "有馀者损之，不足者补之。"
+    },
+    {
+      "chapter": 77,
+      "page": 112,
+      "ocr": "天之道，损有而补不足。",
+      "reviewed": "天之道，损有馀而补不足。"
+    },
+    {
+      "chapter": 77,
+      "page": 112,
+      "ocr": "人之道，则不然，损不足以奉有。",
+      "reviewed": "人之道，则不然，损不足以奉有馀。"
+    },
+    {
+      "chapter": 77,
+      "page": 112,
+      "ocr": "孰能有以奉天下，唯有道者。",
+      "reviewed": "孰能有馀以奉天下，唯有道者。"
+    },
+    {
+      "chapter": 77,
+      "page": 112,
+      "ocr": "功成而不处，其不欲见现贤。",
+      "reviewed": "功成而不处，其不欲见贤。"
+    },
+    {
+      "chapter": 79,
+      "page": 114,
+      "ocr": "和大怨，必有怨；",
+      "reviewed": "和大怨，必有馀怨；"
+    },
+    {
+      "chapter": 80,
+      "page": 115,
+      "ocr": "使有什伯佰之器而不用；",
+      "reviewed": "使有什伯之器而不用；"
+    },
+    {
+      "chapter": 81,
+      "page": 117,
+      "ocr": "知智者不博，博者不知智。",
+      "reviewed": "知者不博，博者不知。"
+    }
+  ]
+}

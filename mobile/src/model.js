@@ -4,6 +4,7 @@ const pinyinCorrections = require("./data/pinyin-corrections.json");
 const suppliedEdition = require("./data/supplied-edition.json");
 const fourBooks = require("./data/four-books.json");
 const guliang = require("./data/guliang.json");
+const laozi = require("./data/laozi.json");
 const { applyGuliangEdition } = require("./guliang-edition");
 const { applySuppliedEdition } = require("./supplied-edition");
 
@@ -197,8 +198,9 @@ if (appliedCorrectionKeys.size !== correctionKeys.size) {
   const missing = [...correctionKeys].filter((key) => !appliedCorrectionKeys.has(key));
   throw new Error(`拼音校正表引用了不存在的篇目或位置：${missing.join(", ")}`);
 }
-const demoLessons = applyGuliangEdition(applySuppliedEdition(applySuppliedEdition(correctedLessons, suppliedEdition, formatPinyin), fourBooks, formatPinyin), guliang, formatPinyin);
-const demoBooks = corpus.books.map((book) => {
+const demoLessons = [...applyGuliangEdition(applySuppliedEdition(applySuppliedEdition(correctedLessons, suppliedEdition, formatPinyin), fourBooks, formatPinyin), guliang, formatPinyin),
+  ...laozi.lessons.map(lesson => ({ ...lesson, pinyin: formatPinyin(lesson.text, lesson.pinyinUnits) }))];
+const demoBooks = [...corpus.books, laozi.book].map((book) => {
   const bookLessons = demoLessons.filter((lesson) => lesson.bookId === book.id);
   if (book.id === 'chunqiu') return { ...book, title: guliang.title, lessonCount: bookLessons.length, chapterCount: 12,
     editionNote: '经文保留原阅读分段；新增姚政、邓启铜注释本《榖梁传》两册传文，按经传标记区分。扫描本经 OCR 辅助核对，拼音为程序自动注音。' };
@@ -330,6 +332,7 @@ function getLessonText(lesson, script = "simplified") {
 
 function getLessonSourceNote(lesson) {
   if (lesson?.publiclyCorrected) return "本段已应用公共原文校正；可在修改原文中恢复项目底稿。拼音含自动注音，可继续校正。";
+  if (lesson?.bookId === 'laozi') return `正文依据邓启铜注释本《老子·大学·中庸》（PDF 第${lesson.sourcePdfPages.join('、')}页）；拼音优先保留书中可识别注音，其余自动补注，可继续校正。`;
   if (lesson?.contentKind === 'classic') return '《春秋》经文，沿用原语料及阅读分段；拼音为程序自动注音。';
   if (lesson?.contentKind === 'commentary') return `${lesson.sourceNote} 来源：姚政、邓启铜注释本第${lesson.sourcePdfVolume}册，PDF 第${lesson.sourcePdfPages.join('、')}页；OCR 辅助整理，拼音为程序自动注音。`;
   if (lesson?.editionSource) {
@@ -419,7 +422,7 @@ function searchLessons(query, lessons = demoLessons) {
 module.exports = {
   corpus,
   legacyLessons: correctedLessons,
-  contentRevision: `${suppliedEdition.contentRevision}:${fourBooks.contentRevision}:${guliang.contentRevision}`,
+  contentRevision: `${suppliedEdition.contentRevision}:${fourBooks.contentRevision}:${guliang.contentRevision}:${laozi.contentRevision}`,
   demoBooks,
   demoLessons,
   projectPinyinCorrectionCount: correctionKeys.size,
